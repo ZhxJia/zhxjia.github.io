@@ -271,7 +271,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>正式博客的破壳日 o(￣ヘ￣o#)</p>
+          <p>正式博客的破壳日 o(￣ヘ￣o#)
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/02/03/hello-world/#more" rel="contents">
@@ -356,7 +356,7 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4.8k</span>
+              <span>4.7k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -378,14 +378,11 @@
           <p>kalman Filter 和 least square 目的均为最优化某一指标，指标是优化的关键：</p>
 <p>常用的估计准则有：</p>
 <ul>
-<li><p>无偏估计：估计值的期望等于被估计参数的真实值。</p>
-</li>
-<li><p>线性最小方差估计：将估计量限制为观测值的线性函数，已知观测量Z和和被估计量X一二阶矩（EX,Var{X},EZ,Var{Z},Cov{X,Z}）,使估计误差的方差最小，即最小化$tr{E[\tilde{X}-E\tilde{X}][\tilde{X}-E\tilde{X}]^{T}}$ ,$\tilde{X}$为估计误差（等价于最小化均方误差阵，若为无偏估计）可得其无偏估计值为$\tilde{X}_{LMV}(Z)=EX+cov(X,Z)(var(Z))^{-1}[Z-EZ]$对于观测模型Z=HX+V，上述条件若已知</p>
-<p>${EX=\mu_x,Var(X)=P_x,EV=0,Var(V)=R,E(XV^T)=0}$ 即可得到。</p>
-</li>
-<li><p>最小二乘估计：对数据（X、Z）的统计特性一无所知，但仍需对X进行估计，目标是最小化残差[^1]平方和。</p>
-<p>满足最小方差必满足残差平方和最小，反之则不成立。</p>
-</li>
+<li><p>无偏估计：估计值的期望等于被估计参数的真实值。</p></li>
+<li><p>线性最小方差估计：将估计量限制为观测值的线性函数，已知观测量Z和和被估计量X一二阶矩（EX,Var{X},EZ,Var{Z},Cov{X,Z}）,使估计误差的方差最小，即最小化<span class="math inline">\(tr\{E[\tilde{X}-E\tilde{X}][\tilde{X}-E\tilde{X}]^{T}\}\)</span> ,<span class="math inline">\(\tilde{X}\)</span>为估计误差（等价于最小化均方误差阵，若为无偏估计）可得其无偏估计值为<span class="math inline">\(\tilde{X}_{LMV}(Z)=EX+cov(X,Z)(var(Z))^{-1}[Z-EZ]\)</span>对于观测模型Z=HX+V，上述条件若已知</p>
+<p><span class="math inline">\(\{EX=\mu_x,Var(X)=P_x,EV=0,Var(V)=R,E(XV^T)=0\}\)</span> 即可得到。</p></li>
+<li><p>最小二乘估计：对数据（X、Z）的统计特性一无所知，但仍需对X进行估计，目标是最小化残差<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>平方和。</p>
+<p>满足最小方差必满足残差平方和最小，反之则不成立。</p></li>
 </ul>
           <!--noindex-->
             <div class="post-button">
@@ -498,6 +495,7 @@
 
       
           
+
       
     </div>
 
