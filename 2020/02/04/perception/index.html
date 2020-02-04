@@ -332,7 +332,7 @@
 </ul></li>
 <li>消息接收发送的方式</li>
 </ul>
-<hr />
+<hr>
 <h2 id="感知模块对象创建过程">感知模块对象创建过程</h2>
 <p>apollo中对象的创建大多采用直接法，也有部分对象使用单例模式创建<code>DECLARE_SINGLETON(AdapterManager)</code>,还有部分对象采用工厂模式创建。</p>
 <p>感知（perception）模块位于命名空间<code>apollo::perception</code> 中，创建过程</p>
@@ -342,7 +342,7 @@
 <p>创建过程位于<code>bool ModuleController::LoadModule(const DagConfig&amp; dag_config)</code>中</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ModuleController::LoadModule</span><span class="params">(<span class="keyword">const</span> DagConfig&amp; dag_config)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">string</span> load_path;</span><br><span class="line">	<span class="comment">//...</span></span><br><span class="line">    class_loader_manager_.LoadLibrary(load_path);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; component : module_config.components()) &#123;</span><br><span class="line">      <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; class_name = component.class_name();</span><br><span class="line">      <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;ComponentBase&gt; base =</span><br><span class="line">          class_loader_manager_.CreateClassObj&lt;ComponentBase&gt;(class_name);</span><br><span class="line">      <span class="keyword">if</span> (base == <span class="literal">nullptr</span> || !base-&gt;Initialize(component.<span class="built_in">config</span>())) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      component_list_.emplace_back(<span class="built_in">std</span>::<span class="built_in">move</span>(base));</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//...</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>工厂类对象指针找到后使用<code>classobj = factory-&gt;CreateObj();</code>即可将PerceptionComponent 类对象创建。</p>
-<hr />
+<hr>
 <h2 id="功能模块构建">功能模块构建</h2>
 <blockquote>
 <p>基于模板类<code>Component</code> 派生各组件类</p>
@@ -394,7 +394,7 @@
 <p><code>FusionCameraDetectionComponent::OnReceiveImage</code>中发布消息。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> send_sensorframe_ret = sensorframe_writer_-&gt;Write(prefused_message);</span><br></pre></td></tr></table></figure></li>
 </ul>
-<hr />
+<hr>
 <h2 id="具体算法分析">具体算法分析：</h2>
 <h2 id="消息发送接收类型">消息发送接收类型：</h2>
 <p><code>FusionCameraDetectionComponent::Init(){}</code> 中以模板类的方式开头定义了四个writer:</p>
@@ -473,12 +473,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/02/04/%E5%88%9D%E8%AF%86slam/" rel="prev" title="slam初探">
-      <i class="fa fa-chevron-left"></i> slam初探
+    <a href="/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/" rel="prev" title="相机标定">
+      <i class="fa fa-chevron-left"></i> 相机标定
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/02/04/kalman_filter_and_lsm/" rel="next" title="最优估计 -- kalman and lsm">
-      最优估计 -- kalman and lsm <i class="fa fa-chevron-right"></i>
+    <a href="/2020/02/04/%E5%88%9D%E8%AF%86slam/" rel="next" title="slam初探">
+      slam初探 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
