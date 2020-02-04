@@ -42,31 +42,6 @@
     
     
     <entry>
-      <title>slam初探</title>
-      <link href="/2020/02/04/%E5%88%9D%E8%AF%86slam/"/>
-      <url>/2020/02/04/%E5%88%9D%E8%AF%86slam/</url>
-      
-        <content type="html"><![CDATA[<figure><embed src="初识slam/slam-structure.pngstyle"><figcaption>slam流程图</figcaption></figure><center>图1. slam 流程图</center>]]></content>
-      
-      
-      <categories>
-          
-          <category> slam </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> slam </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>apollo感知代码阅读笔记</title>
       <link href="/2020/02/04/perception/"/>
       <url>/2020/02/04/perception/</url>
@@ -84,6 +59,31 @@
         <tags>
             
             <tag> 感知 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>slam初探</title>
+      <link href="/2020/02/04/%E5%88%9D%E8%AF%86slam/"/>
+      <url>/2020/02/04/%E5%88%9D%E8%AF%86slam/</url>
+      
+        <content type="html"><![CDATA[<figure><img src="/.io//slam-structure.png" alt="slam流程图"><figcaption>slam流程图</figcaption></figure><center>图1. slam 流程图</center>]]></content>
+      
+      
+      <categories>
+          
+          <category> slam </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> slam </tag>
             
         </tags>
       
