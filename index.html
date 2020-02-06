@@ -210,6 +210,142 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/06/OnReceiveImages/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/06/OnReceiveImages/" class="post-title-link" itemprop="url">OnReceiveImages</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-02-06 13:52:36 / 修改时间：17:19:39" itemprop="dateCreated datePublished" datetime="2020-02-06T13:52:36+08:00">2020-02-06</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/02/06/OnReceiveImages/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/06/OnReceiveImages/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ol type="1">
+<li>由FusionCameraDetectionComponent::Init()中的InitCameraListeners()创建回调函数</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FusionCameraDetectionComponent::OnReceiveImage</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;apollo::drivers::Image&gt; &amp;message,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;camera_name)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>函数参数说明：</p>
+<blockquote>
+<p>apollo::drivers::Image类包含：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">Image</span> </span>&#123;</span><br><span class="line">  <span class="keyword">optional</span> apollo.common.Header header = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">string</span> frame_id = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">double</span> measurement_time = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">uint32</span> height = <span class="number">4</span>;  <span class="comment">// image height, that is, number of rows</span></span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">uint32</span> width = <span class="number">5</span>;   <span class="comment">// image width, that is, number of columns</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">string</span> encoding = <span class="number">6</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">uint32</span> step = <span class="number">7</span>;  <span class="comment">// Full row length in bytes</span></span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">bytes</span> data = <span class="number">8</span>;   <span class="comment">// actual matrix data, size is (step * rows)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该消息类型文件定义：<code>modules/drivers/proto/sensor_image.proto</code></p>
+</blockquote>
+<blockquote>
+<p><code>std::string &amp;camera_name</code> 包含两类：</p>
+<ul>
+<li>front_6mm</li>
+<li>front_12mm</li>
+</ul>
+</blockquote>
+<ol start="2" type="1">
+<li>进行TimeStamp的判断之后：</li>
+</ol>
+<ul>
+<li><p>创建<code>apollo::perception::PerceptionObstacles</code> 对象<em><code>out_message</code></em></p>
+<blockquote>
+<p>类定义位于modules/perception/proto/perception_obstacle.proto</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">PerceptionObstacles</span> </span>&#123;</span><br><span class="line">  <span class="keyword">repeated</span> PerceptionObstacle perception_obstacle = <span class="number">1</span>;  <span class="comment">// An array of obstacles</span></span><br><span class="line">  <span class="keyword">optional</span> common.Header header = <span class="number">2</span>;                    <span class="comment">// Header</span></span><br><span class="line">  <span class="keyword">optional</span> common.ErrorCode error_code = <span class="number">3</span> [default = OK];</span><br><span class="line">  <span class="keyword">optional</span> LaneMarkers lane_marker = <span class="number">4</span>;</span><br><span class="line">  <span class="keyword">optional</span> CIPVInfo cipv_info = <span class="number">5</span>;  <span class="comment">// Closest In Path Vehicle (CIPV)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</blockquote></li>
+<li><p>创建<code>SensorFrameMessage</code> 类对象<em><code>prefused_message</code></em></p>
+<blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SensorFrameMessage</span> &#123;</span></span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  SensorFrameMessage() &#123; type_name_ = <span class="string">"SensorFrameMessage"</span>; &#125;</span><br><span class="line">  ~SensorFrameMessage() = <span class="keyword">default</span>;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">GetTypeName</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> type_name_; &#125;</span><br><span class="line">  <span class="function">SensorFrameMessage* <span class="title">New</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">new</span> SensorFrameMessage; &#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  apollo::common::ErrorCode error_code_ = apollo::common::ErrorCode::OK;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">string</span> sensor_id_;</span><br><span class="line">  <span class="keyword">double</span> timestamp_ = <span class="number">0.0</span>;</span><br><span class="line">  <span class="keyword">uint32_t</span> seq_num_ = <span class="number">0</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">string</span> type_name_;</span><br><span class="line">  base::HdmapStructConstPtr hdmap_;</span><br><span class="line"></span><br><span class="line">  base::FramePtr frame_;</span><br><span class="line"></span><br><span class="line">  ProcessStage process_stage_ = ProcessStage::UNKNOWN_STAGE;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</blockquote></li>
+</ul>
+<ol start="3" type="1">
+<li>调用函数<code>IntenalProc(message,camera_name,&amp;error_code,prefused_message.get(),out_message.get())</code></li>
+</ol>
+<blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">FusionCameraDetectionComponent::InternalProc</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;apollo::drivers::Image <span class="keyword">const</span>&gt; &amp;in_message,</span></span></span><br><span class="line"><span class="function"><span class="params"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;camera_name, apollo::common::ErrorCode *error_code,</span></span></span><br><span class="line"><span class="function"><span class="params">SensorFrameMessage *prefused_message,</span></span></span><br><span class="line"><span class="function"><span class="params">apollo::perception::PerceptionObstacles *out_message)</span></span>&#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该函数实现对接收到图像信息的处理，程序前部分实现对<code>prefused_message</code> 和 <code>camera_frame</code>相关数据参数的赋值,然后运行<code>camera_obstacle_pipelin_-&gt;Perception(&amp;camera_frame)</code></p>
+<p>主要的处理函数如下</p>
+<blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ObstacleCameraPerception::Perception</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> CameraPerceptionOptions &amp;options, CameraFrame *frame)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">//lane detector and postprocessor</span></span><br><span class="line">        lane_detector_-&gt;Detect(lane_detetor_options, frame)</span><br><span class="line">        ...</span><br><span class="line">        lane_postprocessor_-&gt;Process2D(lane_postprocessor_options, frame)</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">//Calibration service</span></span><br><span class="line">        frame-&gt;calibration_service-&gt;Update(frame);</span><br><span class="line">    	...</span><br><span class="line">        lane_postprocessor_-&gt;Process3D(lane_postprocessor_options, frame)</span><br><span class="line">        ...</span><br><span class="line">        WriteLanelines(write_out_lane_file_, lane_file_path, frame-&gt;lane_objects)</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// Obstacle prediction</span></span><br><span class="line">    tracker_-&gt;Predict(tracker_options, frame)      </span><br><span class="line">    <span class="comment">// detect :detector 根据provider名称建立</span></span><br><span class="line">    detector-&gt;Detect(detector_options, frame)</span><br><span class="line">    WriteDetections(...)<span class="comment">//write all detections results as kitti format</span></span><br><span class="line">    <span class="comment">//extarctor</span></span><br><span class="line">    extractor_-&gt;Extract(extractor_options, frame)</span><br><span class="line">    <span class="comment">//tracker Associate2D</span></span><br><span class="line">    tracker_-&gt;Associate2D(tracker_options, frame)</span><br><span class="line">    <span class="comment">//Transform</span></span><br><span class="line">    transformer_-&gt;Transform(transformer_options, frame)</span><br><span class="line">    <span class="comment">//Obstacle postprocessor</span></span><br><span class="line">    obstacle_postprocessor_-&gt;<span class="built_in">Process</span>(obstacle_postprocessor_options,</span><br><span class="line">                                        frame)</span><br><span class="line">    <span class="comment">//tracker Associate3D</span></span><br><span class="line">    tracker_-&gt;Associate3D(tracker_options, frame)</span><br><span class="line">    <span class="comment">//track</span></span><br><span class="line">    tracker_-&gt;Track(tracker_options, frame)</span><br><span class="line">    <span class="comment">//save tracked detections results as kitti format</span></span><br><span class="line">    WriteDetections(tracked_detection_out_dir,frame-&gt;tracked_objectes);</span><br><span class="line">    <span class="comment">//填充多边形并设置锚点</span></span><br><span class="line">    FillObjectPloygonFromBBox3D(tracked_object)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</blockquote>
+<ol start="4" type="1">
+<li><p>make protobuf message</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MakeProtobufMsg(msg_timestamp, seq_num_, camera_frame.tracked_objects,</span><br><span class="line">                      camera_frame.lane_objects, *error_code,</span><br><span class="line">                      out_message)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">FusionCameraDetectionComponent::MakeProtobufMsg</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">double</span> msg_timestamp, <span class="keyword">int</span> seq_num,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::ObjectPtr&gt; &amp;objects,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::LaneLine&gt; &amp;lane_objects,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> apollo::common::ErrorCode error_code,</span></span></span><br><span class="line"><span class="function"><span class="params">    apollo::perception::PerceptionObstacles *obstacles)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</blockquote></li>
+<li><p>Determine CIPV</p></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/04/slam1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -770,7 +906,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -842,12 +978,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">13k</span>
+    <span title="站点总字数">17k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">22 分钟</span>
+    <span title="站点阅读时长">28 分钟</span>
 </div>
 
 <span id="sitetime"></span>
