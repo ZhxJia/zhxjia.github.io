@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>Apollo工厂模式解析</title>
+      <link href="/2020/02/07/factory-mode/"/>
+      <url>/2020/02/07/factory-mode/</url>
+      
+        <content type="html"><![CDATA[<p>apollo 中工厂模式相关知识介绍 <a id="more"></a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 无人驾驶 </category>
+          
+          <category> c++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> apollo </tag>
+            
+            <tag> c++ </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Apollo中can卡配置</title>
       <link href="/2020/02/07/can-conf/"/>
       <url>/2020/02/07/can-conf/</url>
