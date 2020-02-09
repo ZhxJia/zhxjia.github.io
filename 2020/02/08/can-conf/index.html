@@ -60,7 +60,7 @@
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/08/can-conf/messagemanager.png">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/08/can-conf/ge3file.png">
 <meta property="article:published_time" content="2020-02-08T04:19:53.766Z">
-<meta property="article:modified_time" content="2020-02-08T13:42:47.670Z">
+<meta property="article:modified_time" content="2020-02-09T15:02:22.205Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="无人驾驶">
 <meta name="twitter:card" content="summary">
@@ -237,10 +237,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-02-08 12:19:53 / 修改时间：21:42:47" itemprop="dateCreated datePublished" datetime="2020-02-08T12:19:53+08:00">2020-02-08</time>
+              <time title="创建时间：2020-02-08 12:19:53" itemprop="dateCreated datePublished" datetime="2020-02-08T12:19:53+08:00">2020-02-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-09 23:02:22" itemprop="dateModified" datetime="2020-02-09T23:02:22+08:00">2020-02-09</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -286,14 +292,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>7.7k</span>
+              <span>12k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>13 分钟</span>
+              <span>20 分钟</span>
             </span>
 
         </div>
@@ -308,6 +314,7 @@
         <p>apollo开源框架中can卡的配置 <a id="more"></a></p>
 <p>[TOC]</p>
 <h3 id="前置内容">1. 前置内容</h3>
+<p>本文主要参考：https://zhuanlan.zhihu.com/p/61838008</p>
 <p>Apollo 在车辆的信息交互和车辆配置上均使用了<code>Protobuf</code></p>
 <blockquote>
 <p>Protocol Buffers 是一种轻便高效的结构化数据存储格式，可以用于结构化数据串行化，或者说序列化。它很适合做数据存储或 RPC 数据交换格式。可用于通讯协议、数据存储等领域的语言无关、平台无关、可扩展的序列化结构数据格式。目前提供了 C++、Java、Python 三种语言的 API。<a href="https://www.ibm.com/developerworks/cn/linux/l-cn-gpb/index.html" target="_blank" rel="noopener" title="protobuf 相关介绍">[1]</a></p>
@@ -417,14 +424,42 @@
 </ul></li>
 </ul>
 </blockquote></li>
+</ul></li>
 </ul>
 <h4 id="canbus工厂模式">3.2 CANBus工厂模式</h4>
 <p>通过上述方法能够增加新车型的原因在于Apollo的配置基于<code>工厂模型</code> （参见另一篇文章）实现的。</p>
 <blockquote>
 <p>工厂方法模式（Factory method pattern）是一种实现了“工厂”概念的<code>面向对象设计模式</code> 。就像其他<code>创建型模式</code>一样，它也是处理在不指定<code>对象</code>具体类型的情况下创建对象的问题。工厂方法模式的实质是“定义一个创建对象的接口，但让实现这个接口的类来决定实例化哪个<code>类</code> ”。工厂方法让类的实例化推迟到子类中进行。<a href="https://zh.wikipedia.org/wiki/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95#cite_note-1(https://zh.wikipedia.org/wiki/工厂方法#cite_note-1)" target="_blank" rel="noopener">[5]</a></p>
 </blockquote>
-<p>CANBus模块中Vehicle相关的内容使用工厂模式抽象出了<code>VehicleController</code>,<code>MessageManager</code>,<code>AbstractVehicleFactory</code> 三个接口。CANBus的<strong>业务</strong>代码(<code>canbus_component.cc</code>) 通过以上接口来操纵具体的对象，用户无需关心具体的对象是什么，从而实现了业务逻辑和目标对象的解耦。</p></li>
-</ul>
+<p>CANBus模块中Vehicle相关的内容使用工厂模式抽象出了<code>VehicleController</code>,<code>MessageManager</code>,<code>AbstractVehicleFactory</code> 三个接口。CANBus的<strong>业务</strong>代码(<code>canbus_component.cc</code>) 通过以上接口来操纵具体的对象，用户无需关心具体的对象是什么，从而实现了业务逻辑和目标对象的解耦。</p>
+<p>在Canbus模块中，工厂类为&quot;VehicleFactory&quot;,继承于工厂模板&quot;Factory&quot;。&quot;VehicleFactory&quot;工厂维护了键值对为“VehicleParameter::VechileBrand”和&quot;AbstractVehicleFactory&quot;的Map。</p>
+<p>如下所示，每新注册注册一种车型，该Map中就会插入一条汽车品牌(VehicleBrand)和该品牌汽车生产工厂(AbstractVehicleFactory)的键值对。(ProductCreator 采用Lambda 表达式)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">VehicleFactory::RegisterVehicleFactory</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  Register(apollo::common::LINCOLN_MKZ, []() -&gt; AbstractVehicleFactory * &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> LincolnVehicleFactory();</span><br><span class="line">  &#125;);</span><br><span class="line">  Register(apollo::common::GEM, []() -&gt; AbstractVehicleFactory * &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> GemVehicleFactory();</span><br><span class="line">  &#125;);</span><br><span class="line">  Register(apollo::common::LEXUS, []() -&gt; AbstractVehicleFactory * &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> LexusVehicleFactory();</span><br><span class="line">  &#125;);</span><br><span class="line">  Register(apollo::common::TRANSIT, []() -&gt; AbstractVehicleFactory * &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> TransitVehicleFactory();</span><br><span class="line">  &#125;);</span><br><span class="line">  Register(apollo::common::GE3, []() -&gt; AbstractVehicleFactory * &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Ge3VehicleFactory();</span><br><span class="line">  &#125;);</span><br><span class="line">  Register(apollo::common::WEY, []() -&gt; AbstractVehicleFactory * &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> WeyVehicleFactory();</span><br><span class="line">  &#125;);</span><br><span class="line">  Register(apollo::common::ZHONGYUN, []() -&gt; AbstractVehicleFactory * &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ZhongyunVehicleFactory();</span><br><span class="line">  &#125;);</span><br><span class="line">  Register(apollo::common::CH,</span><br><span class="line">           []() -&gt; AbstractVehicleFactory * &#123; <span class="keyword">return</span> <span class="keyword">new</span> ChVehicleFactory(); &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当VehicleFactory类的<code>CreateVehicle</code>方法被调用时，&quot;VehicleFactory&quot;会根据输入的汽车品牌，在Map中查找并返回可以生产这种汽车的工厂。</p>
+<p>例如输入汽车品牌为<code>GE3</code> ，&quot;VehicleFactory&quot;会返回<code>Ge3VehicleFactory</code> ,<code>Ge3VehicleFactory</code>继承于<code>AbstractVehicleFactory</code> 。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Creates an AbstractVehicleFactory object based on vehicle_parameter</span></span><br><span class="line"><span class="comment"> * @param vehicle_parameter is defined in vehicle_parameter.proto</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;AbstractVehicleFactory&gt; <span class="title">CreateVehicle</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> VehicleParameter &amp;vehicle_parameter)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><code>AbstractVehicleFactory</code> 工厂会产出一组适用于该品牌车型的产品即<code>MessageManager</code>和<code>Vehiclecontroller</code></p>
+<p><code>modules/canbus/vehicle/ge3/ge3_vehicle_factory.h</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;VehicleController&gt;</span><br><span class="line">Ge3VehicleFactory::CreateVehicleController() &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;VehicleController&gt;(<span class="keyword">new</span> ge3::Ge3Controller());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;MessageManager&lt;::apollo::canbus::ChassisDetail&gt;&gt;</span><br><span class="line">Ge3VehicleFactory::CreateMessageManager() &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;MessageManager&lt;::apollo::canbus::ChassisDetail&gt;&gt;(</span><br><span class="line">      <span class="keyword">new</span> ge3::Ge3MessageManager());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Ge3VehicleFactory</code> 最终会生产处一组适用于该品牌车型的产品，即<code>VehicleController</code> 和 <code>MessageManager</code></p>
+<h3 id="canbus组件">4.Canbus组件</h3>
+<p>​ 最后介绍CANBus模块的CanbusComponent，该类继承于<code>apollo::cyber::TimerComponent</code> ，主要作用是处理来自控制模块的控制指令，并将信号消息发送至CAN card。</p>
+<p>​ CanbusComponent 的初始化函数（Init）主要完成以下工作：</p>
+<ol type="1">
+<li><p>读取Canbus配置文件</p>
+<p><code>modules/canbus/conf/canbusconf.pb.txt</code></p>
+<p><code>modules/canbus/proto/canbus_conf.proto</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!GetProtoConfig(&amp;canbus_conf_)) &#123;</span><br><span class="line">  AERROR &lt;&lt; <span class="string">"Unable to load canbus conf file: "</span> &lt;&lt; ConfigFilePath();</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>根据配置文件初始化<code>Can-client</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">can_client_ = can_factory-&gt;CreateCANClient(canbus_conf_.can_card_parameter());</span><br></pre></td></tr></table></figure></li>
+<li><p>根据配置文件获取汽车工厂</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">VehicleFactory vehicle_factory;</span><br><span class="line">  vehicle_factory.RegisterVehicleFactory();</span><br><span class="line">  <span class="keyword">auto</span> vehicle_object =</span><br><span class="line">      vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());</span><br></pre></td></tr></table></figure></li>
+<li><p>获取该汽车工厂生产的<code>message_manager</code> 和 <code>Vehicle_controller</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">message_manager_ = vehicle_object-&gt;CreateMessageManager();</span><br><span class="line"><span class="keyword">if</span> (can_receiver_.Init(can_client_.<span class="built_in">get</span>(), message_manager_.<span class="built_in">get</span>(),</span><br><span class="line">                         canbus_conf_.enable_receiver_log()) != ErrorCode::OK) &#123;...&#125;</span><br><span class="line"><span class="keyword">if</span> (can_sender_.Init(can_client_.<span class="built_in">get</span>(), canbus_conf_.enable_sender_log()) !=</span><br><span class="line">      ErrorCode::OK) &#123;...&#125;</span><br><span class="line">vehicle_controller_ = vehicle_object-&gt;CreateVehicleController();</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
+<li><p>使能Can收发和<code>Vehicle_controller</code></p>
+<p>初始化完成后，<code>CanbusComponent</code> 会周期性的报告车身状态，并执行来自<code>Control</code> 模块和<code>Guardian</code>模块的指令。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">CanbusComponent::Proc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  PublishChassis();</span><br><span class="line">  <span class="keyword">if</span> (FLAGS_enable_chassis_detail_pub) &#123;</span><br><span class="line">    PublishChassisDetail();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125; <span class="comment">//周期性执行</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//事件触发，Reader回调函数</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CanbusComponent::OnControlCommand</span><span class="params">(<span class="keyword">const</span> ControlCommand &amp;control_command)</span> </span>&#123;<span class="comment">/*...*/</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CanbusComponent::OnGuardianCommand</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> GuardianCommand &amp;guardian_command)</span> </span>&#123;</span><br><span class="line">  apollo::control::ControlCommand control_command;</span><br><span class="line">  control_command.CopyFrom(guardian_command.control_command());</span><br><span class="line">  OnControlCommand(control_command);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
 <h3 id="参考链接">参考链接</h3>
 <blockquote>
 <p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-gpb/index.html" target="_blank" rel="noopener" title="protobuf 相关介绍">1</a> https://www.ibm.com/developerworks/cn/linux/l-cn-gpb/index.html protobuf 相关介绍</p>
@@ -432,6 +467,7 @@
 <p><a href="http://apollo.auto/docs/procedure_cn.html" target="_blank" rel="noopener" title="针对车辆CAN DBC文件如何生成proto文件">3</a> http://apollo.auto/docs/procedure_cn.html 针对车辆CAN DBC文件如何生成proto文件</p>
 <p><a href="https://github.com/ApolloAuto/apollo/tree/master/modules/canbus" target="_blank" rel="noopener" title="canbus">4</a> https://github.com/ApolloAuto/apollo/tree/master/modules/canbus &quot;canbus&quot;</p>
 <p><a href="https://zh.wikipedia.org/wiki/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95#cite_note-1(https://zh.wikipedia.org/wiki/工厂方法#cite_note-1)" target="_blank" rel="noopener">5</a> https://zh.wikipedia.org/wiki/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95#cite_note-1(https://zh.wikipedia.org/wiki/工厂方法#cite_note-1)</p>
+<p>[6] https://zhuanlan.zhihu.com/p/61838008</p>
 </blockquote>
 <blockquote>
 
@@ -524,7 +560,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前置内容"><span class="nav-number">1.</span> <span class="nav-text">1. 前置内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apollo-cancard参数配置文件"><span class="nav-number">2.</span> <span class="nav-text">2. Apollo Cancard参数配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#apollo-中采用proto文件管理相关配置"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 apollo 中采用proto文件管理相关配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#信号交互"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 信号交互</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#车辆配置"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 车辆配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现"><span class="nav-number">3.</span> <span class="nav-text">3 代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#canbus模块"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 Canbus模块</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#canbus工厂模式"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 CANBus工厂模式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考链接"><span class="nav-number">4.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前置内容"><span class="nav-number">1.</span> <span class="nav-text">1. 前置内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apollo-cancard参数配置文件"><span class="nav-number">2.</span> <span class="nav-text">2. Apollo Cancard参数配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#apollo-中采用proto文件管理相关配置"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 apollo 中采用proto文件管理相关配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#信号交互"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 信号交互</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#车辆配置"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 车辆配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现"><span class="nav-number">3.</span> <span class="nav-text">3 代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#canbus模块"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 Canbus模块</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#canbus工厂模式"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 CANBus工厂模式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#canbus组件"><span class="nav-number">4.</span> <span class="nav-text">4.Canbus组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考链接"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -612,12 +648,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">29k</span>
+    <span title="站点总字数">35k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">48 分钟</span>
+    <span title="站点阅读时长">59 分钟</span>
 </div>
 
 <span id="sitetime"></span>
