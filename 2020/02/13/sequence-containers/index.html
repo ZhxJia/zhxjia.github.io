@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="c++ 模板库中序列容器的使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="序列容器">
+<meta property="og:url" content="https://zhxjia.github.io/2020/02/13/sequence-containers/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="c++ 模板库中序列容器的使用">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/13/sequence-containers/lambda.png">
+<meta property="article:published_time" content="2020-02-13T09:48:19.586Z">
+<meta property="article:modified_time" content="2020-02-15T16:12:53.699Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="c++">
+<meta property="article:tag" content="STL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhxjia.github.io/2020/02/13/sequence-containers/lambda.png">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/02/13/sequence-containers/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>序列容器 | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/13/sequence-containers/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          序列容器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-13 17:48:19" itemprop="dateCreated datePublished" datetime="2020-02-13T17:48:19+08:00">2020-02-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-16 00:12:53" itemprop="dateModified" datetime="2020-02-16T00:12:53+08:00">2020-02-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c/" itemprop="url" rel="index">
+                    <span itemprop="name">c++</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c/%E6%A8%A1%E6%9D%BF%E7%B1%BB/" itemprop="url" rel="index">
+                    <span itemprop="name">模板类</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/02/13/sequence-containers/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/13/sequence-containers/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>12 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>c++ 模板库中序列容器的使用</p>
+<a id="more"></a>
+<p>序列(顺序)容器以线性序列的方式存储元素。它没有对元素进行排序，元素的顺序和存储它们的顺序相同,主要有以下五种标准的序列容器：</p>
+<blockquote>
+<ul>
+<li>array&lt;T,N&gt;(数组容器):长度固定的序列，存放N个T类型的对象，不能增加或删除元素。</li>
+<li>vector<T>(向量容器):长度可变的序列，存放T类型的对象，只能在序列的末尾增删元素。</T></li>
+<li>deque<T>(双向队列容器):长度可变的序列，两端均可增删元素。</T></li>
+<li>list<T>(链表容器):长度可变的序列，存放T类型对象，在序列任何地方都可以增加或删除元素。(双向链表)</T></li>
+<li>forward_list<T>(正向链表容器)，长度可变，由T类型对象组成的序列。(单向链表)</T></li>
+</ul>
+</blockquote>
+<p>下面具体介绍容器中常见的函数成员用法(限于篇幅，主要介绍典型的vector容器和list容器)</p>
+<p>为了方便介绍STL的相关内容，首先介绍STL库的相关前置知识和思想，主要包括：</p>
+<blockquote>
+<ul>
+<li>模板</li>
+<li>容器</li>
+<li>迭代器</li>
+<li>智能指针</li>
+<li>算法</li>
+</ul>
+</blockquote>
+<h3 id="一前置知识">一、前置知识</h3>
+<ul>
+<li><p><strong>模板</strong></p>
+<p>模板是一组函数或类的参数实现，模板并不是可执行代码，而是用于生成代码的配方，没有使用的模板会被编译器忽略。</p>
+<p><strong>模板函数</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function">T&amp; <span class="title">larger</span><span class="params">(T&amp; a, T&amp; b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a &gt; b ? a : b;</span><br><span class="line">&#125;<span class="comment">//&amp;表示引用</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> <span class="keyword">const</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">first</span><span class="params">(<span class="string">"To be or not to be "</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">second</span><span class="params">(<span class="string">"This is a question"</span>)</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; larger(first, second) &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">int</span> a =<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> b =<span class="number">2</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; larger(a, b) &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; To be <span class="keyword">or</span> <span class="keyword">not</span> to be </span><br><span class="line">&gt;&gt;&gt; <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<p>模板函数可以隐式推断传入类型，当然也可以显式指定类型</p>
+<p><strong>模板类</strong></p>
+<p>引入以下实现一个数组类的实例</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstddef&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt; //memory 要置于shared_ptr之前　真神奇</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;bits/shared_ptr.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> A&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Array</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    A *elements;</span><br><span class="line">    <span class="keyword">size_t</span> count;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Array</span><span class="params">(<span class="keyword">size_t</span> arraySize)</span></span>;   <span class="comment">//显式构造函数</span></span><br><span class="line">    Array(<span class="keyword">const</span> Array &amp;other);          <span class="comment">//拷贝构造函数 </span></span><br><span class="line">    Array(Array &amp;&amp;other);               <span class="comment">//转移构造函数</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">virtual</span> ~Array() &#123;&#125;;                   <span class="comment">//析构函数</span></span><br><span class="line">    A &amp;<span class="keyword">operator</span>[](<span class="keyword">size_t</span> index);        <span class="comment">//Subscript operator</span></span><br><span class="line">    <span class="keyword">const</span> A &amp;<span class="keyword">operator</span>[](<span class="keyword">size_t</span> index) <span class="keyword">const</span>;  <span class="comment">// Subscript operator</span></span><br><span class="line">    Array &amp;<span class="keyword">operator</span>=(<span class="keyword">const</span> Array &amp;rhs);   <span class="comment">// Assignment operator</span></span><br><span class="line">    Array &amp;<span class="keyword">operator</span>=(Array &amp;&amp;rhs);   <span class="comment">//Move assignment operator　&amp;&amp;:右值引用</span></span><br><span class="line">    <span class="function"><span class="keyword">size_t</span> <span class="title">size</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> count; &#125;     <span class="comment">//Accessor for count</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>拷贝构造函数利用现有对象初始化创建新对象(Array<int> A2 =A1)，为防止shallow copy ,需要重载此函数。</int></p>
+<p>如果想要将A3的属性赋值给A4(A4 = A3),则需要重载operator。</p>
+<p>类成员模板函数定义(std::nothrow 用于申请内存不足时返回nullptr)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> A&gt;</span><br><span class="line">Array&lt;A&gt;::Array(<span class="keyword">size_t</span> arraySize) : elements(<span class="keyword">new</span>(<span class="built_in">std</span>::nothrow) A[arraySize]) &#123;</span><br><span class="line">    <span class="keyword">if</span> (elements == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cerr</span> &lt;&lt; <span class="string">"Memory allocation faliure in Array constructor."</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="comment">//没有足够的内存会返回nullptr</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> A&gt;</span><br><span class="line"><span class="keyword">inline</span> Array&lt;A&gt;::Array(<span class="keyword">const</span> Array &amp;other):elements(<span class="keyword">new</span>(<span class="built_in">std</span>::nothrow) A[other.count]), count(other.count) &#123;</span><br><span class="line">    <span class="keyword">if</span> (elements == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cerr</span> &lt;&lt; <span class="string">"Memory allocation faliure in Array constructor."</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">size_t</span> i&#123;<span class="number">0</span>&#125;; i &lt; count; i++)&#123;</span><br><span class="line">            elements[i] = other.elements[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>容器</strong></p>
+<p>容器是STL各种功能的基础，是以特定形式存储和组织其他对象的对象，容器中数据的访问采用iterators,STL提供以下几种类型的容器：</p>
+<ul>
+<li><strong>序列容器(sequence containers)：</strong>以线性组织的方式存储对象，和数组类似，但是不需要连续的存储空间。</li>
+<li><strong>关联容器(Associative Containers)：</strong>存储和键关联的对象。可以通过相关联的建从关联容器中获取对应的值，也可通过迭代器从关联容器中得到对象。</li>
+<li><strong>容器适配器(Container Adapters):</strong> 是提供了替换机制的适配类模板，可以用来访问基础的序列容器和关联容器。</li>
+</ul>
+<p>STL容器存储的是对象的副本。STL要求移动构造函数和复制运算符必须被指定为noexcept，即不会抛出异常。容器在堆上存放对象，并自动管理它们所占用的内存，一个T类型的对象如果要存放在容器中，需要满足一些特定要求，这些要求取决与你对元素执行的操作，通常有复制、移动、交换等操作,下面给出一个满足在容器中存放的T类型对象的示例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">T</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">public</span>:</span><br><span class="line">    	T();						<span class="comment">//default constructor</span></span><br><span class="line">    	T(<span class="keyword">const</span> T &amp;t);				<span class="comment">//copy constructor</span></span><br><span class="line">    	~T();						<span class="comment">//Destructor</span></span><br><span class="line">    	T &amp;<span class="keyword">operator</span>=(<span class="keyword">const</span> T &amp;t);	<span class="comment">//重载＝运算符</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果在关联容器中使用对象的话，对象需要定义operator&lt;(),提供小于运算符，来使用sort()和merge()这类算法。</p></li>
+<li><p><strong>迭代器</strong></p>
+<p>​ 当使用容器时，不可避免地会使用到iterators去访问数据，迭代器是一个行为类似于指针的模板类对象，只要迭代器iter指向一个有效对象，就可以通过使用*iter解引用的方式来获取一个对象的引用。如果iter指向一个可以访问成员的类对象，类成员就可以通过iter-&gt;member来使用。</p>
+<p>​ 迭代器将算法和不同类型容器的元素联系了起来，获取迭代器的方式有：</p>
+<ul>
+<li>调用容器对象<code>begin()</code>和<code>end()</code>，返回的这两个迭代器分别指向第一个和最后一个元素下一个位置。<code>end()</code>返回的迭代器并没有指向一个有效的元素，所以既不能解引用，也不能递增它。亦可以通过调用<code>std::beign(container)</code>和<code>std::end(contrainer)</code> 获取的迭代器是等价的。</li>
+</ul>
+<p>　不同的算法要求具有不同功能的迭代器，下面由简至繁依次列出不同类别的迭代器：</p>
+<blockquote>
+<ul>
+<li><strong>输入迭代器(input iterators)</strong>提供对对象的只读访问，必须支持表达式<code>*iter</code>以引用它所指向的值，且输入迭代器无减量运算(iter--是错误的)。常用操作(iter++ 、iter1 == iter2、iter1 != iter2)</li>
+<li><strong>输出迭代器(output iterators)</strong> 提供对对象的只写访问，必须支持表达式<code>*iter=new_value</code>,同样其无减量操作</li>
+<li><strong>正向迭代器(forward iterators)</strong>结合了输入和输出迭代器的功能，可以使用多次。</li>
+<li><strong>双向迭代器(bidirectional iterators)</strong>具有和正向迭代器同样的功能，但允许进行前向和后向遍历，一次可以使用减量操作和增量操作</li>
+<li><strong>随机访问迭代器(random access iterators)</strong>提供了和双向迭代器同样的功能，但是能支持对元素的随机访问。同时支持<code>iter+n</code>,<code>iter-n</code>或者直接通过索引访问<code>iter[n]</code>,等同于<code>*(iter+n)</code>,还可通过<code>iter1-iter2</code>获得两个迭代器之间元素的个数。</li>
+</ul>
+</blockquote>
+<ul>
+<li><p>迭代器适配器</p>
+<p>适配器类模板定义了三种不同的迭代器:反向迭代器(reverse iterators)、插入迭代器(insert iterators)和移动迭代器(move iterators)。</p>
+<p>插入迭代器:</p>
+<blockquote>
+<p>后向插入迭代器(back_insert_itreator)通过调用成员函数<code>push_back()</code>将一个新元素添加到容器的尾部。<code>vecotr</code>、<code>list</code>、<code>deque</code>容器具有一个<code>push_back()</code>函数。</p>
+<p>前向插入迭代器(front_insert_iterator)通过调用成员函数<code>push_front()</code>将一个新元素添加到容器的头部。<code>list</code> 、<code>forward_list</code> 、<code>deque</code>容器均有一个<code>push_front()</code>函数</p>
+</blockquote></li>
+</ul></li>
+<li><p>智能指针</p>
+<p>智能指针是一个可以模仿原生指针(指向静态变量或堆上生成的变量)的模板类，主要区别在于：</p>
+<ul>
+<li>智能指针只能用来保存<code>堆</code>上分配的内存的地址。</li>
+<li>不能像对原生指针一样对智能指针进行一些自增或是自减这样的算数运算。</li>
+</ul>
+<p>对于在自由存储区创建的对象，通常使用智能指针而不是原生指针。智能指针的优势是不用担心内存的释放，可以在容器中使用智能指针，如果使用一个类的基类作为智能指针的类型参数，可以用它指向一个派生类对象，这保存了一个对象的指针而不是对象，因而能够保持这个对象的多态性,std明明空间中定义了三种不同类型的智能指针模板：</p>
+<ul>
+<li><p><code>unique_ptr&lt;T&gt;</code>对象就像一个指向类型T的指针，具有排它的特性，不存在多个<code>unique_ptr&lt;T&gt;</code> 指向同一个地址，即一个<code>unique_ptr&lt;T&gt;</code>完全拥有它所指向的内容。可以使用std::move()移出其存储的地址，移出后该<code>unique_ptr&lt;T&gt;</code>变为无效。</p></li>
+<li><p><code>shared_ptr&lt;T&gt;</code>对象和<code>unique_ptr&lt;T&gt;</code>不同的是多个<code>shared_ptr&lt;T&gt;</code>可以指向同一个地址，共享对象的所有权，引用计数保存了指向给定地址的<code>shared_ptr&lt;T&gt;</code>的数量，当引用计数为0时，分配的内存自动释放。</p></li>
+<li><p><code>weak_ptr&lt;T&gt;</code>可以从一个<code>shared_ptr&lt;T&gt;</code>创建，它们指向同一个地址，创建<code>weak_ptr&lt;T&gt;</code>不会增加<code>shared_ptr&lt;T&gt;</code>对象的引用次数，所以其会组织所指向对象的销毁。使用<code>weak_ptr&lt;T&gt;</code>主要原因是为了避免<strong>循环引用</strong>。</p>
+<p><strong>unique_ptr<T></T></strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; <span class="title">pname</span><span class="params">(<span class="keyword">new</span> <span class="built_in">std</span>::<span class="built_in">string</span> (<span class="string">"Algernon"</span>))</span></span>;</span><br></pre></td></tr></table></figure>
+<p>或者使用<code>memory</code>头文件中函数<code>make_unique&lt;T&gt;()</code>函数来生成<code>unique_ptr&lt;T&gt;</code>对象：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> pname = <span class="built_in">std</span>::make_unique&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;(<span class="string">"Algernon"</span>)</span><br></pre></td></tr></table></figure>
+<p>​ 注意不能以传值的方式将一个<code>unique_ptr&lt;T&gt;</code>对象传入函数中，因为它们不支持拷贝，<strong>必须使用引用的方式</strong>,同时只能通过移动或生成它们的方式，在容器中存放<code>unique_ptr&lt;T&gt;</code>对象。<code>unique_ptr&lt;T&gt;</code>对象析构会释放它所指向对象的内存。在解引用一个指针时，需要先判断其是否为空,<code>if(!pname)</code> 可以将<code>pname</code>隐式转换为布尔型。</p>
+<p>​ 类的<code>get()</code>成员函数可以返回一个<code>unique_ptr&lt;T&gt;</code>所包含的原生指针：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> pstr &#123;unique_p.<span class="built_in">get</span>()&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>shared_ptr<T></T></strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">double</span>&gt; <span class="title">pdata</span> <span class="params">(<span class="keyword">new</span> <span class="keyword">double</span>(<span class="number">999.0</span>))</span></span>;</span><br></pre></td></tr></table></figure>
+<p>或者使用<code>memory</code>头文件中函数<code>make_shared&lt;T&gt;()</code>来生成<code>shared_ptr&lt;T&gt;</code>对象：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> pdata = <span class="built_in">std</span>::make_shared&lt;<span class="keyword">double</span>&gt;(<span class="number">999.0</span>);</span><br></pre></td></tr></table></figure>
+<p>使用<code>shared_prt&lt;T&gt;</code>的成员函数<code>get()</code> 可以获得一个原生指针:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> pvalue = pdata.<span class="built_in">get</span>() <span class="comment">//return double*</span></span><br></pre></td></tr></table></figure>
+<p>使用<code>reset()</code>函数重置指针,<code>unique()</code>可以查看对象的实例数，<code>use_count()</code>返回当前被调用对象的实例个数</p>
+<p><strong>weak_ptr<T></T></strong></p>
+<p><code>weak_ptr&lt;T&gt;</code>只能由<code>shared_ptr&lt;T&gt;</code>对象或已有的<code>weak_ptr&lt;T&gt;</code>创建。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> pdata = <span class="built_in">std</span>::make_shared&lt;X&gt;();</span><br><span class="line"><span class="function"><span class="built_in">std</span>::weak_ptr&lt;X&gt; <span class="title">pwdata</span> <span class="params">(pdata)</span></span>;</span><br><span class="line"><span class="function"><span class="built_in">std</span>::weak_ptr&lt;X&gt; <span class="title">pwdata2</span> <span class="params">(pwdata)</span></span>;</span><br></pre></td></tr></table></figure></li>
+</ul></li>
+<li><p><strong>算法</strong></p>
+<p>算法提供了计算和分析的函数，算法通过迭代器访问数据元素。</p>
+<p>将函数作为实参传入另一个函数主要由以下三种方式：</p>
+<ol type="1">
+<li>使用函数指针。</li>
+<li>传入一个<code>函数对象</code>作为实参</li>
+<li>使用<code>lambda</code>表达式作为形参</li>
+</ol>
+<ul>
+<li><p>函数对象</p>
+<p>函数对象也称仿函数，是重载了函数调用运算符<code>operator()()</code>的类对象</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Volume</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">double</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">double</span> x ,<span class="keyword">double</span> y ,<span class="keyword">double</span> z)</span></span>&#123;<span class="keyword">return</span> x*y*z;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Volume volume;	<span class="comment">//create a functor</span></span><br><span class="line"><span class="keyword">double</span> room &#123;volume(<span class="number">16</span>,<span class="number">12</span>,<span class="number">8.5</span>)&#125;;</span><br></pre></td></tr></table></figure></li>
+<li><p>lambda表达式</p>
+<p>一个lambda表达式定义了一个匿名函数，lambda可以捕获它们作用域内的变量,然后利用它们.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[] (<span class="keyword">double</span> value) &#123;<span class="keyword">return</span> value*value*value;&#125;</span><br></pre></td></tr></table></figure>
+<p><code>[ ]</code>称为<code>lambda</code>引入符，表示了<code>lambda</code>表达式的开始，内部为捕获列表，引入符后面圆括号<code>()</code>表示了参数列表，与一般函数类似，<code>{}</code>中即为函数主体,值得注意的是示例中并没有具体指定返回类型，返回类型默认由返回值的类型，无返回值则为<code>void</code>，若要指定返回值<code>[](double value)-&gt;double {return value*value*value;}</code></p>
+<p>可以使用变量来保存<code>lambda</code>的地址,然后变量可以当做函数指针使用。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> cube = [](<span class="keyword">double</span> value)&#123;<span class="keyword">return</span> value*value*value;&#125;</span><br><span class="line"><span class="keyword">double</span> x &#123;<span class="number">2.5</span>&#125;;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; x &lt;&lt;<span class="string">"cubed is: "</span> &lt;&lt; cube(x) &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>将lambda表达式传给函数</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> ForwardIter,<span class="keyword">typename</span> F&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change</span><span class="params">(ForwardIter first,ForwoardIter last,F fun)</span></span>&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">auto</span> iter = first;iter!= last;++iter)</span><br><span class="line">		*iter = fun(*iter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>形参fun接受任意合适的lambda表达式，也接受函数对象或普通的函数指针。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> data[] &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>&#125;;</span><br><span class="line">change(<span class="built_in">std</span>::<span class="built_in">begin</span>(data),<span class="built_in">std</span>::<span class="built_in">end</span>(data),[] (<span class="keyword">int</span> value)&#123;<span class="keyword">return</span> value*value;&#125;);</span><br></pre></td></tr></table></figure>
+<p>标准库的<code>functional</code>头文件定义了一个模板类型<code>std::function&lt;&gt;</code> ,对任意类型函数指针的封装，又给定的返回类型和形参类型。前面表示lambda表达式的变量可以按如下方式定义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::function&lt;<span class="keyword">double</span> (<span class="keyword">double</span>)&gt; op = [] (<span class="keyword">double</span> value)&#123;<span class="keyword">return</span> value*value*value;&#125;;</span><br></pre></td></tr></table></figure>
+<p>op现在可以作为实参，传给任意接受函数实参且签名相同的函数。</p>
+<p><strong>捕获列表</strong></p>
+<p><img src="/2020/02/13/sequence-containers/lambda.png"></p>
+<p>默认捕获子句捕获和lambda表达式定义同样范围的所有变量。若<code>[]</code>中有<code>=</code>则为按值传递;若为<code>&amp;</code>则为按引用传递。</p></li>
+</ul></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/c/" rel="tag"># c++</a>
+              <a href="/tags/STL/" rel="tag"># STL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/13/apollo-nn/" rel="prev" title="Apollo中的神经网络框架">
+      <i class="fa fa-chevron-left"></i> Apollo中的神经网络框架
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一前置知识"><span class="nav-number">1.</span> <span class="nav-text">一、前置知识</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">45k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:15</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/02/13/sequence-containers/";
+    this.page.identifier = "2020/02/13/sequence-containers/";
+    this.page.title = "序列容器";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

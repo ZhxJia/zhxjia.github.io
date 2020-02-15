@@ -49,14 +49,14 @@
   };
 </script>
 
-  <meta name="description" content="OnReceiveImages()内部函数处理流程:">
+  <meta name="description" content="一、OnReceiveImages()内部函数处理流程:">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Apollo回调函数概览">
 <meta property="og:url" content="https://zhxjia.github.io/2020/02/06/OnReceiveImages/index.html">
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
-<meta property="og:description" content="OnReceiveImages()内部函数处理流程:">
+<meta property="og:description" content="一、OnReceiveImages()内部函数处理流程:">
 <meta property="article:published_time" content="2020-02-06T05:52:36.464Z">
-<meta property="article:modified_time" content="2020-02-08T13:44:28.469Z">
+<meta property="article:modified_time" content="2020-02-15T12:02:35.238Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="感知">
 <meta name="twitter:card" content="summary">
@@ -240,7 +240,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-08 21:44:28" itemprop="dateModified" datetime="2020-02-08T21:44:28+08:00">2020-02-08</time>
+                <time title="修改时间：2020-02-15 20:02:35" itemprop="dateModified" datetime="2020-02-15T20:02:35+08:00">2020-02-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -287,14 +287,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4.1k</span>
+              <span>5.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>7 分钟</span>
+              <span>10 分钟</span>
             </span>
 
         </div>
@@ -306,8 +306,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>OnReceiveImages()内部函数处理流程: <a id="more"></a></p>
-<p>[TOC]</p>
+        <h3 id="一onreceiveimages内部函数处理流程">一、OnReceiveImages()内部函数处理流程:</h3>
+<a id="more"></a>
 <ol type="1">
 <li>由FusionCameraDetectionComponent::Init()中的InitCameraListeners()创建回调函数</li>
 </ol>
@@ -344,8 +344,14 @@
 </ol>
 <blockquote>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">FusionCameraDetectionComponent::InternalProc</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;apollo::drivers::Image <span class="keyword">const</span>&gt; &amp;in_message,</span></span></span><br><span class="line"><span class="function"><span class="params"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;camera_name, apollo::common::ErrorCode *error_code,</span></span></span><br><span class="line"><span class="function"><span class="params">SensorFrameMessage *prefused_message,</span></span></span><br><span class="line"><span class="function"><span class="params">apollo::perception::PerceptionObstacles *out_message)</span></span>&#123;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>该函数实现对接收到图像信息的处理，程序前部分实现对<code>prefused_message</code> 和 <code>camera_frame</code>相关数据参数的赋值,然后运行<code>camera_obstacle_pipelin_-&gt;Perception(&amp;camera_frame)</code></p>
-<p>主要的处理函数如下</p>
+<p>该函数实现对接收到图像信息的处理，程序前部分实现对<code>prefused_message</code> 和 <code>camera_frame</code>相关数据与参数的赋值，获取相机到世界坐标系的仿射矩阵</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">camera2world_trans_wrapper_map_[camera_name]-&gt;GetSensor2worldTrans(...);</span><br></pre></td></tr></table></figure>
+<p>填充图像数据,其中数据来自OnreceiveMessage接收到的消息</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">camera_frame.data_provider-&gt;FillImageData(</span><br><span class="line">    image_height_, image_width_,</span><br><span class="line">    <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">const</span> <span class="keyword">uint8_t</span> *&gt;(in_message-&gt;data().data()),</span><br><span class="line">    in_message-&gt;encoding())</span><br></pre></td></tr></table></figure>
+<p>有了数据之后，科技进行算法处理了，运行<code>camera_obstacle_pipelin_-&gt;Perception(&amp;camera_frame)</code> ,实现主要图像算法处理。</p>
+<ul>
+<li><code>Perception</code>中主要的处理函数如下</li>
+</ul>
 <blockquote>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ObstacleCameraPerception::Perception</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> CameraPerceptionOptions &amp;options, CameraFrame *frame)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">//lane detector and postprocessor</span></span><br><span class="line">        lane_detector_-&gt;Detect(lane_detetor_options, frame)</span><br><span class="line">        ...</span><br><span class="line">        lane_postprocessor_-&gt;Process2D(lane_postprocessor_options, frame)</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">//Calibration service</span></span><br><span class="line">        frame-&gt;calibration_service-&gt;Update(frame);</span><br><span class="line">    	...</span><br><span class="line">        lane_postprocessor_-&gt;Process3D(lane_postprocessor_options, frame)</span><br><span class="line">        ...</span><br><span class="line">        WriteLanelines(write_out_lane_file_, lane_file_path, frame-&gt;lane_objects)</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// Obstacle prediction</span></span><br><span class="line">    tracker_-&gt;Predict(tracker_options, frame)      </span><br><span class="line">    <span class="comment">// detect :detector 根据provider名称建立</span></span><br><span class="line">    detector-&gt;Detect(detector_options, frame)</span><br><span class="line">    WriteDetections(...)<span class="comment">//write all detections results as kitti format</span></span><br><span class="line">    <span class="comment">//extarctor</span></span><br><span class="line">    extractor_-&gt;Extract(extractor_options, frame)</span><br><span class="line">    <span class="comment">//tracker Associate2D</span></span><br><span class="line">    tracker_-&gt;Associate2D(tracker_options, frame)</span><br><span class="line">    <span class="comment">//Transform</span></span><br><span class="line">    transformer_-&gt;Transform(transformer_options, frame)</span><br><span class="line">    <span class="comment">//Obstacle postprocessor</span></span><br><span class="line">    obstacle_postprocessor_-&gt;<span class="built_in">Process</span>(obstacle_postprocessor_options,</span><br><span class="line">                                        frame)</span><br><span class="line">    <span class="comment">//tracker Associate3D</span></span><br><span class="line">    tracker_-&gt;Associate3D(tracker_options, frame)</span><br><span class="line">    <span class="comment">//track</span></span><br><span class="line">    tracker_-&gt;Track(tracker_options, frame)</span><br><span class="line">    <span class="comment">//save tracked detections results as kitti format</span></span><br><span class="line">    WriteDetections(tracked_detection_out_dir,frame-&gt;tracked_objectes);</span><br><span class="line">    <span class="comment">//填充多边形并设置锚点</span></span><br><span class="line">    FillObjectPloygonFromBBox3D(tracked_object)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </blockquote>
@@ -358,6 +364,75 @@
 </blockquote></li>
 <li><p>Determine CIPV</p></li>
 </ol>
+<h3 id="二detector-and-tracker">二、detector and tracker</h3>
+<p>​ 目前发表的相关检测跟踪的算法(ResNet,YOLO等)主要面向广泛的计算机视觉的应用，与自动驾驶领域中的检测和跟踪还是存在一定的区别的，由于汽车行驶在结构化、规则化的道路上，面向的场景更为具体，有很多的几何约束可以用于检测；其次，自动驾驶中的检测模型需要输出的信息更多，包括了障碍物的尺寸、朝向、速度等信息，然而如果以上任务都分别由专用的模块进行处理，则对系统负担较大，处理流程太长，因此还需要做<strong>多任务学习</strong>和网络结构的适配。</p>
+<p>​ 一个完整的系统除了深度学习模型，还需要做一些后处理，后处理模块针对下游模块，对后续的影响比较直接。在视觉感知中，后处理主要分为三个部分：</p>
+<p>​ 第一是2D-3D的几何计算，2D到3D的转换需要考虑的因素包括:</p>
+<blockquote>
+<ul>
+<li>相机pose 的影响</li>
+<li>接地点</li>
+<li>稳定性</li>
+</ul>
+</blockquote>
+<p>​ 第二是时序信息计算，主要针对跟踪处理，需要注意以下几点：</p>
+<blockquote>
+<ul>
+<li>对相机帧率和延时有要求，要求跟踪必须是一个轻量级的模块，因为检测已经占据了大部分时间</li>
+<li>充分利用检测模型的输出信息（特征、类别等）进行跟踪</li>
+<li>可以考虑轻量级Metric Learning</li>
+</ul>
+</blockquote>
+<p>​ 第三是多相机的环视融合</p>
+<blockquote>
+<ul>
+<li>相机布局决定融合策略，要做好视野重叠</li>
+</ul>
+</blockquote>
+<p>​ 检测——&gt;2D to 3D转换 ——&gt;跟踪——&gt;位置、速度</p>
+<p>​ HM目标跟踪器的主要功能是跟踪分割步骤检测到的障碍物。通常，它通过将当前检测结果与现有跟踪列表相关联的方式，形成和更新跟踪列表。如果原来的目标都不在出现则删除旧跟踪列表，在确认新的检测结果之后会生成新的跟踪列表。</p>
+<p>​ 关联之后，将会估计更新后的跟踪列表的运动状态。HM目标跟踪器使用Hungarian算法（匈牙利算法）对检测和跟踪(detection-to-track)进行关联，使用Robust Kalman Filter（鲁棒卡尔曼滤波）进行运动估计。</p>
+<ul>
+<li><p>检测到跟踪关联</p>
+<p>将检测与现有的跟踪列表进行关联时，Apollo构建了一个二分图并使用Hungarian算法对检测和跟踪(detection-to-track)进行关联，使用<code>Robust Kalman Filter</code> (鲁棒卡尔曼滤波器)进行运动估计。</p></li>
+<li><p>计算关联距离矩阵</p>
+<p>首先建立一个关联距离矩阵。一个给定的检测和跟踪之间的距离可以通过一系列关联属性进行计算，这些关联属性包括运动一致性和外观一致性。<code>HM</code> 跟踪器中距离计算中使用的一些属性如下所示：</p>
+<p>​</p>
+<table>
+<thead>
+<tr class="header">
+<th>关联属性名称</th>
+<th>评估一致性的说明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>location_distance</td>
+<td>运动</td>
+</tr>
+<tr class="even">
+<td>direction_distance</td>
+<td>运动</td>
+</tr>
+<tr class="odd">
+<td>bbox_size_distance</td>
+<td>外观</td>
+</tr>
+<tr class="even">
+<td>point_num_distance</td>
+<td>外观</td>
+</tr>
+<tr class="odd">
+<td>histogram_distance</td>
+<td>外观</td>
+</tr>
+</tbody>
+</table></li>
+</ul>
+<p>obstacle perdiction</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tracker_-&gt;Predict()</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">OMTObstacleTracker::Predict</span><span class="params">(<span class="keyword">const</span> ObstacleTrackerOptions &amp;options,</span></span></span><br><span class="line"><span class="function"><span class="params">                                 CameraFrame *frame)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">auto</span> &amp;target : targets_) &#123;</span><br><span class="line">    target.Predict(frame);</span><br><span class="line">    <span class="keyword">auto</span> obj = target.latest_object;</span><br><span class="line">    frame-&gt;proposed_objects.push_back(obj-&gt;object);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中target的结构定义为：</p>
 
     </div>
 
@@ -449,6 +524,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一onreceiveimages内部函数处理流程"><span class="nav-number">1.</span> <span class="nav-text">一、OnReceiveImages()内部函数处理流程:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二detector-and-tracker"><span class="nav-number">2.</span> <span class="nav-text">二、detector and tracker</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -464,20 +540,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -506,7 +582,7 @@
           <h3 class="widget-title">Tag Cloud</h3>
           <div id="myCanvasContainer" class="widget tagcloud">
               <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li></ul>
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li></ul>
         </canvas>
        </div>
      </div>
@@ -536,12 +612,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">35k</span>
+    <span title="站点总字数">45k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">59 分钟</span>
+    <span title="站点阅读时长">1:15</span>
 </div>
 
 <span id="sitetime"></span>
