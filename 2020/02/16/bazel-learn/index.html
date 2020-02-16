@@ -49,21 +49,19 @@
   };
 </script>
 
-  <meta name="description" content="单应性矩阵">
+  <meta name="description" content="安装 参考：https:&#x2F;&#x2F;docs.bazel.build&#x2F;versions&#x2F;master&#x2F;install.html apt 安装失败，通过binary安装,安装文件下载：https:&#x2F;&#x2F;github.com&#x2F;bazelbuild&#x2F;bazel&#x2F;releases 12345678910sudo apt install g++ unzip zip# Ubuntu 16.04 (LTS) uses">
 <meta property="og:type" content="article">
-<meta property="og:title" content="相机标定">
-<meta property="og:url" content="https://zhxjia.github.io/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/index.html">
+<meta property="og:title" content="bazel C++编译入门">
+<meta property="og:url" content="https://zhxjia.github.io/2020/02/16/bazel-learn/index.html">
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
-<meta property="og:description" content="单应性矩阵">
-<meta property="article:published_time" content="2020-02-04T04:25:08.000Z">
-<meta property="article:modified_time" content="2020-02-04T10:13:45.665Z">
+<meta property="og:description" content="安装 参考：https:&#x2F;&#x2F;docs.bazel.build&#x2F;versions&#x2F;master&#x2F;install.html apt 安装失败，通过binary安装,安装文件下载：https:&#x2F;&#x2F;github.com&#x2F;bazelbuild&#x2F;bazel&#x2F;releases 12345678910sudo apt install g++ unzip zip# Ubuntu 16.04 (LTS) uses">
+<meta property="article:published_time" content="2020-02-16T11:18:45.187Z">
+<meta property="article:modified_time" content="2020-02-16T12:36:16.007Z">
 <meta property="article:author" content="ZhxJia">
-<meta property="article:tag" content="感知">
-<meta property="article:tag" content="标定">
-<meta property="article:tag" content="视觉">
+<meta property="article:tag" content="工具">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://zhxjia.github.io/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/">
+<link rel="canonical" href="https://zhxjia.github.io/2020/02/16/bazel-learn/">
 
 
 <script id="page-configurations">
@@ -75,7 +73,7 @@
   };
 </script>
 
-  <title>相机标定 | ZhxJia's Blog</title>
+  <title>bazel C++编译入门 | ZhxJia's Blog</title>
   
 
 
@@ -212,7 +210,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/16/bazel-learn/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/jd.png">
@@ -225,7 +223,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          相机标定
+          bazel C++编译入门
         </h1>
 
         <div class="post-meta">
@@ -236,7 +234,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-02-04 12:25:08 / 修改时间：18:13:45" itemprop="dateCreated datePublished" datetime="2020-02-04T12:25:08+08:00">2020-02-04</time>
+              <time title="创建时间：2020-02-16 19:18:45 / 修改时间：20:36:16" itemprop="dateCreated datePublished" datetime="2020-02-16T19:18:45+08:00">2020-02-16</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -244,14 +242,14 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" itemprop="url" rel="index">
-                    <span itemprop="name">无人驾驶</span>
+                  <a href="/categories/c/" itemprop="url" rel="index">
+                    <span itemprop="name">c++</span>
                   </a>
                 </span>
                   ，
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/%E6%A0%87%E5%AE%9A/" itemprop="url" rel="index">
-                    <span itemprop="name">标定</span>
+                  <a href="/categories/c/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index">
+                    <span itemprop="name">工具</span>
                   </a>
                 </span>
             </span>
@@ -272,8 +270,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/04/相机标定/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2020/02/16/bazel-learn/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/16/bazel-learn/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -283,14 +281,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5</span>
+              <span>2.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>5 分钟</span>
             </span>
 
         </div>
@@ -302,7 +300,41 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="单应性矩阵">单应性矩阵</h3>
+        <a id="more"></a>
+<h2 id="安装">安装</h2>
+<p>参考：https://docs.bazel.build/versions/master/install.html</p>
+<p>apt 安装失败，通过binary安装,安装文件下载：https://github.com/bazelbuild/bazel/releases</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install g++ unzip zip</span><br><span class="line"><span class="comment"># Ubuntu 16.04 (LTS) uses OpenJDK 8 by default:</span></span><br><span class="line">sudo apt-get install openjdk-8-jdk</span><br><span class="line"></span><br><span class="line"><span class="comment"># Ubuntu 18.04 (LTS) uses OpenJDK 11 by default:</span></span><br><span class="line">sudo apt-get install openjdk-11-jdk</span><br><span class="line">sudo bash bazel-&lt;version&gt;-installer-linux-x86_64.sh --user</span><br><span class="line"></span><br><span class="line">vim ~/.bashrc</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">"<span class="variable">$PATH</span>:<span class="variable">$HOME</span>/bin"</span></span><br></pre></td></tr></table></figure>
+<h2 id="编译">编译</h2>
+<p>参考教程:https://docs.bazel.build/versions/master/tutorial/cpp.html</p>
+<h3 id="工作区workspace">工作区(workspace)</h3>
+<p>bazel基于工作区(workspace)的概念编译，工作区存放了所有的源代码和Bazel编译输出文件的目录，也就是整个项目的根目录，与bazel编译相关的文件:</p>
+<ul>
+<li>WORKSPACE文件，用于指定当前文件夹就是一个Bazel的工作区，所以WORKSPACE文件总是存在于项目的根目录下。</li>
+<li>一个或多个BUILD文件，用于告诉Bazel怎么构建项目的不同部分。(如果工作区中的一个目录包含含BUILD文件，即为一个package)</li>
+</ul>
+<p>如果要指定一个目录为Bazel工作区，只要在该目录下创建一个空的WORKSPACE文件即可。当Bazel编译项目是，所有的输入和依赖想都必须在同一个工作区中，不同的工作区的文件，除非linked否则彼此独立。</p>
+<p>WORKSPACE文件中可以设置第三方代码库，即外部引用</p>
+<h3 id="build文件组成">BUILD文件组成</h3>
+<p>BUILD文件中最重要的指令是编译指令，告诉Bazel如何编译输出，比如是生成可执行二进制文件还是链接库。BUILD文件中每一天编译指令被称为一个target，它指向一系列的源文件和依赖，一个target也可以指向别的target。</p>
+<p>bazelbuild的简单例子可以参考：https://github.com/bazelbuild/examples</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="string">"@rules_cc//cc:defs.bzl"</span>, <span class="string">"cc_binary"</span>)</span><br><span class="line"></span><br><span class="line">cc_binary(</span><br><span class="line">	name = <span class="string">"hello-world"</span>,</span><br><span class="line">	srcs = [<span class="string">"hello-world.cc"</span>],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><code>name</code>即为该target名称，<code>src</code>包含了源文件，<code>cc_binary</code>为内置的生成二进制文件的指令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bazel build //main:hello-world</span><br></pre></td></tr></table></figure>
+<p>在WORSPACE目录下上述命令行指令即可实现编译，<code>main:hello-world</code>表示位于main目录下的target <code>helo-world</code>,同时获得如下输出，生成的二进制文件位于<code>bazel-bin/main/hello-world</code> <strong>路径相对于WORKSPACE</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">INFO: Found 1 target...</span><br><span class="line">Target //main:hello-world up-to-date:</span><br><span class="line">  bazel-bin/main/hello-world</span><br></pre></td></tr></table></figure>
+<h3 id="多个target同时编译">多个target同时编译</h3>
+<p>对于大型项目来说，一般会把它拆分成多个<code>target</code>和多个<code>package</code>来实现快速增量的编译。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="string">"@rules_cc//cc:defs.bzl"</span>, <span class="string">"cc_binary"</span>, <span class="string">"cc_library"</span>)                   </span><br><span class="line"></span><br><span class="line">cc_library(</span><br><span class="line">   name = <span class="string">"hello-greet"</span>,</span><br><span class="line">   srcs = [<span class="string">"hello-greet.cc"</span>],</span><br><span class="line">   hdrs = [<span class="string">"hello-greet.h"</span>],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">cc_binary(</span><br><span class="line">    name = <span class="string">"hello-world"</span>,</span><br><span class="line">    srcs = [<span class="string">"hello-world.cc"</span>],</span><br><span class="line">    deps = [</span><br><span class="line">        <span class="string">":hello-greet"</span>,</span><br><span class="line">    ],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>在这个BUILD文件中，首先编译了<code>hello-greet</code>这个库(利用bazel内置的cc_library编译指令)，然后在编译<code>hello-world</code>这个二进制文件。<code>hellow-world</code>这个target的<code>deps</code>属性告诉Bazel，要构建<code>hello-world</code>这个二进制文件，首先需要<code>hello-greet</code>这个库。</p>
+<h3 id="多个package同时编译">多个package同时编译</h3>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">└── stage3</span><br><span class="line">    ├── lib</span><br><span class="line">    │   ├── BUILD</span><br><span class="line">    │   ├── hello-time.cc</span><br><span class="line">    │   └── hello-time.h</span><br><span class="line">    ├── main</span><br><span class="line">    │   ├── BUILD</span><br><span class="line">    │   ├── hello-greet.cc</span><br><span class="line">    │   ├── hello-greet.h</span><br><span class="line">    │   └── hello-world.cc</span><br><span class="line">    ├── README.md</span><br><span class="line">    └── WORKSPACE</span><br></pre></td></tr></table></figure>
+<p>两个BUILD对应的为两个package,因此对于Bazel来说，整个工作区包含了两个package: lib和main。两个目录下的<code>BUILD</code>文件分别定义如下： main下的BUILD文件：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="string">"@rules_cc//cc:defs.bzl"</span>, <span class="string">"cc_binary"</span>, <span class="string">"cc_library"</span>)                   </span><br><span class="line"></span><br><span class="line">cc_library(</span><br><span class="line">    name = <span class="string">"hello-greet"</span>,</span><br><span class="line">    srcs = [<span class="string">"hello-greet.cc"</span>],</span><br><span class="line">    hdrs = [<span class="string">"hello-greet.h"</span>],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">cc_binary(</span><br><span class="line">    name = <span class="string">"hello-world"</span>,</span><br><span class="line">    srcs = [<span class="string">"hello-world.cc"</span>],</span><br><span class="line">    deps = [</span><br><span class="line">        <span class="string">":hello-greet"</span>,</span><br><span class="line">        <span class="string">"//lib:hello-time"</span>,</span><br><span class="line">    ],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><code>lib/BUILD</code>:</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="string">"@rules_cc//cc:defs.bzl"</span>, <span class="string">"cc_library"</span>)                                </span><br><span class="line"></span><br><span class="line">cc_library(</span><br><span class="line">    name = <span class="string">"hello-time"</span>,</span><br><span class="line">    srcs = [<span class="string">"hello-time.cc"</span>],</span><br><span class="line">    hdrs = [<span class="string">"hello-time.h"</span>],</span><br><span class="line">    visibility = [<span class="string">"//main:__pkg__"</span>],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>显然main下的<code>hello-world</code>这个target依赖于<code>lib</code>这个package中的<code>hello-time</code>target 即(<code>deps = [&quot;//lib:hello-time&quot;]</code>),Bazel通过<code>deps</code>这个属性知道自己的依赖项。同时注意到<code>lib/BUILD</code>文件中的将<code>hello-time</code>这个target显示可见(通过<code>visibility</code>属性)，这是因为默认情况下targets只对同一个BUILD文件里的其他targets可见。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bazel build //main:hello-world</span><br></pre></td></tr></table></figure>
 
     </div>
 
@@ -312,9 +344,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag"># 感知</a>
-              <a href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag"># 标定</a>
-              <a href="/tags/%E8%A7%86%E8%A7%89/" rel="tag"># 视觉</a>
+              <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"># 工具</a>
           </div>
 
         
@@ -322,11 +352,11 @@
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2020/02/04/perception/" rel="next" title="apollo感知代码阅读笔记">
-      apollo感知代码阅读笔记 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/02/16/doxygen/" rel="prev" title="doxygen">
+      <i class="fa fa-chevron-left"></i> doxygen
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -393,7 +423,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#单应性矩阵"><span class="nav-number">1.</span> <span class="nav-text">单应性矩阵</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译"><span class="nav-number">2.</span> <span class="nav-text">编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#工作区workspace"><span class="nav-number">2.1.</span> <span class="nav-text">工作区(workspace)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#build文件组成"><span class="nav-number">2.2.</span> <span class="nav-text">BUILD文件组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多个target同时编译"><span class="nav-number">2.3.</span> <span class="nav-text">多个target同时编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多个package同时编译"><span class="nav-number">2.4.</span> <span class="nav-text">多个package同时编译</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -617,56 +647,6 @@
   
 
   
-      
-<script type="text/x-mathjax-config">
-    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
-
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-      processEscapes: true,
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    TeX: {
-        extensions: ['[mhchem]/mhchem.js'],
-      equationNumbers: {
-        autoNumber: 'AMS'
-      }
-    }
-  });
-
-  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
-    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
-      if (data.display) {
-        var next = data.script.nextSibling;
-        while (next && next.nodeName.toLowerCase() === '#text') {
-          next = next.nextSibling;
-        }
-        if (next && next.nodeName.toLowerCase() === 'br') {
-          next.parentNode.removeChild(next);
-        }
-      }
-    });
-  });
-
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for (i = 0; i < all.length; i += 1) {
-      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
-      if (element.nodeName.toLowerCase() == 'li') {
-        element = element.parentNode;
-      }
-      element.classList.add('has-jax');
-    }
-  });
-</script>
-<script>
-  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
-    MathJax.Hub.Typeset();
-  }, window.MathJax);
-</script>
-
-    
 
   
 
@@ -682,9 +662,9 @@
 </script>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://zhxjia.github.io/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/";
-    this.page.identifier = "2020/02/04/相机标定/";
-    this.page.title = "相机标定";
+    this.page.url = "https://zhxjia.github.io/2020/02/16/bazel-learn/";
+    this.page.identifier = "2020/02/16/bazel-learn/";
+    this.page.title = "bazel C++编译入门";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
     if (window.DISQUS) {
