@@ -49,12 +49,12 @@
   };
 </script>
 
-  <meta name="description" content="##　KITTI数据集结构 kitti数据集采集方式参考http:&#x2F;&#x2F;www.cvlibs.net&#x2F;datasets&#x2F;kitti&#x2F;setup.php  数据集的标签形式：  label描述:  123456789101112131415161718#Values    Name      Description-------------------------------------------">
+  <meta name="description" content="Apollo中Detector的相关结构">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Apollo中的detector">
 <meta property="og:url" content="https://zhxjia.github.io/2020/02/18/apollo-detector/index.html">
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
-<meta property="og:description" content="##　KITTI数据集结构 kitti数据集采集方式参考http:&#x2F;&#x2F;www.cvlibs.net&#x2F;datasets&#x2F;kitti&#x2F;setup.php  数据集的标签形式：  label描述:  123456789101112131415161718#Values    Name      Description-------------------------------------------">
+<meta property="og:description" content="Apollo中Detector的相关结构">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/18/apollo-detector/passat_sensors_920.png">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/18/apollo-detector/kitti_label.png">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/18/apollo-detector/3d_bbox.png">
@@ -68,7 +68,7 @@
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/18/apollo-detector/tensorrtinfer.png">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/18/apollo-detector/apollo_tensorrt.png">
 <meta property="article:published_time" content="2020-02-18T02:17:20.516Z">
-<meta property="article:modified_time" content="2020-02-19T07:21:14.783Z">
+<meta property="article:modified_time" content="2020-02-19T16:22:39.583Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="perception">
 <meta property="article:tag" content="detector">
@@ -254,7 +254,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-19 15:21:14" itemprop="dateModified" datetime="2020-02-19T15:21:14+08:00">2020-02-19</time>
+                <time title="修改时间：2020-02-20 00:22:39" itemprop="dateModified" datetime="2020-02-20T00:22:39+08:00">2020-02-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -295,7 +295,7 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4.1k</span>
+              <span>4.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -314,8 +314,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <a id="more"></a>
-<p>##　KITTI数据集结构</p>
+        <p>Apollo中Detector的相关结构 <a id="more"></a></p>
+<h2 id="kitti数据结构">KITTI数据结构</h2>
 <p>kitti数据集采集方式参考http://www.cvlibs.net/datasets/kitti/setup.php <img src="/2020/02/18/apollo-detector/passat_sensors_920.png" style="zoom:50%;"></p>
 <p>数据集的标签形式： <img src="/2020/02/18/apollo-detector/kitti_label.png" style="zoom:80%;"></p>
 <p>label描述:</p>
@@ -366,6 +366,8 @@
 <h2 id="apollo中的yolo3d">Apollo中的YOLO3D</h2>
 <p><img src="/2020/02/18/apollo-detector/yolo3dr4.png"></p>
 <p><img src="/2020/02/18/apollo-detector/areaid.png"></p>
+<p><strong>outout_blobs</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">loc_pred</span><br><span class="line">obj_pred</span><br><span class="line">cls_pred</span><br><span class="line">ori_pred</span><br><span class="line">dim_pred</span><br><span class="line">brvis_pred</span><br><span class="line">brswt_pred</span><br><span class="line">ltvis_pred</span><br><span class="line">ltswt_pred</span><br><span class="line">rtvis_pred</span><br><span class="line">rtswt_pred</span><br><span class="line">area_id_pred</span><br><span class="line">vis_pred</span><br><span class="line">cut_pred</span><br><span class="line">conv9</span><br><span class="line">conv10</span><br><span class="line">conv3_3</span><br></pre></td></tr></table></figure>
 <h2 id="cuda编程">CUDA编程</h2>
 <p>核函数使用方法： <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Function&lt;&lt;&lt;griddim,blockdim,<span class="keyword">extern</span> shared memory,GPU stream&gt;&gt;&gt;(param...);</span><br></pre></td></tr></table></figure></p>
 <p>其中中间参数可以控制核函数运行所占用的资源： <code>griddim</code>为调用的block数，<code>blockdim</code>为调用的thread数，后面两个参数分别表示动态定义共享内存大小和可使用的SM处理器数。 <img src="/2020/02/18/apollo-detector/cuda_block.png" style="zoom:50%;"></p>
@@ -480,7 +482,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#多任务yolo--3d"><span class="nav-number">1.</span> <span class="nav-text">多任务YOLO -3D</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apollo中的yolo3d"><span class="nav-number">2.</span> <span class="nav-text">Apollo中的YOLO3D</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cuda编程"><span class="nav-number">3.</span> <span class="nav-text">CUDA编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tensorrt"><span class="nav-number">4.</span> <span class="nav-text">TensorRT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">5.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#kitti数据结构"><span class="nav-number">1.</span> <span class="nav-text">KITTI数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多任务yolo--3d"><span class="nav-number">2.</span> <span class="nav-text">多任务YOLO -3D</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apollo中的yolo3d"><span class="nav-number">3.</span> <span class="nav-text">Apollo中的YOLO3D</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cuda编程"><span class="nav-number">4.</span> <span class="nav-text">CUDA编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tensorrt"><span class="nav-number">5.</span> <span class="nav-text">TensorRT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">6.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -496,7 +498,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -509,7 +511,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -538,7 +540,7 @@
           <h3 class="widget-title">Tag Cloud</h3>
           <div id="myCanvasContainer" class="widget tagcloud">
               <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li></ul>
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li></ul>
         </canvas>
        </div>
      </div>
@@ -573,7 +575,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:38</span>
+    <span title="站点阅读时长">1:39</span>
 </div>
 
 <span id="sitetime"></span>
