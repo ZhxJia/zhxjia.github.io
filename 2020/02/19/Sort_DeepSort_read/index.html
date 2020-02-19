@@ -49,19 +49,22 @@
   };
 </script>
 
-  <meta name="description" content="参考：https:&#x2F;&#x2F;www.ibm.com&#x2F;developerworks&#x2F;cn&#x2F;aix&#x2F;library&#x2F;au-learningdoxygen&#x2F;index.html  安装doxygen 1234567sudo apt-get install flex bisongit clone https:&#x2F;&#x2F;github.com&#x2F;doxygen&#x2F;doxygen.gitcd doxygenmkdir bu">
+  <meta name="description" content="Sort和DeepSort论文阅读笔记 概述 1.一些术语 Trajectory(轨迹)：一条轨迹对应这一目标在一个时间段内的位置序列 Tracklet(轨迹段)：形成Trajectory过程中的轨迹片段。完整的Trajectory是由属于同一目标的Tracklets组成。 ID switch(ID切换)：对于同一个目标，由于跟踪算法误判导致其ID发生切换的次数，理想的跟踪算法ID switch">
 <meta property="og:type" content="article">
-<meta property="og:title" content="doxygen">
-<meta property="og:url" content="https://zhxjia.github.io/2020/02/16/doxygen/index.html">
+<meta property="og:title" content="Sort和DeepSort论文阅读笔记">
+<meta property="og:url" content="https://zhxjia.github.io/2020/02/19/Sort_DeepSort_read/index.html">
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
-<meta property="og:description" content="参考：https:&#x2F;&#x2F;www.ibm.com&#x2F;developerworks&#x2F;cn&#x2F;aix&#x2F;library&#x2F;au-learningdoxygen&#x2F;index.html  安装doxygen 1234567sudo apt-get install flex bisongit clone https:&#x2F;&#x2F;github.com&#x2F;doxygen&#x2F;doxygen.gitcd doxygenmkdir bu">
-<meta property="article:published_time" content="2020-02-16T03:23:22.245Z">
-<meta property="article:modified_time" content="2020-02-16T11:17:36.479Z">
+<meta property="og:description" content="Sort和DeepSort论文阅读笔记 概述 1.一些术语 Trajectory(轨迹)：一条轨迹对应这一目标在一个时间段内的位置序列 Tracklet(轨迹段)：形成Trajectory过程中的轨迹片段。完整的Trajectory是由属于同一目标的Tracklets组成。 ID switch(ID切换)：对于同一个目标，由于跟踪算法误判导致其ID发生切换的次数，理想的跟踪算法ID switch">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/19/Sort_DeepSort_read/cnn.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/19/Sort_DeepSort_read/match.png">
+<meta property="article:published_time" content="2020-02-19T07:18:34.685Z">
+<meta property="article:modified_time" content="2020-02-19T07:20:31.596Z">
 <meta property="article:author" content="ZhxJia">
-<meta property="article:tag" content="工具">
+<meta property="article:tag" content="目标跟踪">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhxjia.github.io/2020/02/19/Sort_DeepSort_read/cnn.png">
 
-<link rel="canonical" href="https://zhxjia.github.io/2020/02/16/doxygen/">
+<link rel="canonical" href="https://zhxjia.github.io/2020/02/19/Sort_DeepSort_read/">
 
 
 <script id="page-configurations">
@@ -73,7 +76,7 @@
   };
 </script>
 
-  <title>doxygen | ZhxJia's Blog</title>
+  <title>Sort和DeepSort论文阅读笔记 | ZhxJia's Blog</title>
   
 
 
@@ -210,7 +213,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/16/doxygen/">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/19/Sort_DeepSort_read/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/jd.png">
@@ -223,7 +226,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          doxygen
+          Sort和DeepSort论文阅读笔记
         </h1>
 
         <div class="post-meta">
@@ -234,7 +237,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-02-16 11:23:22 / 修改时间：19:17:36" itemprop="dateCreated datePublished" datetime="2020-02-16T11:23:22+08:00">2020-02-16</time>
+              <time title="创建时间：2020-02-19 15:18:34 / 修改时间：15:20:31" itemprop="dateCreated datePublished" datetime="2020-02-19T15:18:34+08:00">2020-02-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -242,8 +245,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index">
-                    <span itemprop="name">工具</span>
+                  <a href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" itemprop="url" rel="index">
+                    <span itemprop="name">论文阅读</span>
                   </a>
                 </span>
             </span>
@@ -264,8 +267,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2020/02/16/doxygen/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/16/doxygen/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2020/02/19/Sort_DeepSort_read/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/19/Sort_DeepSort_read/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -275,14 +278,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>258</span>
+              <span>2.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>5 分钟</span>
             </span>
 
         </div>
@@ -295,13 +298,68 @@
 
       
         <a id="more"></a>
-<blockquote>
-<p>参考：https://www.ibm.com/developerworks/cn/aix/library/au-learningdoxygen/index.html</p>
-</blockquote>
-<h2 id="安装doxygen">安装doxygen</h2>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install flex bison</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/doxygen/doxygen.git</span><br><span class="line"><span class="built_in">cd</span> doxygen</span><br><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake .. &amp; make </span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
-<h2 id="使用doxygen生成文档">使用Doxygen生成文档</h2>
-<p>--目前应用好像有困难　　暂时先不写了</p>
+<h2 id="sort和deepsort论文阅读笔记">Sort和DeepSort论文阅读笔记</h2>
+<h3 id="概述">概述</h3>
+<h4 id="一些术语">1.一些术语</h4>
+<p><strong>Trajectory</strong>(轨迹)：一条轨迹对应这一目标在一个时间段内的位置序列</p>
+<p><strong>Tracklet</strong>(轨迹段)：形成Trajectory过程中的轨迹片段。完整的Trajectory是由属于同一目标的Tracklets组成。</p>
+<p><strong>ID switch</strong>(ID切换)：对于同一个目标，由于跟踪算法误判导致其ID发生切换的次数，理想的跟踪算法ID switch应为0。</p>
+<h4 id="评价指标">2.评价指标</h4>
+<p>最主要的评价指标是<code>MOTA</code> ,该指标包含了三个要素：FP、FN、identity switches(ID switch)。MOTA越高代表跟踪的综合性能越好。</p>
+<h4 id="框架策略">3.框架策略</h4>
+<ul>
+<li><p>Tracking - by - detection(TBD)</p></li>
+<li><p>Detection-Free Tracking(DFT)</p></li>
+</ul>
+<p>MOT问题本质上可以视为数据关联的问题，即如何将不同时刻的检测目标关联起来，关联目标主要以目标<code>motion</code>的建模和<code>apperance</code>即目标的外观作为关联的根据。</p>
+<h3 id="sort">Sort</h3>
+<p>在卡尔曼滤波的基础上+匈牙利算法将<strong>卡尔曼滤波预测的BBox</strong>与<strong>物体检测的BBox</strong>进行了匹配，选择合适的物体检测BBox作为下一时刻的<strong>物体跟踪BBox</strong>。</p>
+<h4 id="detection">1.Detection</h4>
+<p>采用了FasterRCNN，</p>
+<h4 id="estimation-model">2. Estimation Model</h4>
+<p>通过<code>linear constant velocity model</code>（线性恒速度模型）估计帧间物体的位移。 <span class="math display">\[
+x = [u,v,s,r,\dot{u},\dot{v},\dot{s}]^{T}
+\]</span> 每一个目标的状态采用上述模型描述，其中<code>u</code>和<code>v</code>分别表示目标中心水平和垂直方向像素位置；<code>s</code>和<code>r</code>分别表示面积(scale)和目标边界框的长宽比(aspect ratio)。当一个检测与目标相关联之后，检测得到的bbox被用于更新目标的状态（被更新的状态中，速度分量由卡尔曼滤波器估计得到）；若没有检测与目标关联，利用线性恒速度模型对其状态进行简单预测无需纠正。</p>
+<h4 id="data-association">3.Data Association</h4>
+<p>在分配检测结果到现有的跟踪目标过程中，每一个跟踪目标的bbox通过卡尔曼滤波器提前预测。然后计算每个检测目标和预测的跟踪目标的bbox的交并比(IOU)作为代价矩阵。最后通过<code>匈牙利算法(Hungarian algorithm)</code>解决最优分配问题，小于阈值<span class="math inline">\(IOU_{min}\)</span>的目标不会分配此检测器。</p>
+<h4 id="creation-and-deletion-of-track-identities">4.Creation and Deletion of Track Identities</h4>
+<p>当目标进入或者离开图像，相应需要创建和销毁跟踪的ID。</p>
+<p>对于创建一个跟踪目标，根据是检测与目标的重叠(IOU)小于一定阈值 <span class="math inline">\(IOU_{min}\)</span> ，即认为此检测是一个未被跟踪的对象，并将其状态进行初始化(形状为检测的bbox形状，速度为0),由于此点速度无法估计，因此速度分量的协方差应初始化为一个较大的值，以表征此不确定性。同时，新加入的目标应经过一段试用期，目标需要与检测相关联，以积累足够的证据，防止<code>false positive</code>。</p>
+<p>跟踪终止，当在<span class="math inline">\(T_{Lost}\)</span>帧没有检测到与之关联的检测。这可以防止跟踪器数量的无限增长和由于<u>长时间不根据检测修正的预测</u>导致的定位误差。一般<span class="math inline">\(T_{Lost}\)</span>被设置为1，因为<code>恒速度模型</code>不能很好的描述目标的动态特性，其次本工作关注于帧与帧之间的跟踪，<code>目标的重识别</code>超出了本工作的内容。另外，尽早地删除丢失的目标有利于提高效率。</p>
+<hr>
+<h3 id="deep-sort">Deep Sort</h3>
+<p>由于Sort对于物体遮挡没有显式地处理，因此其<code>ID Switch</code>很高,因此DeepSort中融入了apperance information,即结合了运动和外观的信息。</p>
+<h4 id="deep-association-metric">1. Deep Association Metric</h4>
+<ul>
+<li><strong>state space:</strong> <span class="math inline">\((u,v)\)</span> 为bbox中心位置，<span class="math inline">\(r\)</span>为纵横比，<span class="math inline">\(h\)</span>为高度，以及它们在图像坐标系下的相对速度</li>
+</ul>
+<p><span class="math display">\[
+(u,v,\gamma,h,\dot{x},\dot{y},\dot{\gamma},\dot{h})
+\]</span></p>
+<p>依然采取恒速度的线性观测模型进行估计，直接估计的状态为<span class="math inline">\((u,v,r,h)\)</span>，</p>
+<ul>
+<li><p><strong>assignment problem</strong>:</p>
+<p>Sort 中将新检测到的物体与状态估计得到的预测框进行匹配采用的是<code>匈牙利算法</code>。在DeepSort中需要综合运动和外观信息进行匹配,对此设计了两个合适的度量。</p>
+<p><em>1.motion information:</em> Mahalanobis distance <span class="math display">\[
+d^{(1)}(i,j)=(d_j-y_i)^{T}S_i^{-1}(d_j-y_i)
+\]</span> 其中<span class="math inline">\(d_j\)</span>为第<span class="math inline">\(j\)</span>个检测到的bbox，<span class="math inline">\(y_i\)</span>为第<span class="math inline">\(i\)</span>个估计的bbox，马氏距离,指标为,本文阈值为<span class="math inline">\(t^{(1)} = 9.4877\)</span> <span class="math display">\[
+b_{i,j}^{(1)}=1[d^{(1)}(i,j)\leq t^{(1)}]
+\]</span> <em>2.apperance information:</em> cosine distance <span class="math display">\[
+d^{(2)}(i,j)=min\{1-r_j{}^{T}r_k^{(i)}|r_k^{(i)}\in R_i\}
+\]</span> 对于每个新检测到的bbox <span class="math inline">\(d_j\)</span>，我们计算外观描述（apperance descrioptor）<span class="math inline">\(r_j\)</span>,<span class="math inline">\(||r_j||=1\)</span>。同时，创建<span class="math inline">\(R_k=\{r_k^{(i)}\}_{k=1}^{L_k}\)</span>为最近<span class="math inline">\(L_k=100\)</span>次成功跟踪后 物体检测bbox对应的<span class="math inline">\(L_k\)</span>个特征向量集合。然后第二种度量方式通过第<span class="math inline">\(i\)</span>个跟踪物体特征向量与第<span class="math inline">\(j\)</span>个检测特征向量之间的最小余弦距离表示。</p>
+<p>同样引入一个二元变量表示此关联是否被允许： <span class="math display">\[
+b_{i,j}^{(2)}=1[d^{(2)}(i,j)\leq t^{(2)}]
+\]</span> 外观描述特征向量如何获取？文章中采用了CNN网络获取，结构如下：</p>
+<p><img src="/2020/02/19/Sort_DeepSort_read/cnn.png" style="zoom:75%;"></p>
+<p>综上，通过加权获得最终的度量标准:<span class="math inline">\(c_{i,j}=\lambda d^{(1)}(i,j)+(1-\lambda)d^{(2)}(i,j)\)</span>，同时对应的关联标准<span class="math inline">\(b_{i,j}=\prod_{m=1}^{2}b_{i,j}^{(m)}\)</span>,当相机有较大运动时，取<span class="math inline">\(\lambda=0\)</span>是合适的选择。但基于卡尔曼滤波器推断的马氏距离仍用于忽视不可行的分配。</p></li>
+<li><p><strong>Matching Cascade</strong></p>
+<p>解决了度量问题后，如何匹配track 和 detect，文中提出如下方式：</p>
+<p><img src="/2020/02/19/Sort_DeepSort_read/match.png"></p>
+<p>输入为跟踪集合和检测集合，索引分别为<span class="math inline">\(T,D\)</span> ;首先根据之前的公式计算了代价矩阵<strong>C</strong>和门控矩阵<strong>B</strong>。然后对跟踪器最长存在时间进行迭代，在第6行中选择跟踪器子集<span class="math inline">\(T_n\)</span>(过去n帧都没有被检测器匹配的跟踪目标)，第7行根据代价矩阵匹配<span class="math inline">\(T_n\)</span>和为别分配的检测器目标。第8，9行更新匹配和未匹配的集合，最终返回<span class="math inline">\(M,U\)</span> 。</p>
+<p>显然此循环保证了优先将检测的新目标分配给最近的跟踪。最终匹配阶段，通过和Sort中一样的IOU关联算法作用于age=1的未被匹配跟踪目标，这有助于解释外观的突然变化（例如由于被静态场景局部遮挡）。</p></li>
+<li><p><strong>Deep Apperance Descriptor</strong></p>
+<p>通过在行人重识别数据集上的训练CNN。</p></li>
+</ul>
 
     </div>
 
@@ -311,7 +369,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"># 工具</a>
+              <a href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag"># 目标跟踪</a>
           </div>
 
         
@@ -320,13 +378,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/02/16/cyber-component/" rel="prev" title="Component 组件注册过程">
-      <i class="fa fa-chevron-left"></i> Component 组件注册过程
+    <a href="/2020/02/18/caffe-learn-start/" rel="prev" title="caffe 学习伊始">
+      <i class="fa fa-chevron-left"></i> caffe 学习伊始
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/02/16/bazel-learn/" rel="next" title="bazel C++编译入门">
-      bazel C++编译入门 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -393,7 +448,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装doxygen"><span class="nav-number">1.</span> <span class="nav-text">安装doxygen</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用doxygen生成文档"><span class="nav-number">2.</span> <span class="nav-text">使用Doxygen生成文档</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#sort和deepsort论文阅读笔记"><span class="nav-number">1.</span> <span class="nav-text">Sort和DeepSort论文阅读笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一些术语"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.一些术语</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#评价指标"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.评价指标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#框架策略"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.框架策略</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sort"><span class="nav-number">1.2.</span> <span class="nav-text">Sort</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#detection"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.Detection</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#estimation-model"><span class="nav-number">1.2.2.</span> <span class="nav-text">2. Estimation Model</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#data-association"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.Data Association</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#creation-and-deletion-of-track-identities"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.Creation and Deletion of Track Identities</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#deep-sort"><span class="nav-number">1.3.</span> <span class="nav-text">Deep Sort</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#deep-association-metric"><span class="nav-number">1.3.1.</span> <span class="nav-text">1. Deep Association Metric</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -682,9 +737,9 @@
 </script>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://zhxjia.github.io/2020/02/16/doxygen/";
-    this.page.identifier = "2020/02/16/doxygen/";
-    this.page.title = "doxygen";
+    this.page.url = "https://zhxjia.github.io/2020/02/19/Sort_DeepSort_read/";
+    this.page.identifier = "2020/02/19/Sort_DeepSort_read/";
+    this.page.title = "Sort和DeepSort论文阅读笔记";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
     if (window.DISQUS) {
