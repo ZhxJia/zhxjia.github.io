@@ -60,8 +60,12 @@
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/5.png">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/6.png">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/666.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/13.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/10.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/19.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/20.png">
 <meta property="article:published_time" content="2020-02-22T06:45:51.304Z">
-<meta property="article:modified_time" content="2020-02-23T15:16:09.535Z">
+<meta property="article:modified_time" content="2020-02-24T11:13:31.390Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="track">
 <meta name="twitter:card" content="summary">
@@ -246,7 +250,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-23 23:16:09" itemprop="dateModified" datetime="2020-02-23T23:16:09+08:00">2020-02-23</time>
+                <time title="修改时间：2020-02-24 19:13:31" itemprop="dateModified" datetime="2020-02-24T19:13:31+08:00">2020-02-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -287,14 +291,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.8k</span>
+              <span>5.1k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
+              <span>9 分钟</span>
             </span>
 
         </div>
@@ -333,7 +337,7 @@
 <li><p><code>Target</code>类包含了跟踪物体的id和相关的状态信息,<code>tracked_objects</code>包含了被跟踪的物体vector,是<code>TrackObject</code>类 <code>Target</code>类为期望得到检测框匹配的跟踪物体</p>
 <p><img src="/2020/02/22/apollo-track/4.png"></p></li>
 <li><p><code>TrackObject</code>类则封装了跟踪目标<code>Object</code>类，记录该跟踪目标对应的帧id和传感器名称,是跟踪目标的最小封装单位</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">TrackObject</span> &#123;</span></span><br><span class="line">  PatchIndicator indicator; <span class="comment">//保存了传感器的名称和目标在帧中的id</span></span><br><span class="line">  <span class="keyword">double</span> timestamp;</span><br><span class="line">  base::BBox2DF projected_box;<span class="comment">//由检测得到的原2dbox　经projected_matrix投影得到的bbox 这个矩阵是啥意思不太清楚 narrow to obstacle projected_matrix</span></span><br><span class="line">  base::ObjectPtr object;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">TrackObject</span> &#123;</span></span><br><span class="line">  PatchIndicator indicator; <span class="comment">//保存了传感器的名称和目标在帧中的id</span></span><br><span class="line">  <span class="keyword">double</span> timestamp;</span><br><span class="line">  base::BBox2DF projected_box;<span class="comment">//由检测得到的原2dbox　经projected_matrix投影得到障碍物的bbox 这个矩阵是啥意思不太清楚 narrow to obstacle projected_matrix(应该是为了将不同的相机的bbox统一到一个尺度)</span></span><br><span class="line">  base::ObjectPtr object;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
 <li><p><code>PatchIndicator</code>类主要包含了两个变量,重载运算符&quot;==&quot;为frame_id和patch_id分别相等</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> frame_id;<span class="comment">//为该检测目标对应的是第几帧(frame id )</span></span><br><span class="line"><span class="keyword">int</span> patch_id;<span class="comment">//该检测目标在该帧中的id(object id)</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> sensor_name;<span class="comment">//记录检测到的传感器名称</span></span><br></pre></td></tr></table></figure></li>
 <li><p><code>ObstacleReference</code>类包含了与模板相关的参数：</p>
@@ -345,20 +349,76 @@
 </ol>
 <h3 id="d关联算法的实现">2D关联算法的实现</h3>
 <ol type="1">
-<li>计算各帧与当前帧的余弦相似性:</li>
+<li>计算各帧与当前帧的余弦相似性:（第5步target和det_obj的Apperance的匹配分数会用到）</li>
 <li>从已跟踪物体列表中去除最早帧之前的帧中检测到的目标</li>
 <li>根据当前帧的检测物体，得到当前的检测跟踪列表</li>
 </ol>
-<p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(...)&#123;</span><br><span class="line">    ...</span><br><span class="line">	ProjectBox(frame-&gt;detected_objects[i]-&gt;camera_supplement.box,</span><br><span class="line">               frame-&gt;project_matrix, &amp;(track_ptr-&gt;projected_box));</span><br><span class="line">	track_objects.push_back(track_ptr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(...)&#123;</span><br><span class="line">    ...</span><br><span class="line">	ProjectBox(frame-&gt;detected_objects[i]-&gt;camera_supplement.box,</span><br><span class="line">             frame-&gt;project_matrix, &amp;(track_ptr-&gt;projected_box));<span class="comment">//图像2dbox投影到障碍物坐标系</span></span><br><span class="line">	track_objects.push_back(track_ptr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <ol start="4" type="1">
 <li><p>校正当前帧检测目标的三维尺寸</p>
 <p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reference_.CorrectSize(frame); <span class="comment">//这个函数挺长的，还没细看明天看</span></span><br></pre></td></tr></table></figure></p></li>
 <li><p>生成假设</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 评估新检测目标与targets的相似性</span></span><br><span class="line"><span class="comment">// @param [in]: track_objects :该帧检测器新检测到的目标</span></span><br><span class="line"><span class="comment">// @param [in/out]: </span></span><br><span class="line"><span class="comment">// </span></span><br><span class="line">GenerateHypothesis(track_objects);</span><br></pre></td></tr></table></figure>
-<p>其中对应的主要成员变量类型<code>Hypothesis</code>的定义为:</p>
-<p><img src="/2020/02/22/apollo-track/666.png"></p></li>
-<li><p>创建新目标</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> new_count = CreateNewTarget(track_objects);</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 评估新检测目标与targets的相似性</span></span><br><span class="line"><span class="comment">// @param [in]: track_objects :该帧检测器新检测到的目标</span></span><br><span class="line"><span class="comment">// @param [in/out]: </span></span><br><span class="line"><span class="comment">// output:target匹配第(frame_id)帧中的第几个检测物(track_object),</span></span><br><span class="line"><span class="comment">//        并将该track_object加入到target的tracked_objects中</span></span><br><span class="line">GenerateHypothesis(track_objects);</span><br></pre></td></tr></table></figure>
+<p>其中对应的主要成员变量类型<code>Hypothesis</code>的定义为:（此为target和object的）</p>
+<p><img src="/2020/02/22/apollo-track/666.png"></p>
+<p>处理函数：</p>
+<p><img src="/2020/02/22/apollo-track/13.png"></p>
+<p>得到target与对应det_obj的匹配分数后，根据分数由大到小分配,最终将检测物体(det_obj)加入到匹配分数最高的target的tracked_objects中。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">target.Add(det_obj); </span><br><span class="line"><span class="comment">//将det_obj添加到给定的target的tracked_objects中,并将该target的lost_age清零</span></span><br></pre></td></tr></table></figure>
+<p>除了上面的四个分数，最终score还需要加上不同物体类型切换的代价值。</p>
+<figure>
+<img src="/2020/02/22/apollo-track/10.png" alt="type_change_cost"><figcaption>type_change_cost</figcaption>
+</figure></li>
+<li><p>创建新跟踪目标(target)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> new_count = CreateNewTarget(track_objects);</span><br></pre></td></tr></table></figure>
+<p>由<code>track_objects</code>创建新的跟踪目标的条件有：</p>
+<ol type="1">
+<li>首先该det_obj与现有的target的匹配分数很小，即该det_obj与现有target匹配失败
+<ol start="2" type="1">
+<li>该det_obj的box需要是有效的(bbox宽高大于20同时小于图像宽高)</li>
+<li>该det_obj的box矩形没有被某个target的bbox覆盖 ,此处target的bbox指tracked_objects中最近检测的bbox</li>
+<li>在上述条件都满足的前提下，需满足det_obj的高度大于最小模板的高度,也可以是未知类型(此时高度的模板未知)</li>
+</ol></li>
+</ol></li>
+<li><p>超过存活周期(lost_age&gt;5)的target,否则执行(即正常跟踪的target)下列方法，通过<code>latest_object</code>进行相应更新.并调用对应的<code>滤波方法</code>进行预测</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">target.UpdateType(frame);</span><br><span class="line">target.Update2D(frame);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><strong>UpdateType():</strong></p>
+<p>对于未丢失检测(lost_age=0)的target:</p>
+<ol type="1">
+<li>计算该target的最近检测目标(latest_object-&gt;object)的高度与模板中等尺寸的高度接近程度,接近程度由高斯分布衡量:</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//~N(mu=1.0,sigma=0.3)  反映了object的box_height与模板中等高度的接近程度</span></span><br><span class="line"><span class="keyword">float</span> alpha = gaussian(</span><br><span class="line">        <span class="built_in">rect</span>.<span class="built_in">height</span> /</span><br><span class="line">            (<span class="number">50</span> * (kMidTemplateHWL.at(object-&gt;sub_type).at(<span class="number">0</span>) + <span class="number">0.01f</span>)),</span><br><span class="line">        <span class="number">1.0f</span>, target_param_.type_filter_var());</span><br><span class="line"><span class="comment">//该target同类型的probs会往上叠加(在不同帧之间)，因为每帧该target都有一个对应的latest_object</span></span><br><span class="line">type_probs[<span class="keyword">static_cast</span>&lt;<span class="keyword">int</span>&gt;(object-&gt;sub_type)] += alpha;</span><br></pre></td></tr></table></figure>
+<p>根据上述最大的<code>type_probs</code>更新target的对应类型</p>
+<ol start="2" type="1">
+<li>将上述(alpha, object-&gt;size(0), object-&gt;size(1),object-&gt;size(2))组成4维向量，将此测量量添加到该target的<code>MaxNMeanFilter world_lwh</code>及<code>MeanFilter world_lwh_for_unmovable</code>中：</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">world_lwh.AddMeasure(size_measurement); <span class="comment">//MaxNMeanFilter window=15 根据alpha由大到小</span></span><br><span class="line">world_lwh_for_unmovable.AddMeasure(size_measurement); <span class="comment">//测量值的均值和方差</span></span><br></pre></td></tr></table></figure>
+<figure>
+<img src="/2020/02/22/apollo-track/19.png" alt="MaxNMeanFilter"><figcaption>MaxNMeanFilter</figcaption>
+</figure>
+<p>这一步将得到该target 的15次测量值，按照alpha由大到小排序，并取平均更新3d object size,其中的object为该target的lastest_obj</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (object-&gt;type == base::ObjectType::UNKNOWN_UNMOVABLE) &#123;</span><br><span class="line">  object-&gt;<span class="built_in">size</span> =</span><br><span class="line">      world_lwh_for_unmovable.get_state().block&lt;<span class="number">3</span>, <span class="number">1</span>&gt;(<span class="number">1</span>, <span class="number">0</span>).cast&lt;<span class="keyword">float</span>&gt;();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  object-&gt;<span class="built_in">size</span> = world_lwh.get_state().block&lt;<span class="number">3</span>, <span class="number">1</span>&gt;(<span class="number">1</span>, <span class="number">0</span>).cast&lt;<span class="keyword">float</span>&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>camera:</p>
+<p>6mm : reliable z is 40(m) ,intrinsic(f) is approximate is 2000(像素)</p>
+<p>12mm:reliable z is 80(m),instrinsic(f) is approximate si 4000(像素)</p>
+</blockquote></li>
+<li><p><strong>Update2D():</strong> 更新2d box的大小。</p>
+<ol type="1">
+<li><p>向滤波器中添加测量值,进行滤波计算</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">measurement &lt;&lt; <span class="built_in">rect</span>.<span class="built_in">width</span>, <span class="built_in">rect</span>.<span class="built_in">height</span>;</span><br><span class="line">image_wh.AddMeasure(measurement);<span class="comment">//一阶低通filter</span></span><br><span class="line">measurement &lt;&lt; center.x, center.y;</span><br><span class="line">image_center.Correct(measurement);<span class="comment">//Kalman_Filter</span></span><br></pre></td></tr></table></figure></li>
+<li><p>更新:得到该target最近最近检测物体(latest_object)的projected_box(单位：米)</p>
+<figure>
+<img src="/2020/02/22/apollo-track/20.png" alt="2d box update"><figcaption>2d box update</figcaption>
+</figure></li>
+</ol></li>
+</ul>
+<ol start="8" type="1">
+<li><p>在Association之后通过IOU合并重复的targets</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CombineDuplicateTargets();</span><br></pre></td></tr></table></figure></li>
+<li><p>对原始的box返回滤波结果</p></li>
+</ol></li>
 </ol>
 <h2 id="tracker_-associate3dframe根据3d信息关联">tracker_-&gt;Associate3D(frame):根据3D信息关联</h2>
 <h2 id="tracker_-trackframe跟踪算法">tracker_-&gt;Track(frame):跟踪算法</h2>
@@ -541,12 +601,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">67k</span>
+    <span title="站点总字数">69k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:52</span>
+    <span title="站点阅读时长">1:56</span>
 </div>
 
 <span id="sitetime"></span>
