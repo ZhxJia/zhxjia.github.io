@@ -49,21 +49,23 @@
   };
 </script>
 
-  <meta name="description" content="单应性矩阵 相机畸变校正　Brown模型 在摄影测量和计算机视觉中都需要对含有畸变的影像进行改正操作，常用到的模型是对透视影像改正的Brown模型">
+  <meta name="description" content="Apollo中障碍物后处理">
 <meta property="og:type" content="article">
-<meta property="og:title" content="相机标定">
-<meta property="og:url" content="https://zhxjia.github.io/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/index.html">
+<meta property="og:title" content="Apollo中障碍物后处理">
+<meta property="og:url" content="https://zhxjia.github.io/2020/02/25/apollo-obstacle-postprocess/index.html">
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
-<meta property="og:description" content="单应性矩阵 相机畸变校正　Brown模型 在摄影测量和计算机视觉中都需要对含有畸变的影像进行改正操作，常用到的模型是对透视影像改正的Brown模型">
-<meta property="article:published_time" content="2020-02-04T04:25:08.000Z">
-<meta property="article:modified_time" content="2020-02-19T11:46:55.210Z">
+<meta property="og:description" content="Apollo中障碍物后处理">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/25/apollo-obstacle-postprocess/IMG_0299.jpg">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/25/apollo-obstacle-postprocess/1.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/25/apollo-obstacle-postprocess/2.png">
+<meta property="article:published_time" content="2020-02-25T12:42:32.931Z">
+<meta property="article:modified_time" content="2020-02-25T16:59:25.978Z">
 <meta property="article:author" content="ZhxJia">
-<meta property="article:tag" content="感知">
-<meta property="article:tag" content="标定">
-<meta property="article:tag" content="视觉">
+<meta property="article:tag" content="障碍物检测">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhxjia.github.io/2020/02/25/apollo-obstacle-postprocess/IMG_0299.jpg">
 
-<link rel="canonical" href="https://zhxjia.github.io/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/">
+<link rel="canonical" href="https://zhxjia.github.io/2020/02/25/apollo-obstacle-postprocess/">
 
 
 <script id="page-configurations">
@@ -75,7 +77,7 @@
   };
 </script>
 
-  <title>相机标定 | ZhxJia's Blog</title>
+  <title>Apollo中障碍物后处理 | ZhxJia's Blog</title>
   
 
 
@@ -212,7 +214,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/25/apollo-obstacle-postprocess/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/jd.png">
@@ -225,7 +227,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          相机标定
+          Apollo中障碍物后处理
         </h1>
 
         <div class="post-meta">
@@ -235,14 +237,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-02-04 12:25:08" itemprop="dateCreated datePublished" datetime="2020-02-04T12:25:08+08:00">2020-02-04</time>
+              <time title="创建时间：2020-02-25 20:42:32" itemprop="dateCreated datePublished" datetime="2020-02-25T20:42:32+08:00">2020-02-25</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-19 19:46:55" itemprop="dateModified" datetime="2020-02-19T19:46:55+08:00">2020-02-19</time>
+                <time title="修改时间：2020-02-26 00:59:25" itemprop="dateModified" datetime="2020-02-26T00:59:25+08:00">2020-02-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -250,14 +252,14 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" itemprop="url" rel="index">
-                    <span itemprop="name">无人驾驶</span>
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
                   </a>
                 </span>
                   ，
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/%E6%A0%87%E5%AE%9A/" itemprop="url" rel="index">
-                    <span itemprop="name">标定</span>
+                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
+                    <span itemprop="name">perception</span>
                   </a>
                 </span>
             </span>
@@ -278,8 +280,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/04/相机标定/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2020/02/25/apollo-obstacle-postprocess/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/25/apollo-obstacle-postprocess/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -289,14 +291,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>70</span>
+              <span>2.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>5 分钟</span>
             </span>
 
         </div>
@@ -308,10 +310,41 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <a id="more"></a>
-<h3 id="单应性矩阵">单应性矩阵</h3>
-<h3 id="相机畸变校正brown模型">相机畸变校正　Brown模型</h3>
-<p>在摄影测量和计算机视觉中都需要对含有畸变的影像进行改正操作，常用到的模型是对透视影像改正的Brown模型</p>
+        <p>Apollo中障碍物后处理</p>
+<a id="more"></a>
+<h2 id="对检测到的障碍物进行后处理的条件">对检测到的障碍物进行后处理的条件</h2>
+<ul>
+<li>bbox位于roi区域内</li>
+<li>障碍物的中心距离相机中心大于阈值(30)</li>
+</ul>
+<p><img src="/2020/02/25/apollo-obstacle-postprocess/IMG_0299.jpg" style="zoom:30%;"></p>
+<h2 id="后处理的初始参数配置">后处理的初始参数配置</h2>
+<p><img src="/2020/02/25/apollo-obstacle-postprocess/1.png"></p>
+<p><code>object_center[1] +=dimension_hwl[0] / 2</code>则此时中心点接触地面 (即车辆坐标系中心下移至平面)</p>
+<h2 id="postprocessobjwithground">PostProcessObjWithGround</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">postprocessor_-&gt;PostProcessObjWithGround(</span><br><span class="line">        obj_postprocessor_options, object_center, dimension_hwl, &amp;rotation_y);</span><br><span class="line"><span class="comment">//函数功能定义</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ObjPostProcessor::PostProcessObjWithGround</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> ObjPostProcessorOptions &amp;options, <span class="keyword">float</span> center[<span class="number">3</span>], <span class="keyword">float</span> hwl[<span class="number">3</span>],</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">float</span> *ry)</span> </span>&#123;</span><br><span class="line">  <span class="built_in">memcpy</span>(hwl, options.hwl, <span class="keyword">sizeof</span>(<span class="keyword">float</span>) * <span class="number">3</span>);</span><br><span class="line">  <span class="keyword">float</span> bbox[<span class="number">4</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">  <span class="built_in">memcpy</span>(bbox, options.bbox, <span class="keyword">sizeof</span>(<span class="keyword">float</span>) * <span class="number">4</span>);</span><br><span class="line">  *ry = options.ry;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// soft constraints</span></span><br><span class="line">  <span class="keyword">bool</span> adjust_soft =</span><br><span class="line">      AdjustCenterWithGround(bbox, hwl, *ry, options.plane, center);</span><br><span class="line">  <span class="keyword">if</span> (center[<span class="number">2</span>] &gt; params_.dist_far) &#123;</span><br><span class="line">    <span class="keyword">return</span> adjust_soft;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// hard constraints</span></span><br><span class="line">  <span class="keyword">bool</span> adjust_hard = PostRefineCenterWithGroundBoundary(</span><br><span class="line">      bbox, hwl, *ry, options.plane, options.line_segs, center,</span><br><span class="line">      options.check_lowerbound);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> adjust_soft || adjust_hard;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>具体的的处理算法有两种：</p>
+<ul>
+<li><p><strong>AdjustCenterWithGround</strong>:软约束--通过中心点投影位于平面内的约束进行中心点的更新。</p>
+<p>部分主要处理函数如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">iou_ini = GetProjectionScore(ry, bbox, hwl, center); <span class="comment">//获取角点投影box和检测box的交并比初始值</span></span><br><span class="line">...</span><br><span class="line"><span class="comment">//开始更新中心坐标</span></span><br><span class="line"><span class="keyword">while</span>(!<span class="built_in">stop</span>)&#123;</span><br><span class="line">    common::IProjectThroughIntrinsic(k_mat_, center, x); <span class="comment">//center投影到图像坐标系 x</span></span><br><span class="line">    x[<span class="number">0</span>] *= common::IRec(x[<span class="number">2</span>]);</span><br><span class="line">    x[<span class="number">1</span>] *= common::IRec(x[<span class="number">2</span>]);<span class="comment">//齐次坐标</span></span><br><span class="line">    <span class="keyword">bool</span> in_front = common::IBackprojectPlaneIntersectionCanonical(</span><br><span class="line">        x, k_mat_, plane, center_test);<span class="comment">//再将此中心点根据平面约束投影回3d空间-&gt;center_test</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">float</span> iou_cur = GetProjectionScore(ry, bbox, hwl, center);</span><br><span class="line">    <span class="keyword">float</span> iou_test = GetProjectionScore(ry, bbox, hwl, center_test);</span><br><span class="line">        <span class="keyword">float</span> dist = common::ISqrt(common::ISqr(center[<span class="number">0</span>] - center_test[<span class="number">0</span>]) +</span><br><span class="line">                               common::ISqr(center[<span class="number">2</span>] - center_test[<span class="number">2</span>]));<span class="comment">//检测得到的center与平面内的center_test的距离</span></span><br><span class="line">    <span class="keyword">float</span> cost_cur = dist + WEIGHT_IOU * (<span class="number">1.0f</span> - (iou_cur + iou_test) / <span class="number">2</span>);</span><br><span class="line">    <span class="comment">// std::cout &lt;&lt; "cost___ " &lt;&lt; cost_cur &lt;&lt; "@" &lt;&lt; iter &lt;&lt; std::endl;</span></span><br><span class="line">    <span class="keyword">if</span> (cost_cur &gt;= cost_pre) &#123;</span><br><span class="line">      <span class="built_in">stop</span> = <span class="literal">true</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      cost_delta = (cost_pre - cost_cur) / cost_pre;</span><br><span class="line">      cost_pre = cost_cur;</span><br><span class="line">      center[<span class="number">0</span>] += (center_test[<span class="number">0</span>] - center[<span class="number">0</span>]) * lr;</span><br><span class="line">      center[<span class="number">2</span>] += (center_test[<span class="number">2</span>] - center[<span class="number">2</span>]) * lr; <span class="comment">//更新center,与之前"Transform模块中的center更新相似",此时的依据是点的反投影位于平面</span></span><br><span class="line">      ++iter;</span><br><span class="line">      <span class="built_in">stop</span> = iter &gt;= MAX_ITERATION || cost_delta &lt; EPS_COST_DELTA ||</span><br><span class="line">             cost_pre &lt; MIN_COST;</span><br><span class="line">    &#125;</span><br><span class="line">    lr *= params_.learning_r_decay; </span><br><span class="line">&#125;</span><br><span class="line"> <span class="keyword">float</span> iou_res = GetProjectionScore(ry, bbox, hwl, center);</span><br><span class="line">  <span class="keyword">if</span> (iou_res &lt; iou_ini * params_.shrink_ratio_iou) &#123; <span class="comment">//0.9 IOu缩小比率，更新完center后若其iou反而缩减到原iou的0.9以下，则还是用初始值</span></span><br><span class="line">    <span class="built_in">memcpy</span>(center, center_input, <span class="keyword">sizeof</span>(<span class="keyword">float</span>) * <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">//更新失败</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+<p><img src="/2020/02/25/apollo-obstacle-postprocess/2.png"></p>
+<p>由内参所表示的反投影关系：(x,y)-&gt;(X,Y,Z) <span class="math display">\[
+X=\frac{x-c_x}{f_x}*Z=umcx*Z\\
+Y=\frac{y-c_y}{f_y}*Z=vmcy*Z\\
+\]</span> 若X,Y,Z位于平面AX+BY+CZ+D=0内，则 <span class="math display">\[
+A*umcx*Z+B*vmcy*Z+C*Z+D=0\\
+A*umcx+B*vmcy+C=-\frac{D}{Z}
+\]</span></p></li>
+<li><p><strong>PostRefineCenterWithGroundBoundary</strong>硬约束--</p>
+<p>该函数通过<code>line_segs</code>(内部存储了当前帧检测物体的2D框信息),</p>
+<p>部分主要处理如下:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// hard constraints</span></span><br><span class="line"><span class="keyword">bool</span> adjust_hard = PostRefineCenterWithGroundBoundary(</span><br><span class="line">      bbox, hwl, *ry, options.plane, options.line_segs, center,</span><br><span class="line">      options.check_lowerbound);</span><br><span class="line"><span class="comment">//该函数主要处理流程如下：</span></span><br></pre></td></tr></table></figure>
+<p>GetDxDzForCenterFromGroundLineSeg</p>
+<p>先通过平面约束得到2d box 在 3d中的反投影，即将bbox2d中的两个点反投影到了3d平面中。</p>
+<p>将坐标系转为车辆坐标系</p>
+<p>得到障碍物中心与车辆中心的直线方程</p></li>
+</ul>
 
     </div>
 
@@ -321,9 +354,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag"># 感知</a>
-              <a href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag"># 标定</a>
-              <a href="/tags/%E8%A7%86%E8%A7%89/" rel="tag"># 视觉</a>
+              <a href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag"># 障碍物检测</a>
           </div>
 
         
@@ -331,11 +362,11 @@
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2020/02/04/perception/" rel="next" title="apollo感知代码阅读笔记">
-      apollo感知代码阅读笔记 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/02/23/tracking_without_bells_and_whistles/" rel="prev" title="tracking without bells and whistles论文阅读">
+      <i class="fa fa-chevron-left"></i> tracking without bells and whistles论文阅读
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -402,7 +433,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#单应性矩阵"><span class="nav-number">1.</span> <span class="nav-text">单应性矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相机畸变校正brown模型"><span class="nav-number">2.</span> <span class="nav-text">相机畸变校正　Brown模型</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#对检测到的障碍物进行后处理的条件"><span class="nav-number">1.</span> <span class="nav-text">对检测到的障碍物进行后处理的条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后处理的初始参数配置"><span class="nav-number">2.</span> <span class="nav-text">后处理的初始参数配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#postprocessobjwithground"><span class="nav-number">3.</span> <span class="nav-text">PostProcessObjWithGround</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -418,7 +449,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -431,7 +462,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -460,7 +491,7 @@
           <h3 class="widget-title">Tag Cloud</h3>
           <div id="myCanvasContainer" class="widget tagcloud">
               <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li></ul>
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
         </canvas>
        </div>
      </div>
@@ -490,12 +521,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">72k</span>
+    <span title="站点总字数">76k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:01</span>
+    <span title="站点阅读时长">2:06</span>
 </div>
 
 <span id="sitetime"></span>
@@ -691,9 +722,9 @@
 </script>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://zhxjia.github.io/2020/02/04/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A/";
-    this.page.identifier = "2020/02/04/相机标定/";
-    this.page.title = "相机标定";
+    this.page.url = "https://zhxjia.github.io/2020/02/25/apollo-obstacle-postprocess/";
+    this.page.identifier = "2020/02/25/apollo-obstacle-postprocess/";
+    this.page.title = "Apollo中障碍物后处理";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
     if (window.DISQUS) {
