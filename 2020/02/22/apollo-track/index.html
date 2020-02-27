@@ -71,9 +71,10 @@
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/26.png">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/28.png">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/29.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/IMG_0304.jpg">
 <meta property="og:image" content="https://zhxjia.github.io/2020/02/22/apollo-track/30.png">
 <meta property="article:published_time" content="2020-02-22T06:45:51.304Z">
-<meta property="article:modified_time" content="2020-02-26T14:55:10.298Z">
+<meta property="article:modified_time" content="2020-02-27T11:03:54.147Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="track">
 <meta name="twitter:card" content="summary">
@@ -258,7 +259,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-26 22:55:10" itemprop="dateModified" datetime="2020-02-26T22:55:10+08:00">2020-02-26</time>
+                <time title="修改时间：2020-02-27 19:03:54" itemprop="dateModified" datetime="2020-02-27T19:03:54+08:00">2020-02-27</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -299,14 +300,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.8k</span>
+              <span>11k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>15 分钟</span>
+              <span>18 分钟</span>
             </span>
 
         </div>
@@ -474,18 +475,41 @@
 <p><img src="/2020/02/22/apollo-track/26.png"></p>
 <p><strong><code>Reference update</code>中更新Reference中的相关参数</strong></p>
 <ul>
-<li><code>reference_</code>中的所有reference的area每次更新衰减0.98</li>
-<li>​ 对于每个target中最近检测到的物体，如果是可以参考的类型(CAR,VAN)，同时其box的高度大于50，box的底边位置大于内参矩阵中的c_y(即box尽可能位于图像底部),此时该target可以被参考。将该box的底边中心点也进行下采样(y_discrete=y/25,x_discrete=x/25),这样可以与<code>ref_map</code>的尺寸对应。 ​ 如果此中心点所对应的<code>ref_map</code>为0(即该点对应的参考图第一次被使用)，将其对应的Reference信息push到数组<code>reference_</code>中存储，并将<code>ref_map</code>中对应位置置为当前<code>refs</code>存储的元素数(即将refs中对应的索引存储到ref_map的对应位置中);否则，若该点对应的ref_map大于零(表示该点已经存在某个物体，其中存储的值为当时的<code>refs</code>中对应的索引)，同时此时box的area大于之前存在的reference的area，则将属性进行替换。</li>
+<li><p><code>reference_</code>中的所有reference的area每次更新衰减0.98</p></li>
+<li><p>​ 对于每个target中最近检测到的物体，如果是可以参考的类型(CAR,VAN)，同时其box的高度大于50，box的底边位置大于内参矩阵中的c_y(即box尽可能位于图像底部),此时该target可以被参考。将该box的底边中心点也进行下采样(y_discrete=y/25,x_discrete=x/25),这样可以与<code>ref_map</code>的尺寸对应。 ​ 如果此中心点所对应的<code>ref_map</code>为0(即该点对应的参考图第一次被使用)，将其对应的Reference信息push到数组<code>reference_</code>中存储，并将<code>ref_map</code>中对应位置置为当前<code>refs</code>存储的元素数(即将refs中对应的索引存储到ref_map的对应位置中);否则，若该点对应的ref_map大于零(表示该点已经存在某个物体，其中存储的值为当时的<code>refs</code>中对应的索引)，同时此时box的area大于之前存在的reference的area，则将属性进行替换。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">r.area = box.Area();</span><br><span class="line">r.ymax = y;</span><br><span class="line">r.k = obj-&gt;<span class="built_in">size</span>[<span class="number">2</span>] / (y - box.ymin); <span class="comment">// H/h</span></span><br></pre></td></tr></table></figure></li>
 </ul>
 <p><strong>通过reference检测Ground</strong></p>
-<p>​ 首先对于目前<code>refs</code>存储的所有<code>reference</code>，将其对应的box底边位置（y_max）以及深度<code>z_ref</code>存储到<code>vd_samples</code>中,当reference的数量大于<code>min_nr_samples=6</code>时，可进行Ground的检测(需要在线标定的相机Pitch角度和相机离地平面的高度)</p>
+<p>​ 首先对于目前<code>refs</code>存储的所有<code>reference</code>，将其对应的box底边位置（y_max）以及深度倒数<code>1/z_ref</code>存储到<code>vd_samples</code>中,当reference的数量大于<code>min_nr_samples=6</code>时，可进行Ground的检测(需要在线标定的相机Pitch角度和相机离地平面的高度)</p>
 <p><img src="/2020/02/22/apollo-track/28.png"></p>
 <p><strong>DetetGround:</strong></p>
 <p>若给定了相机坐标系下的平面，则由<span class="math inline">\(Ax+By+Cz+D=0 -&gt; a*y+b*disp+c=0\)</span> : ground4-&gt;ground3:</p>
 <p><img src="/2020/02/22/apollo-track/29.png"></p>
-<p>否则根据Samples获取</p>
+<p><img src="/2020/02/22/apollo-track/IMG_0304.jpg" style="zoom:30%;"></p>
+<p>否则根据之前的存储的<code>reference</code>进行地平面的检测,<code>CameraGroundPlaneDetector::DetectGroundFromSamples()</code></p>
+<p>ground3与ground4的对应关系如上图所示，通过采样{y_max,1/z}即边界框下边界和深度的倒数即可通过一致性采样得到模型参数。</p>
+<ul>
+<li><p><strong>RobustBinaryFitRansac()</strong></p>
+<p>两个功能函数：</p>
+<ul>
+<li>```c++ template <typename t> //a<em>y+b</em>disp + c = 0-&gt;disp = p0<em>y+p1 void GroundHypoGenFunc(const T </em>v, const T <em>d, T </em>p) { // disp = p0 * y + p1 -&gt; l = {p0, -1, p1} T x[2] = {v[0], d[0]}; T xp[2] = {v[1], d[1]}; T l[3] = {0}; common::ILineFit2d(x, xp, l); p[0] = -l[0] * common::IRec(l[1]); p[1] = -l[2] * common::IRec(l[1]); } <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- &#96;&#96;&#96;c++</span><br><span class="line">  template &lt;typename T&gt;</span><br><span class="line">  void GroundFittingCostFunc(const T *p, const T *v, const T *d, int n,</span><br><span class="line">                             int *nr_inlier,  &#x2F;&#x2F; NOLINT compatible for i-lib</span><br><span class="line">                             int *inliers,</span><br><span class="line">                             T *cost,  &#x2F;&#x2F; NOLINT</span><br><span class="line">                             T error_tol) &#123;</span><br><span class="line">    *cost &#x3D; static_cast&lt;T&gt;(0.0f);</span><br><span class="line">    *nr_inlier &#x3D; 0;</span><br><span class="line">    const T *refx &#x3D; v;</span><br><span class="line">    const T *refp &#x3D; d;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; n; ++i) &#123;</span><br><span class="line">      T d_proj &#x3D; refx[0] * p[0] + p[1];</span><br><span class="line">      T proj_err &#x3D; static_cast&lt;T&gt;(fabs(d_proj - refp[0]));</span><br><span class="line">      if (proj_err &lt; error_tol) &#123;</span><br><span class="line">        inliers[(*nr_inlier)++] &#x3D; i;</span><br><span class="line">        *cost +&#x3D; proj_err;</span><br><span class="line">      &#125;</span><br><span class="line">      ++refx;</span><br><span class="line">      ++refp;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></typename></li>
+</ul>
+<p>以此为模板参数执行：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">common::RobustBinaryFitRansac&lt;<span class="keyword">float</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>,</span><br><span class="line">                                     GroundHypoGenFunc&lt;<span class="keyword">float</span>&gt;,</span><br><span class="line">                                     GroundFittingCostFunc&lt;<span class="keyword">float</span>&gt;, <span class="literal">nullptr</span>&gt;(</span><br><span class="line">          vs, ds, count_vd, p, &amp;nr_inliers, inliers, kThresInlier, <span class="literal">false</span>, <span class="literal">true</span>,</span><br><span class="line">          <span class="number">0.99f</span>, kMinInlierRatio)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<blockquote>
+<p>在机器人领域中，平面检测有多种方法，例如：</p>
+<p>Plane segment finder:algorithm, implementation and applications[C].中采用了霍夫变换方法； Learning compact 3D models of indoor and outdoor environments with a mobile robot中通过随机选择3D点，并在其周围区域增长的方式查找最大点集拟合平面参数； Automatic 3D building reconstruction using plane-roof structures中通过随机一致性采样方法找到局部多边形并合并。</p>
+</blockquote>
 <p><strong>基于RANSAC随机一致性采样的鲁棒方法</strong></p>
+<p>通过ransac算法不断的对平面方程参数进行估算，先介绍一下RANSAC算法:</p>
+<p>RANSAC通过反复选取数据中的一组随机子集来达成目标，被选取的子集被假设为局内点，并通过下属方法进行验证： (1) 有一个模型适用于假设的局内点，及所有未知参数都能从假设的局内点中计算得出（<strong>拟合模型</strong>） (2) 用（1）中得到的模型去测试其他的数据，如果某个点适用于估计的模型(距离小于阈值)，认为它也是局内点。 (3) 如果有足够多的点被归类为假设的局内点，则估计的模型就足够合理。 (4) 然后，用所有假设的局内点重新估计模型，因为它仅仅被初始的假设局内点估计过。 (5) 最后根据估计局内点与模型的错误率来评估模型。</p>
+<p>这个过程重复执行固定次数，每次产生的模型要么因为局内点太少而被舍弃，要么因为它比现有的模型更好而被采用。</p>
+<p>相比于最小二乘采用了所有点，RANSAC仅采用局内点进行模型的计算，局外点并不影响模型效果。</p>
+<p>对于平面的拟合基本步骤如下: (1) 随机取样：随机抽取数据作为样本 (2) 拟合模型：根据样本获取模型参数M (3) 判断距离: 判断所有数据点到模型的距离，将距离小于阈值的加入局内点，记录此时模型的局内点数 (4) 判断：局内点数目&gt;阈值，则利用此时的局内点重新估计模型，重复3-5次，将得到的局内点数最多的模型即为当前 的最佳模型；局内点数目&lt;阈值, 则跳出 (5) 跳到步骤(1)，循环N次</p>
 <h3 id="移除异常的移动">2. 移除异常的移动</h3>
+<h3 id="移除异常的移动-1">2. 移除异常的移动</h3>
 <p>首先根据其位置信息，移除异常移动的target，并将这些target的最新检测目标创建新的target,同时更新这些新创建的target的2D和类型信息(通过相应的滤波器更新当前状态)</p>
 <p><img src="/2020/02/22/apollo-track/30.png"></p>
 <p>然后对target进行三维信息更新(target.Update3D),更新的状态有:</p>
@@ -590,7 +614,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#tracker_-predictframe预测部分"><span class="nav-number">1.</span> <span class="nav-text">tracker_-&gt;Predict(frame):预测部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#extractor_-extractframe特征提取部分"><span class="nav-number">2.</span> <span class="nav-text">extractor_-&gt;Extract(frame):特征提取部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tracker_-associate2dframe根据2d信息关联"><span class="nav-number">3.</span> <span class="nav-text">tracker_-&gt;Associate2D(frame):根据2D信息关联</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#该部分的主要成员变量"><span class="nav-number">3.1.</span> <span class="nav-text">该部分的主要成员变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#d关联算法的实现"><span class="nav-number">3.2.</span> <span class="nav-text">2D关联算法的实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tracker_-associate3dframe根据3d信息关联"><span class="nav-number">4.</span> <span class="nav-text">tracker_-&gt;Associate3D(frame):根据3D信息关联</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更新reference"><span class="nav-number">4.1.</span> <span class="nav-text">1. 更新reference</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移除异常的移动"><span class="nav-number">4.2.</span> <span class="nav-text">2. 移除异常的移动</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tracker_-trackframe跟踪算法"><span class="nav-number">5.</span> <span class="nav-text">tracker_-&gt;Track(frame):跟踪算法</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#tracker_-predictframe预测部分"><span class="nav-number">1.</span> <span class="nav-text">tracker_-&gt;Predict(frame):预测部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#extractor_-extractframe特征提取部分"><span class="nav-number">2.</span> <span class="nav-text">extractor_-&gt;Extract(frame):特征提取部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tracker_-associate2dframe根据2d信息关联"><span class="nav-number">3.</span> <span class="nav-text">tracker_-&gt;Associate2D(frame):根据2D信息关联</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#该部分的主要成员变量"><span class="nav-number">3.1.</span> <span class="nav-text">该部分的主要成员变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#d关联算法的实现"><span class="nav-number">3.2.</span> <span class="nav-text">2D关联算法的实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tracker_-associate3dframe根据3d信息关联"><span class="nav-number">4.</span> <span class="nav-text">tracker_-&gt;Associate3D(frame):根据3D信息关联</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更新reference"><span class="nav-number">4.1.</span> <span class="nav-text">1. 更新reference</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移除异常的移动"><span class="nav-number">4.2.</span> <span class="nav-text">2. 移除异常的移动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移除异常的移动-1"><span class="nav-number">4.3.</span> <span class="nav-text">2. 移除异常的移动</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tracker_-trackframe跟踪算法"><span class="nav-number">5.</span> <span class="nav-text">tracker_-&gt;Track(frame):跟踪算法</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -678,12 +702,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">78k</span>
+    <span title="站点总字数">80k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:14</span>
 </div>
 
 <span id="sitetime"></span>
