@@ -476,6 +476,37 @@
     
     
     <entry>
+      <title>Apollo中的标定</title>
+      <link href="/2020/02/04/apollo_calibration/"/>
+      <url>/2020/02/04/apollo_calibration/</url>
+      
+        <content type="html"><![CDATA[<p>Apollo中的在线标定：用于获取实时外参(针对由于路面颠簸等情况造成相机位姿改变的校正)</p><a id="more"></a><h2 id="calibration_service">Calibration_service</h2><h3 id="初始化">1. 初始化</h3><p><strong>配置文件与配置信息</strong></p><figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">calibration_service_param &#123;</span><br><span class="line">  plugin_param &#123;</span><br><span class="line">      name : <span class="string">"OnlineCalibrationService"</span></span><br><span class="line">      root_dir : <span class="string">""</span></span><br><span class="line">      config_file : <span class="string">""</span></span><br><span class="line">  &#125;</span><br><span class="line">  calibrator_method : <span class="string">"LaneLineCalibrator"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="/2020/02/04/apollo_calibration/init.png"></p><p><code>modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.cc</code></p><p><img src="/2020/02/04/apollo_calibration/home/jachin/space/myblog/blog/source/_posts/apollo_calibration/2.png"></p><p>其中相机状态(camera_status)主要包含以下信息：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">CameraStatus</span> &#123;</span></span><br><span class="line">  <span class="keyword">float</span> camera_ground_height = <span class="number">-1.f</span>;</span><br><span class="line">  <span class="keyword">float</span> pitch_angle = <span class="number">0.f</span>;</span><br><span class="line">  <span class="keyword">float</span> pitch_angle_diff = <span class="number">0.f</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; k_matrix = &#123;<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>&#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; ground_plane = &#123;<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p><strong>LaneLineCalibrator主要初始化过程</strong>：</p><p><img src="/2020/02/04/apollo_calibration/3.png"></p><p><strong>LaneBasedCalibator初始化</strong>：</p><p><img src="/2020/02/04/apollo_calibration/4.png"></p><p><strong>HistogramEstimator初始化</strong>：(这个地方是直方图密度估计吗？存疑)</p><p><img src="/2020/02/04/apollo_calibration/5.png"></p><hr><h2 id="参考文章">参考文章</h2><blockquote><p>[1]崔洪柳. 基于车道线检测的车载摄像机在线标定算法[D].东北大学,2015.</p></blockquote><h3 id="单应性矩阵">单应性矩阵</h3><h3 id="相机畸变校正brown模型">相机畸变校正　Brown模型</h3><p>在摄影测量和计算机视觉中都需要对含有畸变的影像进行改正操作，常用到的模型是对透视影像改正的Brown模型</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> apollo </category>
+          
+          <category> perception </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 感知 </tag>
+            
+            <tag> 标定 </tag>
+            
+            <tag> 视觉 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>博客破壳日</title>
       <link href="/2020/02/04/hello-world/"/>
       <url>/2020/02/04/hello-world/</url>
@@ -531,37 +562,6 @@
         <tags>
             
             <tag> 感知 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Apollo中的标定</title>
-      <link href="/2020/02/04/apollo_calibration/"/>
-      <url>/2020/02/04/apollo_calibration/</url>
-      
-        <content type="html"><![CDATA[<p>Apollo中的在线标定：用于获取实时外参(针对由于路面颠簸等情况造成相机位姿改变的校正)</p><a id="more"></a><h2 id="calibration_service">Calibration_service</h2><h3 id="初始化">1. 初始化</h3><p><strong>配置文件与配置信息</strong></p><figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">calibration_service_param &#123;</span><br><span class="line">  plugin_param &#123;</span><br><span class="line">      name : <span class="string">"OnlineCalibrationService"</span></span><br><span class="line">      root_dir : <span class="string">""</span></span><br><span class="line">      config_file : <span class="string">""</span></span><br><span class="line">  &#125;</span><br><span class="line">  calibrator_method : <span class="string">"LaneLineCalibrator"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><img src="/2020/02/04/apollo_calibration/init.png"></p><p><code>modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.cc</code></p><p><img src="/2020/02/04/apollo_calibration/home/jachin/space/myblog/blog/source/_posts/apollo_calibration/2.png"></p><p>其中相机状态(camera_status)主要包含以下信息：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">CameraStatus</span> &#123;</span></span><br><span class="line">  <span class="keyword">float</span> camera_ground_height = <span class="number">-1.f</span>;</span><br><span class="line">  <span class="keyword">float</span> pitch_angle = <span class="number">0.f</span>;</span><br><span class="line">  <span class="keyword">float</span> pitch_angle_diff = <span class="number">0.f</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; k_matrix = &#123;<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>&#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; ground_plane = &#123;<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p><strong>LaneLineCalibrator主要初始化过程</strong>：</p><p><img src="/2020/02/04/apollo_calibration/3.png"></p><p><strong>LaneBasedCalibator初始化</strong>：</p><p><img src="/2020/02/04/apollo_calibration/4.png"></p><p><strong>HistogramEstimator初始化</strong>：(这个地方是直方图密度估计吗？存疑)</p><p><img src="/2020/02/04/apollo_calibration/5.png"></p><hr><h2 id="参考文章">参考文章</h2><blockquote><p>[1]崔洪柳. 基于车道线检测的车载摄像机在线标定算法[D].东北大学,2015.</p></blockquote><h3 id="单应性矩阵">单应性矩阵</h3><h3 id="相机畸变校正brown模型">相机畸变校正　Brown模型</h3><p>在摄影测量和计算机视觉中都需要对含有畸变的影像进行改正操作，常用到的模型是对透视影像改正的Brown模型</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> apollo </category>
-          
-          <category> perception </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 感知 </tag>
-            
-            <tag> 标定 </tag>
-            
-            <tag> 视觉 </tag>
             
         </tags>
       
