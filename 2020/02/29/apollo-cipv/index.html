@@ -49,19 +49,21 @@
   };
 </script>
 
-  <meta name="description" content="caffe 学习系列">
+  <meta name="description" content="Apollo中CIPV(Closest-In Path Vehicle)为当前车道最接近的车辆，对象由3D边界框表示，其从上到下视图的2D投影将对象定位在地面上，然后检查每个对象是否在当前的车道中。在当前车道的对象中，最接近的一个车辆将被选为CIPV.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="caffe 学习伊始">
-<meta property="og:url" content="https://zhxjia.github.io/2020/02/18/caffe-learn-start/index.html">
+<meta property="og:title" content="apollo中cipv检测">
+<meta property="og:url" content="https://zhxjia.github.io/2020/02/29/apollo-cipv/index.html">
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
-<meta property="og:description" content="caffe 学习系列">
-<meta property="article:published_time" content="2020-02-18T09:34:12.685Z">
-<meta property="article:modified_time" content="2020-02-18T09:34:12.685Z">
+<meta property="og:description" content="Apollo中CIPV(Closest-In Path Vehicle)为当前车道最接近的车辆，对象由3D边界框表示，其从上到下视图的2D投影将对象定位在地面上，然后检查每个对象是否在当前的车道中。在当前车道的对象中，最接近的一个车辆将被选为CIPV.">
+<meta property="og:image" content="https://zhxjia.github.io/2020/02/29/apollo-cipv/perception_visualization_apollo_3.0.png">
+<meta property="article:published_time" content="2020-02-29T08:09:57.714Z">
+<meta property="article:modified_time" content="2020-02-29T12:23:43.681Z">
 <meta property="article:author" content="ZhxJia">
-<meta property="article:tag" content="caffe">
+<meta property="article:tag" content="apollo">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhxjia.github.io/2020/02/29/apollo-cipv/perception_visualization_apollo_3.0.png">
 
-<link rel="canonical" href="https://zhxjia.github.io/2020/02/18/caffe-learn-start/">
+<link rel="canonical" href="https://zhxjia.github.io/2020/02/29/apollo-cipv/">
 
 
 <script id="page-configurations">
@@ -73,7 +75,7 @@
   };
 </script>
 
-  <title>caffe 学习伊始 | ZhxJia's Blog</title>
+  <title>apollo中cipv检测 | ZhxJia's Blog</title>
   
 
 
@@ -210,7 +212,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/18/caffe-learn-start/">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/29/apollo-cipv/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/jd.png">
@@ -223,7 +225,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          caffe 学习伊始
+          apollo中cipv检测
         </h1>
 
         <div class="post-meta">
@@ -232,8 +234,9 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-02-18 17:34:12" itemprop="dateCreated datePublished" datetime="2020-02-18T17:34:12+08:00">2020-02-18</time>
+              <time title="创建时间：2020-02-29 16:09:57 / 修改时间：20:23:43" itemprop="dateCreated datePublished" datetime="2020-02-29T16:09:57+08:00">2020-02-29</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -241,8 +244,14 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/caffe/" itemprop="url" rel="index">
-                    <span itemprop="name">caffe</span>
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
+                    <span itemprop="name">perception</span>
                   </a>
                 </span>
             </span>
@@ -263,8 +272,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2020/02/18/caffe-learn-start/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/18/caffe-learn-start/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2020/02/29/apollo-cipv/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/29/apollo-cipv/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -274,14 +283,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>139</span>
+              <span>2.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>5 分钟</span>
             </span>
 
         </div>
@@ -293,8 +302,36 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>caffe 学习系列 <a id="more"></a></p>
-<p>打算系统学习caffe源码，现在这占个坑 目前打算阅读顺序:SyncedMemory-&gt;Blob-&gt;layer-&gt;Net-&gt;solver 将开一系列笔记： (1)caffe源码学习SyncedMemory (2)caffe源码学习Blob ...</p>
+        <p>Apollo中CIPV(Closest-In Path Vehicle)为当前车道最接近的车辆，对象由3D边界框表示，其从上到下视图的2D投影将对象定位在地面上，然后检查每个对象是否在当前的车道中。在当前车道的对象中，最接近的一个车辆将被选为CIPV.</p>
+<a id="more"></a>
+<p><code>CIPV</code>通过检测道路上的关键物体以进行纵向控制,利用的信息包括物体检测输出及自身所在车道线<code>(object detection,ego-lane line)</code>。其可用于跟车，从跟踪对象和当前车辆运动中，估计对象的轨迹。该轨迹将指导对象如何在道路上作为一组移动并且可以预测未来的轨迹。有两种跟车尾随，一种是跟随特定车辆的纯尾随，另一种是CIPV引导的尾随，当检测到无车道线时，当前车辆遵循<code>CIPV</code>的轨迹。 <img src="/2020/02/29/apollo-cipv/perception_visualization_apollo_3.0.png"></p>
+<p><strong>apollo中感知输出的可视化，左上角是基于图像的输出，左下角显示了对象的3D边界框。右图显示了车道线和物体的三维俯视图。CIPV标有红色框，黄线表示每辆车的轨迹。</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// We use "right handed ZYX" coordinate system for euler angles</span></span><br><span class="line"> <span class="comment">// adjust pitch yaw roll in camera coords</span></span><br><span class="line"> <span class="comment">// Remember that camera coordinate</span></span><br><span class="line"> <span class="comment">// (Z)----&gt; X</span></span><br><span class="line"> <span class="comment">//  |</span></span><br><span class="line"> <span class="comment">//  |</span></span><br><span class="line"> <span class="comment">//  V</span></span><br><span class="line"> <span class="comment">//  Y</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//----------------------------------------------------------------</span></span><br><span class="line"> <span class="comment">//    area ID, corner ID and face ID</span></span><br><span class="line"> <span class="comment">//----------------------------------------------------------------</span></span><br><span class="line"> <span class="comment">//    8 | 1 | 2       a</span></span><br><span class="line"> <span class="comment">//    ---------    0-----1   ^</span></span><br><span class="line"> <span class="comment">//      |   |       |   |    |</span></span><br><span class="line"> <span class="comment">//    7 | 0 | 3    d|   |b</span></span><br><span class="line"> <span class="comment">//      |   |       |   |</span></span><br><span class="line"> <span class="comment">//    ---------    3-----2</span></span><br><span class="line"> <span class="comment">//    6 | 5 | 4       c</span></span><br><span class="line"> <span class="comment">//----------------------------------------------------------------</span></span><br></pre></td></tr></table></figure>
+<h2 id="配置">配置</h2>
+<p>使能<code>CIPV</code>需要在<code>modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt</code> 中设置<code>enable_cipv:able</code></p>
+<h2 id="初始化">初始化</h2>
+<p>基本数据结构的定义位于<code>modules/perception/camera/app/cipv_camera.h</code></p>
+<p><code>cipv</code>初始化位于<code>FuisonCameraDetectionComponent::Init()</code> 初始化所需参数包括了:</p>
+<ul>
+<li><p>图像与地平面之间的单应性矩阵(<code>homography_im2car_</code>)</p>
+<p>该矩阵由可视化<code>Visualizer</code>功能模块计算获得，计算过程可以参照<code>Visualizer::adjust_angles()</code>,这一部分的初始化<code>visualize_.Init_all_info_single_camera(...)</code>由此处执行。</p></li>
+<li><p><code>cipv</code>所需要的车道线的最少点数(最短长度)<code>(kMinLaneLineLengthForCIPV)</code></p>
+<p>该参数默认为2</p></li>
+<li><p>车道线的平均宽度<code>(kAverageLaneWidthInMeter)</code> 默认为3.7(米)</p></li>
+<li><p>最大车辆宽度<code>(kMaxVehicleWidthInMeter)</code></p>
+<p>默认为1.87米</p></li>
+<li><p>平均帧率<code>(kAverageFrameRate)</code> 默认0.05 s</p></li>
+<li><p><code>image_based_cipv_</code></p>
+<p>布尔值,<code>true</code>:在图像空间中检测目标是否位于车道线内，<code>false:</code>在地平面空间中检测目标是否位于车道线</p></li>
+<li><p><code>debug_level</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 0: no debug message</span><br><span class="line">&#x2F;&#x2F; 1: minimal output</span><br><span class="line">&#x2F;&#x2F; 2: some important output</span><br><span class="line">&#x2F;&#x2F; 3: verbose message</span><br><span class="line">&#x2F;&#x2F; 4: visualization</span><br><span class="line">&#x2F;&#x2F; 5: all</span><br><span class="line">&#x2F;&#x2F; -x: specific debugging, where x is the specific number</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="cipv主体流程">CIPV主体流程</h2>
+<p>运行位于<code>FusionCameraDetectionComponent::InternalProc()</code>中，在主体的相关算法(障碍物跟踪检测、车道线检测)处理完成后运行,同时该部分用到了<code>motion_service</code>的信息(<code>MotionBuffer</code>中存储的车辆状态信息<code>VehicleStatus</code>)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  Determine CIPV</span></span><br><span class="line"> <span class="keyword">if</span> (enable_cipv_) &#123;</span><br><span class="line">   CipvOptions cipv_options;</span><br><span class="line">   <span class="keyword">if</span> (motion_buffer_ != <span class="literal">nullptr</span>) &#123;</span><br><span class="line">     <span class="keyword">if</span> (motion_buffer_-&gt;<span class="built_in">size</span>() == <span class="number">0</span>) &#123;</span><br><span class="line">       AWARN &lt;&lt; <span class="string">"motion_buffer_ is empty"</span>;</span><br><span class="line">       cipv_options.velocity = <span class="number">5.0f</span>;</span><br><span class="line">       cipv_options.yaw_rate = <span class="number">0.0f</span>;</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       cipv_options.velocity = motion_buffer_-&gt;back().velocity;</span><br><span class="line">       cipv_options.yaw_rate = motion_buffer_-&gt;back().yaw_rate;</span><br><span class="line">     &#125;</span><br><span class="line">     ADEBUG &lt;&lt; <span class="string">"[CIPV] velocity "</span> &lt;&lt; cipv_options.velocity</span><br><span class="line">            &lt;&lt; <span class="string">", yaw rate: "</span> &lt;&lt; cipv_options.yaw_rate;</span><br><span class="line">     cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options, world2camera,</span><br><span class="line">                         &amp;camera_frame.tracked_objects);</span><br><span class="line"></span><br><span class="line">     <span class="comment">// Get Drop points</span></span><br><span class="line">     <span class="keyword">if</span> (motion_buffer_-&gt;<span class="built_in">size</span>() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">       cipv_.CollectDrops(motion_buffer_, world2camera,</span><br><span class="line">                          &amp;camera_frame.tracked_objects);</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       AWARN &lt;&lt; <span class="string">"motion_buffer is empty"</span>;</span><br><span class="line">     &#125;</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>主要有两个处理函数:<code>DetermineCipv</code>,<code>CollectDrops</code> ,下面分别分析其主要实现的功能:</p>
+<h3 id="determinecipv">DetermineCipv</h3>
+<h3 id="collectdrops">CollectDrops</h3>
 
     </div>
 
@@ -304,7 +341,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/caffe/" rel="tag"># caffe</a>
+              <a href="/tags/apollo/" rel="tag"># apollo</a>
           </div>
 
         
@@ -313,13 +350,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/02/18/apollo-detector/" rel="prev" title="Apollo中的detector">
-      <i class="fa fa-chevron-left"></i> Apollo中的detector
+    <a href="/2020/02/28/apollo-fusion-camera-detection/" rel="prev" title="Apollo中fusion_camera_deteciton组件消息类型">
+      <i class="fa fa-chevron-left"></i> Apollo中fusion_camera_deteciton组件消息类型
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/02/19/Sort_DeepSort_read/" rel="next" title="Sort和DeepSort论文阅读笔记">
-      Sort和DeepSort论文阅读笔记 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -386,6 +420,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化"><span class="nav-number">2.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cipv主体流程"><span class="nav-number">3.</span> <span class="nav-text">CIPV主体流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#determinecipv"><span class="nav-number">3.1.</span> <span class="nav-text">DetermineCipv</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#collectdrops"><span class="nav-number">3.2.</span> <span class="nav-text">CollectDrops</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -609,6 +644,56 @@
   
 
   
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
 
   
 
@@ -624,9 +709,9 @@
 </script>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://zhxjia.github.io/2020/02/18/caffe-learn-start/";
-    this.page.identifier = "2020/02/18/caffe-learn-start/";
-    this.page.title = "caffe 学习伊始";
+    this.page.url = "https://zhxjia.github.io/2020/02/29/apollo-cipv/";
+    this.page.identifier = "2020/02/29/apollo-cipv/";
+    this.page.title = "apollo中cipv检测";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
     if (window.DISQUS) {
