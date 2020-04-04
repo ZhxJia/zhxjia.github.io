@@ -365,6 +365,19 @@
     
     
     <entry>
+      <title>apollo编译遇到的一些问题</title>
+      <link href="/2020/03/09/perception-build/"/>
+      <url>/2020/03/09/perception-build/</url>
+      
+        <content type="html"><![CDATA[<p>apollo感知部分编译遇到的一些问题</p><a id="more"></a><p>glog cmake 编译的问题</p><p>glog 原生不支持cmake，将<code>FindGlog.cmake</code>添加到CMake的模块目录下</p><p>http://www.yeolar.com/note/2014/12/20/glog/</p><p>http://senlinzhan.github.io/2017/10/07/glog/</p><p>https://blog.csdn.net/dbzhang800/article/details/6329314</p><p>如果gflags也是从包管理器安装的，则使用cmake 也需要findGFlags.cmake</p><p>http://www.yeolar.com/note/2014/12/14/gflags/</p><p>glog学习</p><p>https://izualzhy.cn/glog</p><p>protobuf可能遇到的问题</p><p>https://111qqz.github.io/2018/04/protobuf-notes/</p><p>google 开源风格</p><p>https://zh-google-styleguide.readthedocs.io/en/latest/google-cpp-styleguide/scoping/</p><p>https://zh-google-styleguide.readthedocs.io/en/latest/google-cpp-styleguide/headers/</p><p>命名空间相互污染</p><p>using namespace</p><p>glog的使用</p><p>https://www.cnblogs.com/JZ-Ser/articles/7909800.html</p><p>gtest的使用</p><p>https://www.cnblogs.com/coderzh/archive/2009/04/06/1426755.html</p><p>blob</p><p>原caffe中的blob不支持bool和uint8_t类型的数据</p><p>https://cloud.tencent.com/developer/article/1394880</p><p>并发编程</p><p>https://chenxiaowei.gitbook.io/cpp_concurrency_in_action/1.0-chinese</p><p>计算confidence处存在的问题</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct CmpByValue &#123;</span><br><span class="line">    bool operator()(const PAIR &amp;lhs, const PAIR &amp;rhs) &#123;</span><br><span class="line">        return lhs.second &lt;&#x3D; rhs.second;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p>NMS排反了.</p><h3 id="blob-中的offset-与opencv中通过mat.ptrn快速实现各行像素元素的访问">blob 中的offset 与opencv中通过Mat.ptr(n)快速实现各行像素元素的访问</h3>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>深度学习服务器搭建</title>
       <link href="/2020/03/09/dl-frame-build/"/>
       <url>/2020/03/09/dl-frame-build/</url>
