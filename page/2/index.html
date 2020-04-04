@@ -210,7 +210,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/18/apollo-detector/">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/13/apollo-radar-algorithm/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/jd.png">
@@ -224,7 +224,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2020/02/18/apollo-detector/" class="post-title-link" itemprop="url">Apollo中的detector</a>
+            <a href="/2020/03/13/apollo-radar-algorithm/" class="post-title-link" itemprop="url">Apollo中radar的相关算法</a>
         </h1>
 
         <div class="post-meta">
@@ -234,14 +234,755 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-02-18 10:17:20" itemprop="dateCreated datePublished" datetime="2020-02-18T10:17:20+08:00">2020-02-18</time>
+              <time title="创建时间：2020-03-13 21:33:42" itemprop="dateCreated datePublished" datetime="2020-03-13T21:33:42+08:00">2020-03-13</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-25 16:18:04" itemprop="dateModified" datetime="2020-02-25T16:18:04+08:00">2020-02-25</time>
+                <time title="修改时间：2020-03-16 16:47:45" itemprop="dateModified" datetime="2020-03-16T16:47:45+08:00">2020-03-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
+                    <span itemprop="name">perception</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/13/apollo-radar-algorithm/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/13/apollo-radar-algorithm/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>20 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>apollo中radar的目标检测与跟踪算法</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/03/13/apollo-radar-algorithm/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/11/apollo-radar-init/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/11/apollo-radar-init/" class="post-title-link" itemprop="url">Apollo中毫米波雷达的初始化配置</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-11 23:39:50" itemprop="dateCreated datePublished" datetime="2020-03-11T23:39:50+08:00">2020-03-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-17 00:17:08" itemprop="dateModified" datetime="2020-03-17T00:17:08+08:00">2020-03-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
+                    <span itemprop="name">perception</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/11/apollo-radar-init/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/11/apollo-radar-init/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>13 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Apollo中毫米波雷达的初始化相关配置</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/03/11/apollo-radar-init/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/10/deep_crf_tracking/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/10/deep_crf_tracking/" class="post-title-link" itemprop="url">Deep CRF with Inter-Object Constraints论文阅读</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-10 22:40:43" itemprop="dateCreated datePublished" datetime="2020-03-10T22:40:43+08:00">2020-03-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">论文</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/10/deep_crf_tracking/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/10/deep_crf_tracking/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Deep Continuous Conditional Random Fields With Asymmetric Inter-Object Constraints for Online Multi-Object Tracking</p>
+<p>利用了目标之间的非对称关系。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/03/10/deep_crf_tracking/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/10/an-online-learned-crf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/10/an-online-learned-crf/" class="post-title-link" itemprop="url">Apollo中的标定</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-10 22:40:43" itemprop="dateCreated datePublished" datetime="2020-03-10T22:40:43+08:00">2020-03-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper/" itemprop="url" rel="index">
+                    <span itemprop="name">paper</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/10/an-online-learned-crf/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/10/an-online-learned-crf/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>124</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>An Onlined Learned CRF Model for Multi-Target Tracking 论文阅读： 通过CRF模型建立Target之间的关联</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/03/10/an-online-learned-crf/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/10/cuda-learn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/10/cuda-learn/" class="post-title-link" itemprop="url">cuda-learn</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-10 22:40:43" itemprop="dateCreated datePublished" datetime="2020-03-10T22:40:43+08:00">2020-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-11 13:35:20" itemprop="dateModified" datetime="2020-03-11T13:35:20+08:00">2020-03-11</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/10/cuda-learn/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/10/cuda-learn/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>CUDA编程基础知识</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/03/10/cuda-learn/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/09/dl-frame-build/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/09/dl-frame-build/" class="post-title-link" itemprop="url">深度学习服务器搭建</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-09 00:10:41 / 修改时间：00:12:36" itemprop="dateCreated datePublished" datetime="2020-03-09T00:10:41+08:00">2020-03-09</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/09/dl-frame-build/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/09/dl-frame-build/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>171</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a href="https://aimuch.com/2019/03/17/搭建深度学习服务器环境/" target="_blank" rel="noopener">https://aimuch.com/2019/03/17/%E6%90%AD%E5%BB%BA%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%8E%AF%E5%A2%83/</a></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/03/09/dl-frame-build/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/09/hmm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/09/hmm/" class="post-title-link" itemprop="url">HMM隐马尔科夫模型</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-09 00:07:22" itemprop="dateCreated datePublished" datetime="2020-03-09T00:07:22+08:00">2020-03-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%A6%82%E7%8E%87%E8%AE%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">概率论</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/09/hmm/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/09/hmm/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>12</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>隐马尔科夫模型的基础知识</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/03/09/hmm/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/09/apollo-detector/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/09/apollo-detector/" class="post-title-link" itemprop="url">Apollo中的detector</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-09 00:07:22" itemprop="dateCreated datePublished" datetime="2020-03-09T00:07:22+08:00">2020-03-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-10 22:23:16" itemprop="dateModified" datetime="2020-03-10T22:23:16+08:00">2020-03-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -264,8 +1005,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2020/02/18/apollo-detector/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/18/apollo-detector/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2020/03/09/apollo-detector/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/09/apollo-detector/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -297,7 +1038,7 @@
           <p>Apollo中Detector的相关结构</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2020/02/18/apollo-detector/#more" rel="contents">
+              <a class="btn" href="/2020/03/09/apollo-detector/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -321,7 +1062,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/16/bazel-learn/">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/09/apollo-track/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/jd.png">
@@ -335,7 +1076,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2020/02/16/bazel-learn/" class="post-title-link" itemprop="url">bazel C++编译入门</a>
+            <a href="/2020/03/09/apollo-track/" class="post-title-link" itemprop="url">Apollo 中的跟踪算法</a>
         </h1>
 
         <div class="post-meta">
@@ -344,9 +1085,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-02-16 19:18:45 / 修改时间：20:36:16" itemprop="dateCreated datePublished" datetime="2020-02-16T19:18:45+08:00">2020-02-16</time>
+              <time title="创建时间：2020-03-09 00:07:22" itemprop="dateCreated datePublished" datetime="2020-03-09T00:07:22+08:00">2020-03-09</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -354,14 +1094,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c/" itemprop="url" rel="index">
-                    <span itemprop="name">c++</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index">
-                    <span itemprop="name">工具</span>
+                  <a href="/categories/Apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">Apollo</span>
                   </a>
                 </span>
             </span>
@@ -375,8 +1109,119 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2020/02/16/bazel-learn/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/16/bazel-learn/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2020/03/09/apollo-track/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/09/apollo-track/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>21 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Apollo中的检测算法</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/03/09/apollo-track/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/29/apollo-cipv/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/29/apollo-cipv/" class="post-title-link" itemprop="url">apollo中cipv检测</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-02-29 16:09:57 / 修改时间：20:23:43" itemprop="dateCreated datePublished" datetime="2020-02-29T16:09:57+08:00">2020-02-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
+                    <span itemprop="name">perception</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/02/29/apollo-cipv/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/29/apollo-cipv/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -405,933 +1250,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <a id="more"></a>
-<h2 id="安装">安装</h2>
-<p>参考：https://docs.bazel.build/versions/master/install.html</p>
-<p>apt 安装失败，通过binary安装,安装文件下载：https://github.com/bazelbuild/bazel/releases</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install g++ unzip zip</span><br><span class="line"><span class="comment"># Ubuntu 16.04 (LTS) uses OpenJDK 8 by default:</span></span><br><span class="line">sudo apt-get install openjdk-8-jdk</span><br><span class="line"></span><br><span class="line"><span class="comment"># Ubuntu 18.04 (LTS) uses OpenJDK 11 by default:</span></span><br><span class="line">sudo apt-get install openjdk-11-jdk</span><br><span class="line">sudo bash bazel-&lt;version&gt;-installer-linux-x86_64.sh --user</span><br><span class="line"></span><br><span class="line">vim ~/.bashrc</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">"<span class="variable">$PATH</span>:<span class="variable">$HOME</span>/bin"</span></span><br></pre></td></tr></table></figure>
-<h2 id="编译">编译</h2>
-<p>参考教程:https://docs.bazel.build/versions/master/tutorial/cpp.html</p>
-<h3 id="工作区workspace">工作区(workspace)</h3>
-<p>bazel基于工作区(workspace)的概念编译，工作区存放了所有的源代码和Bazel编译输出文件的目录，也就是整个项目的根目录，与bazel编译相关的文件:</p>
-<ul>
-<li>WORKSPACE文件，用于指定当前文件夹就是一个Bazel的工作区，所以WORKSPACE文件总是存在于项目的根目录下。</li>
-<li>一个或多个BUILD文件，用于告诉Bazel怎么构建项目的不同部分。(如果工作区中的一个目录包含含BUILD文件，即为一个package)</li>
-</ul>
-<p>如果要指定一个目录为Bazel工作区，只要在该目录下创建一个空的WORKSPACE文件即可。当Bazel编译项目是，所有的输入和依赖想都必须在同一个工作区中，不同的工作区的文件，除非linked否则彼此独立。</p>
-<p>WORKSPACE文件中可以设置第三方代码库，即外部引用</p>
-<h3 id="build文件组成">BUILD文件组成</h3>
-<p>BUILD文件中最重要的指令是编译指令，告诉Bazel如何编译输出，比如是生成可执行二进制文件还是链接库。BUILD文件中每一天编译指令被称为一个target，它指向一系列的源文件和依赖，一个target也可以指向别的target。</p>
-<p>bazelbuild的简单例子可以参考：https://github.com/bazelbuild/examples</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="string">"@rules_cc//cc:defs.bzl"</span>, <span class="string">"cc_binary"</span>)</span><br><span class="line"></span><br><span class="line">cc_binary(</span><br><span class="line">	name = <span class="string">"hello-world"</span>,</span><br><span class="line">	srcs = [<span class="string">"hello-world.cc"</span>],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<p><code>name</code>即为该target名称，<code>src</code>包含了源文件，<code>cc_binary</code>为内置的生成二进制文件的指令。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bazel build //main:hello-world</span><br></pre></td></tr></table></figure>
-<p>在WORSPACE目录下上述命令行指令即可实现编译，<code>main:hello-world</code>表示位于main目录下的target <code>helo-world</code>,同时获得如下输出，生成的二进制文件位于<code>bazel-bin/main/hello-world</code> <strong>路径相对于WORKSPACE</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">INFO: Found 1 target...</span><br><span class="line">Target //main:hello-world up-to-date:</span><br><span class="line">  bazel-bin/main/hello-world</span><br></pre></td></tr></table></figure>
-<h3 id="多个target同时编译">多个target同时编译</h3>
-<p>对于大型项目来说，一般会把它拆分成多个<code>target</code>和多个<code>package</code>来实现快速增量的编译。</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="string">"@rules_cc//cc:defs.bzl"</span>, <span class="string">"cc_binary"</span>, <span class="string">"cc_library"</span>)                   </span><br><span class="line"></span><br><span class="line">cc_library(</span><br><span class="line">   name = <span class="string">"hello-greet"</span>,</span><br><span class="line">   srcs = [<span class="string">"hello-greet.cc"</span>],</span><br><span class="line">   hdrs = [<span class="string">"hello-greet.h"</span>],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">cc_binary(</span><br><span class="line">    name = <span class="string">"hello-world"</span>,</span><br><span class="line">    srcs = [<span class="string">"hello-world.cc"</span>],</span><br><span class="line">    deps = [</span><br><span class="line">        <span class="string">":hello-greet"</span>,</span><br><span class="line">    ],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<p>在这个BUILD文件中，首先编译了<code>hello-greet</code>这个库(利用bazel内置的cc_library编译指令)，然后在编译<code>hello-world</code>这个二进制文件。<code>hellow-world</code>这个target的<code>deps</code>属性告诉Bazel，要构建<code>hello-world</code>这个二进制文件，首先需要<code>hello-greet</code>这个库。</p>
-<h3 id="多个package同时编译">多个package同时编译</h3>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">└── stage3</span><br><span class="line">    ├── lib</span><br><span class="line">    │   ├── BUILD</span><br><span class="line">    │   ├── hello-time.cc</span><br><span class="line">    │   └── hello-time.h</span><br><span class="line">    ├── main</span><br><span class="line">    │   ├── BUILD</span><br><span class="line">    │   ├── hello-greet.cc</span><br><span class="line">    │   ├── hello-greet.h</span><br><span class="line">    │   └── hello-world.cc</span><br><span class="line">    ├── README.md</span><br><span class="line">    └── WORKSPACE</span><br></pre></td></tr></table></figure>
-<p>两个BUILD对应的为两个package,因此对于Bazel来说，整个工作区包含了两个package: lib和main。两个目录下的<code>BUILD</code>文件分别定义如下： main下的BUILD文件：</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="string">"@rules_cc//cc:defs.bzl"</span>, <span class="string">"cc_binary"</span>, <span class="string">"cc_library"</span>)                   </span><br><span class="line"></span><br><span class="line">cc_library(</span><br><span class="line">    name = <span class="string">"hello-greet"</span>,</span><br><span class="line">    srcs = [<span class="string">"hello-greet.cc"</span>],</span><br><span class="line">    hdrs = [<span class="string">"hello-greet.h"</span>],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">cc_binary(</span><br><span class="line">    name = <span class="string">"hello-world"</span>,</span><br><span class="line">    srcs = [<span class="string">"hello-world.cc"</span>],</span><br><span class="line">    deps = [</span><br><span class="line">        <span class="string">":hello-greet"</span>,</span><br><span class="line">        <span class="string">"//lib:hello-time"</span>,</span><br><span class="line">    ],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<p><code>lib/BUILD</code>:</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="string">"@rules_cc//cc:defs.bzl"</span>, <span class="string">"cc_library"</span>)                                </span><br><span class="line"></span><br><span class="line">cc_library(</span><br><span class="line">    name = <span class="string">"hello-time"</span>,</span><br><span class="line">    srcs = [<span class="string">"hello-time.cc"</span>],</span><br><span class="line">    hdrs = [<span class="string">"hello-time.h"</span>],</span><br><span class="line">    visibility = [<span class="string">"//main:__pkg__"</span>],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<p>显然main下的<code>hello-world</code>这个target依赖于<code>lib</code>这个package中的<code>hello-time</code>target 即(<code>deps = [&quot;//lib:hello-time&quot;]</code>),Bazel通过<code>deps</code>这个属性知道自己的依赖项。同时注意到<code>lib/BUILD</code>文件中的将<code>hello-time</code>这个target显示可见(通过<code>visibility</code>属性)，这是因为默认情况下targets只对同一个BUILD文件里的其他targets可见。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bazel build //main:hello-world</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/16/doxygen/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/16/doxygen/" class="post-title-link" itemprop="url">doxygen</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-02-16 11:23:22 / 修改时间：19:17:36" itemprop="dateCreated datePublished" datetime="2020-02-16T11:23:22+08:00">2020-02-16</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index">
-                    <span itemprop="name">工具</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/02/16/doxygen/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/16/doxygen/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>258</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <a id="more"></a>
-<blockquote>
-<p>参考：https://www.ibm.com/developerworks/cn/aix/library/au-learningdoxygen/index.html</p>
-</blockquote>
-<h2 id="安装doxygen">安装doxygen</h2>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install flex bison</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/doxygen/doxygen.git</span><br><span class="line"><span class="built_in">cd</span> doxygen</span><br><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake .. &amp; make </span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
-<h2 id="使用doxygen生成文档">使用Doxygen生成文档</h2>
-<p>--目前应用好像有困难　　暂时先不写了</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/16/cyber-component/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/16/cyber-component/" class="post-title-link" itemprop="url">Component 组件注册过程</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-02-16 00:15:07 / 修改时间：11:20:58" itemprop="dateCreated datePublished" datetime="2020-02-16T00:15:07+08:00">2020-02-16</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/" itemprop="url" rel="index">
-                    <span itemprop="name">apollo</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/02/16/cyber-component/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/16/cyber-component/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <a id="more"></a>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CYBER_REGISTER_COMPONENT(FusionCameraDetectionComponent);</span><br></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CYBER_REGISTER_COMPONENT(name) \</span></span><br><span class="line">  CLASS_LOADER_REGISTER_CLASS(name, apollo::cyber::ComponentBase)</span><br></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// register class macro</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CLASS_LOADER_REGISTER_CLASS(Derived, Base) \</span></span><br><span class="line">  CLASS_LOADER_REGISTER_CLASS_INTERNAL_1(Derived, Base, __COUNTER__)</span><br></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CLASS_LOADER_REGISTER_CLASS_INTERNAL_1(Derived, Base, UniqueID) \</span></span><br><span class="line">  CLASS_LOADER_REGISTER_CLASS_INTERNAL(Derived, Base, UniqueID)</span><br></pre></td></tr></table></figure>
-<p>最终实际执行： <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CLASS_LOADER_REGISTER_CLASS_INTERNAL(Derived, Base, UniqueID)     \</span></span><br><span class="line">  <span class="keyword">namespace</span> &#123;                                                             \</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">ProxyType</span>##<span class="title">UniqueID</span> &#123;</span>                                            \</span><br><span class="line">    ProxyType##UniqueID() &#123;                                               \</span><br><span class="line">      apollo::cyber::class_loader::utility::RegisterClass&lt;Derived, Base&gt;( \</span><br><span class="line">          #Derived, #Base);                                               \</span><br><span class="line">    &#125;                                                                     \</span><br><span class="line">  &#125;;                                                                      \</span><br><span class="line">  <span class="keyword">static</span> ProxyType##UniqueID g_register_class_##UniqueID;                 \</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Derived, <span class="keyword">typename</span> Base&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">RegisterClass</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; class_name,</span></span></span><br><span class="line"><span class="function"><span class="params">                   <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; base_class_name)</span> </span>&#123;</span><br><span class="line">  AINFO &lt;&lt; <span class="string">"registerclass:"</span> &lt;&lt; class_name &lt;&lt; <span class="string">","</span> &lt;&lt; base_class_name &lt;&lt; <span class="string">","</span></span><br><span class="line">        &lt;&lt; GetCurLoadingLibraryName();</span><br><span class="line"></span><br><span class="line">  utility::AbstractClassFactory&lt;Base&gt;* new_class_factrory_obj =</span><br><span class="line">      <span class="keyword">new</span> utility::ClassFactory&lt;Derived, Base&gt;(class_name, base_class_name);</span><br><span class="line">  new_class_factrory_obj-&gt;AddOwnedClassLoader(GetCurActiveClassLoader());</span><br><span class="line">  new_class_factrory_obj-&gt;SetRelativeLibraryPath(GetCurLoadingLibraryName());</span><br><span class="line"></span><br><span class="line">  GetClassFactoryMapMapMutex().lock();</span><br><span class="line">  ClassClassFactoryMap&amp; factory_map =</span><br><span class="line">      GetClassFactoryMapByBaseClass(<span class="keyword">typeid</span>(Base).name());</span><br><span class="line">  factory_map[class_name] = new_class_factrory_obj;</span><br><span class="line">  GetClassFactoryMapMapMutex().unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/13/sequence-containers/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/13/sequence-containers/" class="post-title-link" itemprop="url">序列容器</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-13 17:48:19" itemprop="dateCreated datePublished" datetime="2020-02-13T17:48:19+08:00">2020-02-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-16 00:12:53" itemprop="dateModified" datetime="2020-02-16T00:12:53+08:00">2020-02-16</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c/" itemprop="url" rel="index">
-                    <span itemprop="name">c++</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c/%E6%A8%A1%E6%9D%BF%E7%B1%BB/" itemprop="url" rel="index">
-                    <span itemprop="name">模板类</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/02/13/sequence-containers/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/13/sequence-containers/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>7.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>12 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>c++ 模板库中序列容器的使用</p>
+          <p>Apollo中CIPV(Closest-In Path Vehicle)为当前车道最接近的车辆，对象由3D边界框表示，其从上到下视图的2D投影将对象定位在地面上，然后检查每个对象是否在当前的车道中。在当前车道的对象中，最接近的一个车辆将被选为CIPV.</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2020/02/13/sequence-containers/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/13/apollo-nn/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/13/apollo-nn/" class="post-title-link" itemprop="url">Apollo中的神经网络框架</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-02-13 15:18:43 / 修改时间：15:29:58" itemprop="dateCreated datePublished" datetime="2020-02-13T15:18:43+08:00">2020-02-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Apollo/" itemprop="url" rel="index">
-                    <span itemprop="name">Apollo</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/02/13/apollo-nn/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/13/apollo-nn/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>755</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="模型类型">模型类型</h3>
-<p>model_type</p>
-<p><code>modules/perception/inference/inference_factory.h</code></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Inference *<span class="title">CreateInferenceByName</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;name,</span></span></span><br><span class="line"><span class="function"><span class="params">                                 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;proto_file,</span></span></span><br><span class="line"><span class="function"><span class="params">                                 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;weight_file,</span></span></span><br><span class="line"><span class="function"><span class="params">                                 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; &amp;outputs,</span></span></span><br><span class="line"><span class="function"><span class="params">                                 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; &amp;inputs,</span></span></span><br><span class="line"><span class="function"><span class="params">                                 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;model_root)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (name == <span class="string">"CaffeNet"</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CaffeNet(proto_file, weight_file, outputs, inputs);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (name == <span class="string">"RTNet"</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> RTNet(proto_file, weight_file, outputs, inputs);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (name == <span class="string">"RTNetInt8"</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> RTNet(proto_file, weight_file, outputs, inputs, model_root);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (name == <span class="string">"PaddleNet"</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> PaddleNet(proto_file, weight_file, outputs, inputs);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>RTNet 表示使用TensorRT加速</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/08/can-conf/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/08/can-conf/" class="post-title-link" itemprop="url">Apollo中can卡配置</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-08 12:19:53" itemprop="dateCreated datePublished" datetime="2020-02-08T12:19:53+08:00">2020-02-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-09 23:02:22" itemprop="dateModified" datetime="2020-02-09T23:02:22+08:00">2020-02-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" itemprop="url" rel="index">
-                    <span itemprop="name">无人驾驶</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/apollo/" itemprop="url" rel="index">
-                    <span itemprop="name">apollo</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/02/08/can-conf/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/08/can-conf/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>12k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>20 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>apollo开源框架中can卡的配置</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/02/08/can-conf/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/07/factory-mode/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/07/factory-mode/" class="post-title-link" itemprop="url">Apollo工厂模式解析</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-07 23:51:44" itemprop="dateCreated datePublished" datetime="2020-02-07T23:51:44+08:00">2020-02-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-09 22:08:56" itemprop="dateModified" datetime="2020-02-09T22:08:56+08:00">2020-02-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" itemprop="url" rel="index">
-                    <span itemprop="name">无人驾驶</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/c/" itemprop="url" rel="index">
-                    <span itemprop="name">c++</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/02/07/factory-mode/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/07/factory-mode/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>6.5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>11 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>apollo 中工厂模式相关知识介绍</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/02/07/factory-mode/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/07/Apollo-IntenalProc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/07/Apollo-IntenalProc/" class="post-title-link" itemprop="url">Apollo InternalProc 感知处理流程</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-07 11:49:50" itemprop="dateCreated datePublished" datetime="2020-02-07T11:49:50+08:00">2020-02-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-13 13:14:50" itemprop="dateModified" datetime="2020-02-13T13:14:50+08:00">2020-02-13</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" itemprop="url" rel="index">
-                    <span itemprop="name">无人驾驶</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/%E6%84%9F%E7%9F%A5/" itemprop="url" rel="index">
-                    <span itemprop="name">感知</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/02/07/Apollo-IntenalProc/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/07/Apollo-IntenalProc/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>16</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Apollo 总体感知算法处理流程</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/02/07/Apollo-IntenalProc/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/02/06/OnReceiveImages/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/06/OnReceiveImages/" class="post-title-link" itemprop="url">Apollo回调函数概览</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-02-06 13:52:36" itemprop="dateCreated datePublished" datetime="2020-02-06T13:52:36+08:00">2020-02-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-18 00:08:04" itemprop="dateModified" datetime="2020-02-18T00:08:04+08:00">2020-02-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" itemprop="url" rel="index">
-                    <span itemprop="name">无人驾驶</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/%E6%84%9F%E7%9F%A5/" itemprop="url" rel="index">
-                    <span itemprop="name">感知</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/02/06/OnReceiveImages/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/06/OnReceiveImages/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>7.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>13 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="一onreceiveimages内部函数处理流程">一、OnReceiveImages()内部函数处理流程:</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/02/06/OnReceiveImages/#more" rel="contents">
+              <a class="btn" href="/2020/02/29/apollo-cipv/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1355,7 +1277,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1423,20 +1345,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">41</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1465,7 +1387,7 @@
           <h3 class="widget-title">Tag Cloud</h3>
           <div id="myCanvasContainer" class="widget tagcloud">
               <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
         </canvas>
        </div>
      </div>
@@ -1495,12 +1417,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">94k</span>
+    <span title="站点总字数">198k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:36</span>
+    <span title="站点阅读时长">5:31</span>
 </div>
 
 <span id="sitetime"></span>

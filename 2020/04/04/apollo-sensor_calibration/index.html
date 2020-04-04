@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="apollo中的坐标系统和多传感器标定及坐标转换(transform组件)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apollo中多传感器标定与坐标系统">
+<meta property="og:url" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="apollo中的坐标系统和多传感器标定及坐标转换(transform组件)">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/coordination_01.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/coordination_02.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/coordination_04.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/C:/Users/jia_z/Desktop/blogrepo/source/_posts/apollo-sensor_calibration/calibration05.jpg">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/C:/Users/jia_z/Desktop/blogrepo/source/_posts/apollo-sensor_calibration/174722.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/gnss.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/calibration06.jpg">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/C:/Users/jia_z/Desktop/blogrepo/source/_posts/apollo-sensor_calibration/odometry.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/230426.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/cal06.jpg">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/205819.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/205718.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/204947.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/C:/Users/jia_z/Desktop/blogrepo/source_posts/apollo-sensor_calibration/recorder.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/calibration10.jpg">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/config.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/caliop.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/accurate.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/C:/Users/jia_z/Desktop/blogrepo/source/_posts/apollo-sensor_calibration/103354.png">
+<meta property="article:published_time" content="2020-04-04T02:58:02.735Z">
+<meta property="article:modified_time" content="2020-04-04T02:58:02.735Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="传感器标定">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/coordination_01.png">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Apollo中多传感器标定与坐标系统 | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Apollo中多传感器标定与坐标系统
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
+                    <span itemprop="name">perception</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/04/apollo-sensor_calibration/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo-sensor_calibration/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>apollo中的坐标系统和多传感器标定及坐标转换(transform组件)</p>
+<a id="more"></a>
+<h2 id="坐标系统">1. 坐标系统</h2>
+<p>参考：<code>docs/specs/coordination_cn.md</code></p>
+<p>Apollo系统中采用的坐标系的定义：</p>
+<h3 id="全球地理坐标系">全球地理坐标系</h3>
+<p>使用全球地理坐标系来表示高精地图(HD Map)中各个元素的地理位置。全球地理坐标系通常用途是用来表示纬度，经度和海拔。Apollo采用的是WGS84(World Geodetic System 1984)作为标准坐标系来表示物体的纬度和经度。通过使用该标准坐标系统，可以使用两个数字：x坐标，y坐标来唯一确定地球表面上除北极点之外的所有点，其中x坐标表示经度，y坐标表示纬度。全球地理坐标系的定义如图所示：</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/coordination_01.png" style="zoom:50%;"></p>
+<h3 id="局部坐标系-东-北-天east-north-up-enu"><strong>局部坐标系-东-北-天(East-North-Up ENU)</strong>:</h3>
+<p>在Apollo中，局部坐标系的定义为：</p>
+<p>z轴-指向上方（与重力线为同一直线） y轴-指向北面 x轴-指向东面</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/coordination_02.png" style="zoom:50%;"></p>
+<p>ENU局部坐标系依赖于在地球表面上建立3D笛卡尔坐标系。</p>
+<p>通用横轴墨卡托正形投影(Universal Transverse Mercator UTM),使用2D的笛卡尔坐标系来给出地球表面点的位置。该坐标系将地球划分为60个区域，每个区域表示为6度的经度带，并且每个区域上使用割线横轴墨卡托投影。在apollo系统中，UTM坐标系统在定位，规划等模块中作为局部坐标系使用。</p>
+<p>关于UTM坐标系统的使用，遵从国际标准规范。开发者可以参考下述网站获取更多细节：</p>
+<p><a href="http://geokov.com/education/utm.aspx" target="_blank" rel="noopener" class="uri">http://geokov.com/education/utm.aspx</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system" target="_blank" rel="noopener" class="uri">https://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system</a></p>
+<h3 id="车辆坐标系-右-前-上right-forward-up-rfu">车辆坐标系-右-前-上(Right-Forward-Up RFU)</h3>
+<p>车辆坐标系的定义为： z轴-通过车顶垂直于地面指向上方 y轴-在行驶方向上指向车辆前方 x轴-面向前方时，指向车辆右侧 车辆坐标系的原点在车辆后轮轴的中心</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/coordination_04.png" style="zoom: 50%;"></p>
+<h3 id="传感器等硬件安装位置">传感器等硬件安装位置</h3>
+<p>下面的示例中，不同颜色箭头代表不同的坐标方向，实心代表垂直向上，包括了4个环视相机，3个radar，1个IMU，1个lidar。</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/C:/Users\jia_z\Desktop\blogrepo\source\_posts\apollo-sensor_calibration\calibration05.jpg" style="zoom: 33%;"></p>
+<p>首先拿到车辆的CAD模型，然后在软件环境中去放置sensor（尽量在软件平台中标注传感器的感知角度距离），需要考虑的不仅仅是空旷环境下传感器的感知范围，也要考虑到真实环境中的遮挡情况，同时要便于传感器融合（不同传感器的感知视野需要overlap）。需要注意的是传感器的安装位置的稳定性和安全性。</p>
+<hr>
+<h2 id="多传感器标定">2. 多传感器标定</h2>
+<p>标定本质就是要获得不同传感器之间的相对位置，然后将各传感器的坐标系对齐，分为内参和外参，有些是传感器厂家提供，有一些则需要自己去重新标定：</p>
+<ul>
+<li><p>内参：传感器自身性质，例如camera焦距，Lidar中各激光管的垂直朝向角。</p></li>
+<li><p>外参：传感器之间的相对位置和朝向，用3自由度的旋转矩阵和3自由度的平移向量表示。</p>
+<blockquote>
+<p>内参虽然一般来说是固定的，但是随着长期的运行，也需要定期标定一下。</p>
+</blockquote></li>
+</ul>
+<p><code>Lidar</code>,<code>Camera</code>,<code>radar</code>之间有不同的观测角度和数据表现形式，要融合它们的各自的优点的前提就是需要它们之间相对的坐标变换关系,传感器的相对相对位置关系可以通过4*4变换矩阵M表示，实际有12个量需要计算表示旋转位移。 <span class="math display">\[
+M=
+\begin{bmatrix}
+R_{3\times3}&amp; T_{3\times1}\\
+0_{1\times3}&amp;1
+\end{bmatrix}
+\]</span> 但是实际上<span class="math inline">\(R_{3\times3}\)</span>可以通过四元数表示转换为4个参数，实际上只需要标定7个参数。</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/C:/Users\jia_z\Desktop\blogrepo\source\_posts\apollo-sensor_calibration\174722.png" style="zoom: 33%;"></p>
+<h3 id="粗略标定">2.1粗略标定</h3>
+<p>首先可以进行粗略的标定，在手凉传感器标定初值的时候，一定要分清楚是从哪一个源传感器到哪一个目标传感器，且这些数值是在目标传感器坐标系下，位移向量以米为单位，旋转以弧度为单位，如下所示，<code>frame_id</code>表示目标传感器， <code>child_frame_id</code>表示源传感器，而<code>translation</code>和<code>rotation</code>是在<code>frame_id</code>即目标传感器坐标系下的short_camera的位姿</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">header:</span></span><br><span class="line">  <span class="attr">stamp:</span></span><br><span class="line">    <span class="attr">secs:</span> <span class="number">0</span></span><br><span class="line">    <span class="attr">nsecs:</span> <span class="number">0</span></span><br><span class="line">  <span class="attr">seq:</span> <span class="number">0</span></span><br><span class="line">  <span class="attr">frame_id:</span> <span class="string">Velodyne64</span> <span class="comment"># Destination sensor</span></span><br><span class="line"><span class="attr">child_frame_id:</span> <span class="string">short_camera</span> <span class="comment"># source sensor</span></span><br><span class="line"><span class="attr">transform:</span></span><br><span class="line">  <span class="attr">translation:</span></span><br><span class="line">    <span class="attr">x:</span> <span class="number">0.9356324324557267</span></span><br><span class="line">    <span class="attr">z:</span> <span class="number">-0.5427650640523064</span></span><br><span class="line">    <span class="attr">y:</span> <span class="number">-0.2485193364771597</span></span><br><span class="line">  <span class="attr">rotation:</span></span><br><span class="line">    <span class="attr">w:</span> <span class="number">0.5171207069875965</span></span><br><span class="line">    <span class="attr">x:</span> <span class="number">-0.4789595241079692</span></span><br><span class="line">    <span class="attr">y:</span> <span class="number">0.5018481750475685</span></span><br><span class="line">    <span class="attr">z:</span> <span class="number">-0.5013305874094867</span></span><br></pre></td></tr></table></figure>
+<h3 id="录取数据">2.2 录取数据</h3>
+<p>在录取数据之前先通过<code>Cyber_montior</code>工具来检查安装的传感器的状态，对应传感器的消息通道名称和帧率信息。绿色代表消息正常首发，红色代表消息没有出现。通过<code>Cyber Monitor</code>可以检查相应传感器的帧率是否正常，例如，激光雷达的帧率是10hz,相机的帧率15hz-20hz,GPS和惯导信号帧率为100hz。 还需要注意GPS的信号是否正常，质量是否足够高，如图红色框中，<code>Narrow_INT</code>是正常状态，此时三个方向上的标准差应该为1-2厘米级别。</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/gnss.png" style="zoom:75%;"></p>
+<p>同样，也可以通过<code>cyber_visualizer</code>命令来查看传感器的原始数据，保证数据质量，如图像是否模糊，lidar是否点云噪音过多，这种问题一般是由于硬件安装和EOS系统的不匹配造成的。</p>
+<p>上述初步检查完成后，按照Apollo的建议采集有效的传感器标定数据，脚本文件<code>($Apollo)/scripts/record_bag.py</code></p>
+<p>对于激光雷达，只需采集原始点云数据；对于相机，建议采集未压缩的原始图像信息；对于惯导和GPS需要采集他们的odometry信息。右图的三个红框分别展示了典型的图像信息、点云信息以及GPS和惯导信息。在使用Apollo DreamView进行数据采集前，可以通过上述步骤修改对应脚本中的消息列表，以适配自己的传感器方案,例如lidar到gnss的标定不需要camera数据，则可以过滤图像数据，以减小数据包的大小。</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/calibration06.jpg" style="zoom: 33%;"></p>
+<p>gnss/odometry:100Hz通道的数据组成：</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/C:/Users\jia_z\Desktop\blogrepo\source\_posts\apollo-sensor_calibration\odometry.png" style="zoom: 67%;"></p>
+<h3 id="标定策略">2.3 标定策略</h3>
+<ul>
+<li><p><strong>相机内参标定：</strong></p></li>
+<li><p><strong>Lidar内参标定：</strong></p></li>
+<li><p><strong>Lidar-to-GPS外参标定：</strong> 在空旷的地方绕8字，每一个时间点GPS都会得到车辆的位置信息(原点是GPS安装点)，然后把每一帧点云都投影到GPS坐标原点的坐标系中，将点云拼接到一起解一个优化，在采集是，希望场景中没有过多的动态障碍物，地面平整，场景中有类似数目，电线杆之类的静态障碍物。由于组合惯导和Lidar没有直接的测量数据对应，所以采用<strong>手眼标定</strong>方法获得外参初值，然后采用基于点云拼接质量进行外参优化。 具体标定方法参考：https://github.com/ApolloAuto/apollo/blob/master/docs/specs/lidar_calibration.pdf</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/230426.png" style="zoom: 50%;"></p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/cal06.jpg" style="zoom: 33%;"></p></li>
+<li><p><strong>Lidar-to-Lidar外参标定：</strong> 每个Lidar与Rigel之间独立进行ICP，然后得到相对<code>Rigel</code>的位移旋转矩阵，再通过传递得到Lidar之间的相对位置。验证方法是将所有的点云都投影到真实的物理世界中，若边缘清晰则标定正常。</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/205819.png"></p></li>
+<li><p><strong>Lidar-to-Camera外参标定：</strong> 在标定间中，贴满二维码(April-Tag 具有高鲁棒性和识别精度的二维码)，每个二维码对应的ID都不一样，然后在标定间中间放置毫米级精度激光扫描仪<code>Rigel</code>,对标定间进行3D建模，这样就知道了标定间墙面上任意点的3D位置(包括了April-Tag的四个角点)。由于<code>Lidar</code>与<code>Rigel</code>都是点云数据，两个点云之间做ICP，得到对应的位移旋转矩阵，相机通过<code>Rigel</code>也可以得到对应的位移旋转矩阵，然后两个位移旋转矩阵进行传递即可得到相对的位置。验证方法是将3D点投影到图像中，观察边界是否一致。 <img src="/2020/04/04/apollo-sensor_calibration/205718.png"></p></li>
+<li><p><strong>Camera-to-Camera外参标定</strong></p>
+<p>在标定间中，长焦和短焦的相机都能够过的Tag的四个角点3D坐标，同时在相机中对应的2D坐标也已知，2D坐标 3D坐标都有了，那么通过多个点对求解这个<code>PNP</code>问题，可以得到短焦相机和长焦相机相对Rigel各自的位移旋转矩阵，最后就可以得到它们之间的相对坐标。标定完成后，需要验证标定结果，对于图像来说可以通过可视化，比如长焦的图像范围一般是包含在短焦的视野范围内的，那么将长焦图像投影到短焦图像上没有重影比较自然则应该比较标准。 <img src="/2020/04/04/apollo-sensor_calibration/204947.png" style="zoom:50%;"></p></li>
+<li><p><strong>自然场景中的Lidar-to-Camera外参标定</strong></p>
+<p>自然场景下的标定有一些要求，需要在场景中找到一些边缘(比如路边的标识牌)，针对lidar(边缘处lidar的深度会有变化)和camera各自对边缘的坐标作为考量的指标，将两个sensor对齐。 相机到lidar的标定，通过4个5的方法来指导开车数据采集过程，即在一个较为空旷，拥有大量静态障碍物的场景中，无人车以大约5英里每小时的速度直线行驶5米后刹车，之后完全停止大约5秒，重复以上步骤5-6次。</p>
+<p>完成数据采集后，可以通过命令<code>cyber_recorder info ${bagname}</code>来检查采集的数据包。通过计算每秒钟采集的数据的帧率，可以大致了解数据是否完整的被存放，例如，Gps惯导信息，帧率为100HZ,在4秒左右的数据包中有大约430个数据，符合预期。而红框中所示的相机，其消息数为0，如果我们需要涉及到相机的标定，那么这个数据集的采集是不成功的。 <img src="/2020/04/04/apollo-sensor_calibration/C:/Users\jia_z\Desktop\blogrepo\source_posts\apollo-sensor_calibration\recorder.png"></p></li>
+<li><p><strong>自然场景中的Bifocal Camreas外参标定</strong> 自然场景下，视野有重叠的多个相机之间的对齐，同样在重叠的视野中找到一个边缘比较锐利的物体，进行外参标定。</p></li>
+<li><p><strong>Camera-to-Radar外参标定</strong> 由于radar不知道高度，其返回的是一个平面内的距离角度信息，需要得到radar相对相机的高度。一般是假设radar是水平安装，安装位置已在汽车的cad模型中固定好了，然后通过CAD模型的测量可以得到这个高度。但是相机的pitch角度即相对radar的俯仰角度(假设radar是水平的)是需要标定的。在假设radar水平的前提下，标定问题退化为相机与地面（水平面）的pitch角度问题，这样就可以借助Lidar,通过Lidar可以得到地面水平面，Camera相对于Lidar已经标定好了，则Camera相对于地面的pitch角度就可以测量出来，这个角度就等同于Camera相对radar的水平角度。</p></li>
+</ul>
+<h3 id="通过apollo工具提供有效数据">2.4 通过Apollo工具提供有效数据</h3>
+<p><img src="/2020/04/04/apollo-sensor_calibration/calibration10.jpg" style="zoom: 33%;"></p>
+<p>当完成数据采集后，可以通过Apollo平台中数据分析提取工具，提取有用的标定信息，仅需一行命令，就可以自动完成数据的提取和压缩，可以将原50GB的数据压缩到3-5GB（5lidars/5Cameras/gps calibration needs）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python /apollo/modules/tools/sensor_calibration/extract_data.py --config /apollo/modules/tools/sensor_calibration/config/camera_to_lidar_calibration.config</span><br></pre></td></tr></table></figure>
+<p><code>*.config</code>配置文件中分为三个部分：第一个部分是io配置，主要是指定标定任务的名称，以及相应的输出路径；第二个部分，主要为指定输入的数据包路径，可以是完整的数据包路径列表，也可以是一个包含多个数据包的文件夹路径。最后一部分主要是指定所需提取的消息名称以及采样率。对于小容量信息(比如GNSS里程计信息)，建议完整保留，采样率为1.</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/config.png" style="zoom:40%;"></p>
+<h3 id="通过apollo产生准确的标定参数">2.5 通过Apollo产生准确的标定参数</h3>
+<p>对于相机内参，由于需要采集棋盘格图像，要求棋盘格的成像能够覆盖图像的各个区域，并且图片中的棋盘格完整。采集步骤如下： 将设备固定在三脚架上，开启相机，观察标定板在相机上的成像。将图像分为图片中的五个区域，将标定板正对相机并移动标定板将成像置于这5个区域内，在每个区域中，分别绕标定板的X,Y轴旋转正负30度左右各一次，绕z轴旋转正负45度左右各一次，并采集图像。</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/caliop.png" style="zoom: 33%;"></p>
+<p>采集完相应的棋盘格图像后，可以使用OpenCV自带的摄像机内参标定工具完成标定。完成内参标定后，按照Apollo建议内参格式，生成对应的内参文件。</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/accurate.png" style="zoom:33%;"></p>
+<p>当完成上述步骤后，可以将数据提取工具产生的压缩包以及摄像头的内参文件，发给 Apollo 服务团队，完成传感器的标定。https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/multiple_lidar_gnss_calibration_guide.md</p>
+<p>https://login.bce.baidu.com/?redirect=http%3A%2F%2Fconsole.bce.baidu.com%2Fapollo%2Fcalibrator%2Findex%2Flist</p>
+<p><img src="/2020/04/04/apollo-sensor_calibration/C:/Users\jia_z\Desktop\blogrepo\source\_posts\apollo-sensor_calibration\103354.png" style="zoom: 50%;"></p>
+<h3 id="多传感器数据融合-关系">多传感器数据融合 关系</h3>
+<h2 id="transform-wrapper">3. Transform Wrapper</h2>
+<p>整个Transform部分的封装格式和相互关联应该为</p>
+<blockquote>
+<p><code>third_party/tf2(ros) -&gt; modules/transform -&gt; perception/onboard/transform_wrapper</code></p>
+</blockquote>
+<p>此部分详细参考文件<code>apollo-transfom_wrapper.md</code></p>
+<h2 id="apollo提供的标定工具">4. Apollo提供的标定工具</h2>
+<p>参考文件：docs/quickstart/multiple_lidar_gnss_calibration_guide_cn.md</p>
+<p>参考文件：https://github.com/ApolloAuto/apollo/blob/master/docs/specs/apollo_lidar_imu_calibration_guide.md</p>
+<h2 id="参考资料">参考资料</h2>
+<p>https://blog.csdn.net/qq_41204464/article/details/102945454</p>
+<p>https://gitbook.cn/books/5cd8e067d7a0dd4c0f47391a/index.html</p>
+<p>https://bit.baidu.com/productsBuy?id=81&amp;chapterId=224</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag"># 传感器标定</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/04/apollo-cyber_bash/" rel="prev" title="Apollo中Cyber RT脚本启动流程">
+      <i class="fa fa-chevron-left"></i> Apollo中Cyber RT脚本启动流程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/04/apollo-lidar_driver/" rel="next" title="apollo lidar驱动组件">
+      apollo lidar驱动组件 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#坐标系统"><span class="nav-number">1.</span> <span class="nav-text">1. 坐标系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全球地理坐标系"><span class="nav-number">1.1.</span> <span class="nav-text">全球地理坐标系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#局部坐标系-东-北-天east-north-up-enu"><span class="nav-number">1.2.</span> <span class="nav-text">局部坐标系-东-北-天(East-North-Up ENU):</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#车辆坐标系-右-前-上right-forward-up-rfu"><span class="nav-number">1.3.</span> <span class="nav-text">车辆坐标系-右-前-上(Right-Forward-Up RFU)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#传感器等硬件安装位置"><span class="nav-number">1.4.</span> <span class="nav-text">传感器等硬件安装位置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多传感器标定"><span class="nav-number">2.</span> <span class="nav-text">2. 多传感器标定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#粗略标定"><span class="nav-number">2.1.</span> <span class="nav-text">2.1粗略标定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#录取数据"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 录取数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标定策略"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 标定策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过apollo工具提供有效数据"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 通过Apollo工具提供有效数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过apollo产生准确的标定参数"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 通过Apollo产生准确的标定参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多传感器数据融合-关系"><span class="nav-number">2.6.</span> <span class="nav-text">多传感器数据融合 关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#transform-wrapper"><span class="nav-number">3.</span> <span class="nav-text">3. Transform Wrapper</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apollo提供的标定工具"><span class="nav-number">4.</span> <span class="nav-text">4. Apollo提供的标定工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">198k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:31</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/";
+    this.page.identifier = "2020/04/04/apollo-sensor_calibration/";
+    this.page.title = "Apollo中多传感器标定与坐标系统";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

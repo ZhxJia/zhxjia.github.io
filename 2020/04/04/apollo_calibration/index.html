@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Apollo中的在线标定：用于获取实时外参(针对由于路面颠簸等情况造成相机位姿改变的校正)，由于在线标定算法用到车道线信息，因此此处将车道线检测的相关算法一并说明。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apollo中的标定">
+<meta property="og:url" content="https://zhxjia.github.io/2020/04/04/apollo_calibration/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="Apollo中的在线标定：用于获取实时外参(针对由于路面颠簸等情况造成相机位姿改变的校正)，由于在线标定算法用到车道线信息，因此此处将车道线检测的相关算法一并说明。">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo_calibration/C:/Users/jia_z/Desktop/blogrepo/source/_posts/apollo_calibration/hist_hat.jpg">
+<meta property="article:published_time" content="2020-04-04T02:58:02.807Z">
+<meta property="article:modified_time" content="2020-04-04T02:58:02.807Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="感知">
+<meta property="article:tag" content="标定">
+<meta property="article:tag" content="视觉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhxjia.github.io/2020/04/04/apollo_calibration/C:/Users/jia_z/Desktop/blogrepo/source/_posts/apollo_calibration/hist_hat.jpg">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/04/04/apollo_calibration/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Apollo中的标定 | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo_calibration/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Apollo中的标定
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
+                    <span itemprop="name">perception</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/04/apollo_calibration/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo_calibration/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>15k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>25 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Apollo中的在线标定：用于获取实时外参(针对由于路面颠簸等情况造成相机位姿改变的校正)，由于在线标定算法用到车道线信息，因此此处将车道线检测的相关算法一并说明。</p>
+<a id="more"></a>
+<h2 id="lanedetector">LaneDetector</h2>
+<p>算法接口文件:<code>modules/perception/camera/lib/interface/base_lane_detector.h</code> 该算法实现从图像中检测车道线。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: detect lane from image.</span></span><br><span class="line"><span class="comment">// @param [in]: options</span></span><br><span class="line"><span class="comment">// @param [in/out]: frame</span></span><br><span class="line"><span class="comment">// detected lanes should be filled, required,</span></span><br><span class="line"><span class="comment">// 3D information of lane can be filled, optional.</span></span><br><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">Detect</span><span class="params">(<span class="keyword">const</span> LaneDetectorOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">                    CameraFrame* frame)</span> </span>= <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="初始化">1.初始化</h3>
+<p><strong>配置文件信息</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">lane_param &#123;</span><br><span class="line">  lane_detector_param &#123;</span><br><span class="line">    plugin_param &#123;</span><br><span class="line">      name : <span class="string">"DarkSCNNLaneDetector"</span></span><br><span class="line">      root_dir : <span class="string">"/apollo/modules/perception/production/data/perception/camera/models/lane_detector/"</span></span><br><span class="line">      config_file : <span class="string">"config_darkSCNN.pt"</span></span><br><span class="line">    &#125;</span><br><span class="line">    camera_name : <span class="string">"front_6mm"</span></span><br><span class="line">  &#125;</span><br><span class="line">  lane_postprocessor_param &#123;</span><br><span class="line">    name : <span class="string">"DarkSCNNLanePostprocessor"</span></span><br><span class="line">    root_dir : <span class="string">"/apollo/modules/perception/production/data/perception/camera/models/lane_postprocessor/darkSCNN/"</span></span><br><span class="line">    config_file : <span class="string">"config.pt"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>初始化程序</strong>： <code>ObstacleCameraPerception::Init()</code>中执行<code>InitLane()</code>进行初始化</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 车道线检测初始化</span></span><br><span class="line"><span class="comment">// @param [in]: work_root:当前工作路径，通过`GetCyberWorkRoot()`可以获取</span></span><br><span class="line"><span class="comment">// @param [in]: model:相机传感器模型，通过SensorManage类加载`perception_gflags.cc`中的对应文件获取</span></span><br><span class="line"><span class="comment">// @param [in]: perception_param_:上面参数配置文件的相关信息</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">InitLane</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;work_root,</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">const</span> base::BaseCameraModelPtr model,</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">const</span> app::PerceptionParam &amp;perception_param)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>车道线的初始化包括两大部分，一是检测器detector初始化，二是后处理其postprocessor初始化。</p>
+<p><strong>检测器detector初始化</strong> 由于车道线检测这里用到了网络模型，因此detector初始化过程主要加载了模型的配置文件，以及具体的功能实现类 <code>DarkSCNNLaneDetector</code>,然后同障碍物检测的detector相似 进行<code>DarkSCNNLaneDetector</code>的初始化: 需要注意的是，<code>LaneDetector</code>的实现在<code>camera/lib/lane/detector/darkSCNN</code>, 而检测器参数配置则位于<code>production/data/perception/camera/models/lane_detector</code>下。</p>
+<blockquote>
+<p>model_name -&gt; darkSCNN proto_flie -&gt; deploy.prototxt weight_file -&gt; deploy.caffemodel</p>
+</blockquote>
+<p>网络的输入输出节点名称</p>
+<blockquote>
+<p>input_blob : &quot;data&quot; vpt_blob : &quot;fc_out&quot; //消失点检测 seg_blob : &quot;softmax&quot; //分割输出</p>
+</blockquote>
+<p>根据上述参数创建网络的推断模型<code>CreateInferenceByName</code>，此处<code>cnnadapter_lane_</code>的推断模型为<code>caffe</code>,然后对此推断模型进行初始化，之前的创建过程并未将参数加载到<code>caffe</code>模型中，因此<code>cnnadapter_lane_-&gt;Init</code>将网络模型结构和网络参数导入到Caffe中。</p>
+<p><strong>后处理器postprocessor初始化</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">lane_map_width: <span class="number">640</span></span><br><span class="line">lane_map_height: <span class="number">480</span></span><br><span class="line">roi_height: <span class="number">768</span></span><br><span class="line">roi_start: <span class="number">312</span></span><br><span class="line">roi_width: <span class="number">1920</span></span><br></pre></td></tr></table></figure>
+<p>后处理器实现类<code>DarkSCNNLanePostprocessor</code>,该功能类的初始化加载上面所示参数，同时也加载了<code>detector</code>的部分参数(图像裁剪相关)</p>
+<h3 id="算法实现">2. 算法实现</h3>
+<p>算法实现的相关过程位于<code>obstacle_camera_perception.cc</code>中的<code>Perception</code>函数中,并注意车道线检测算法只工作于 <code>front_6mm</code>相机上,算法流程如下,然后分模块进行说明。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Detect -&gt; Process2D(postprocessor) -&gt; Update(Calibration) -&gt; Process3D(postprocessor)</span></span><br></pre></td></tr></table></figure>
+<h4 id="detect">2.1 Detect</h4>
+<ul>
+<li><p>准备图像数据，并将图像数据拷贝到input_blob中 首先对原始图像(<code>1920*1080</code>)进行裁剪，得到ROI图像，(<code>1920*1080</code>)-&gt;(<code>1920*768</code>)</p>
+<p>由于<code>DarkSCNN</code>网络结构输出为<code>640*480</code>,所以还需要<code>resize,</code>通过GPU实现图像大小的转换。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 通过GPU对每个像素并行处理进行resize后的图像</span></span><br><span class="line"><span class="comment">// @param [in]: image_src_:(dataprovider提供的原始图像)</span></span><br><span class="line"><span class="comment">// @param [in/out]: input_blob(将数据拷贝到input_blob中) </span></span><br><span class="line"><span class="comment">// @param [in]: image_mean(将图像减去此均值)</span></span><br><span class="line"><span class="comment">// @note : channel_axis=fasle(input_blob:nchw src:nhwc) channel_axis=true(dst=src=nhwc)</span></span><br><span class="line">inference::ResizeGPU(</span><br><span class="line">      image_src_, input_blob, <span class="keyword">static_cast</span>&lt;<span class="keyword">int</span>&gt;(crop_width_), <span class="number">0</span>,</span><br><span class="line">      <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(image_mean_[<span class="number">0</span>]), <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(image_mean_[<span class="number">1</span>]),</span><br><span class="line">      <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(image_mean_[<span class="number">2</span>]), <span class="literal">false</span>, <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(<span class="number">1.0</span>));</span><br></pre></td></tr></table></figure>
+<p>通过上述程序将图像数据拷贝到了网络模型的输入input_blob中，接下来进行前向推断，获取结果。</p></li>
+<li><p>前向推断<code>cnnadapter_lane_-&gt;Infer()</code>,获取网络模型输出。</p></li>
+<li><p>将网络输出seg_blob数据转换到图像矩阵Mat中,其中每一个通道c代表一类车道线,然后遍历图片中每一个像素位置的类别(通道c)大于阈值<code>0.95</code>则将打上对应的类别标签，最后将处理好的像素为对应类别标签的<code>Mat</code>转换为<code>blob</code>类型</p>
+<p><code>frame-&gt;lane_detected_blob = lane_blob_;</code>将检测数据保存到<code>frame</code>帧结构中即完成了车道线检测的数据获取任务。</p></li>
+</ul>
+<p>在<code>darkSCNN</code>网络中，除了输出车道线的语义分割像素位置，还同时设计了消失点检测的子网络，通过最后的全连接层输出消失点： 网络输出的消失点坐标是相对于输入图像中心的偏移，将消失点恢复到网络的输入图像中，然后再根据roi裁剪恢复到原始图像中，同样将消失点坐标保存到<code>frame</code>数据结构中，<code>frame-&gt;pred_vpt = v_point</code></p>
+<p>通过对网络输出数据的初步处理，将检测信息保存到<code>frame</code>中，原始检测数据的获取部分就完成了，接下来进行数据的后处理。</p>
+<h4 id="postprocess-2d">2.2 Postprocess 2D</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: detect lane from image.</span></span><br><span class="line"><span class="comment">// @param [in]: options</span></span><br><span class="line"><span class="comment">// @param [in/out]: frame</span></span><br><span class="line"><span class="comment">// detected lanes should be filled, required,</span></span><br><span class="line"><span class="comment">// 3D information of lane can be filled, optional.</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Process2D</span><span class="params">(<span class="keyword">const</span> LanePostprocessorOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">               CameraFrame* frame)</span> <span class="keyword">override</span></span>;</span><br></pre></td></tr></table></figure>
+<p>该部分主要通过检测器得到的语义分割信息提取车道线，车道线的数据结构为<code>modules/perception/base/lane_struct.h</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">LaneLine</span> &#123;</span></span><br><span class="line">  LaneLineType type;</span><br><span class="line">  <span class="comment">// @brief laneline position -&gt; 13</span></span><br><span class="line">  LaneLinePositionType pos_type;</span><br><span class="line">  <span class="comment">// @brief image coordinate system</span></span><br><span class="line">  LaneLineCubicCurve curve_car_coord;</span><br><span class="line">  <span class="comment">// @brief camera coordinate system</span></span><br><span class="line">  LaneLineCubicCurve curve_camera_coord;</span><br><span class="line">  <span class="comment">// @brief image coordinate system</span></span><br><span class="line">  LaneLineCubicCurve curve_image_coord;</span><br><span class="line">  <span class="comment">// @brief curve image point set</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Point2DF&gt; curve_image_point_set;</span><br><span class="line">  <span class="comment">// @brief curve camera point set</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Point3DF&gt; curve_camera_point_set;</span><br><span class="line">  <span class="comment">// @brief curve car coord point set, only on XY plane</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Point2DF&gt; curve_car_coord_point_set;</span><br><span class="line">  <span class="comment">// @brief image end point set</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;EndPoints&gt; image_end_point_set;</span><br><span class="line">  <span class="comment">// @brief track id</span></span><br><span class="line">  <span class="keyword">int</span> track_id = <span class="number">-1</span>;</span><br><span class="line">  <span class="comment">// @brief confidence for lane line</span></span><br><span class="line">  <span class="keyword">float</span> confidence = <span class="number">1.0f</span>;</span><br><span class="line"></span><br><span class="line">  LaneLineUseType use_type;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>车道线检测过程可以分为四个阶段：</p>
+<ul>
+<li><p>检测车道线边界，以车辆为中心，左侧的车道线提取右边界，右侧的车道线提取左边界。</p></li>
+<li><p>根据提取的边界线点通过<code>ransac</code>采样去除离群点。 首先确定车道线拟合方程<span class="math inline">\(y=ax^3+bx^2+cx+d\)</span>,因此通过<code>ransac</code>确定车道线方程程序中至少需要8个点。 程序中貌似仅仅拟合了二阶(b,c,d)？</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 拟合边界点,去除离群值</span></span><br><span class="line"><span class="comment">// @param [in]: pos_vec(地平面下的边界点)</span></span><br><span class="line"><span class="comment">// @param [in/out]: selected_points(去除离群值之后的边界点)</span></span><br><span class="line"><span class="comment">// @param [in]: coeff(多项式系数,a,b,c,d)</span></span><br><span class="line"><span class="comment">// @param [in]: N(所需的最少点数minNumPoints=8)</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">RansacFitting</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Eigen::Matrix&lt;Dtype, <span class="number">2</span>, <span class="number">1</span>&gt;&gt;&amp; pos_vec,</span></span></span><br><span class="line"><span class="function"><span class="params">                   <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Eigen::Matrix&lt;Dtype, <span class="number">2</span>, <span class="number">1</span>&gt;&gt;* selected_points,</span></span></span><br><span class="line"><span class="function"><span class="params">                   Eigen::Matrix&lt;Dtype, <span class="number">4</span>, <span class="number">1</span>&gt;* coeff, <span class="keyword">const</span> <span class="keyword">int</span> max_iters = <span class="number">100</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                   <span class="keyword">const</span> <span class="keyword">int</span> N = <span class="number">5</span>, Dtype inlier_thres = <span class="number">0.1</span>)</span></span></span><br></pre></td></tr></table></figure></li>
+<li><p>[1]对某些特殊情形下的车道线类型进行置换（比如车辆压在边界线上，或者已经到达左右边界），然后开始向<code>LaneLine</code>数据类型中填充数据。 [2]填充对应13种车道线类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">map</span>&lt;base::LaneLinePositionType, <span class="keyword">int</span>&gt; spatialLUTind = &#123;</span><br><span class="line">    &#123;base::LaneLinePositionType::UNKNOWN, <span class="number">0</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::FOURTH_LEFT, <span class="number">1</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::THIRD_LEFT, <span class="number">2</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::ADJACENT_LEFT, <span class="number">3</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::EGO_LEFT, <span class="number">4</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::EGO_CENTER, <span class="number">5</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::EGO_RIGHT, <span class="number">6</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::ADJACENT_RIGHT, <span class="number">7</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::THIRD_RIGHT, <span class="number">8</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::FOURTH_RIGHT, <span class="number">9</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::OTHER, <span class="number">10</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::CURB_LEFT, <span class="number">11</span>&#125;,</span><br><span class="line">    &#123;base::LaneLinePositionType::CURB_RIGHT, <span class="number">12</span>&#125;&#125;;</span><br></pre></td></tr></table></figure>
+<p>[3]根据拟合的车道线曲线，x=3时对应的y值判断车道线是否无效(即车道线的排列顺序对应y值应有的顺序)。 [4]将车道线参数值添加到车道线数据结构<code>LaneLine</code>中，并将此数据添加到<code>Frame</code>中 <code>frame-&gt;lane_objects.push_back(cur_object);</code> [5]针对车辆位于左边或者右边的车道线上，修改对应一边的车道线的类型标签。</p></li>
+</ul>
+<h4 id="postprocess-3dprocess3d之前进行了calibration-service-中相机状态的更新">2.3 Postprocess 3D（Process3D之前进行了Calibration Service 中相机状态的更新）</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// convert image point to the camera coordinate</span></span><br><span class="line"><span class="comment">// &amp; fit the line using polynomial</span></span><br><span class="line"><span class="comment">// @param :options(same as process 2D),frame</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Process3D</span><span class="params">(<span class="keyword">const</span> LanePostprocessorOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">               CameraFrame* frame)</span> <span class="keyword">override</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>ConvertImagePoint2Camera(frame)</code>将车道线坐标转换到相机坐标系 利用<code>Calibration Service</code>校正过的<code>pitch</code>角度，以及相机到地平面的高度<code>camera_ground_height</code> 结合内参：
+<ul>
+<li><code>ImagePoint2Camera(image_point,..) return camera_point3d</code>,相机高度可用于计算由于距离未知所引入的尺度因子(齐次坐标同时乘以一个系数，坐标不变)</li>
+</ul></li>
+<li><code>PolyFitCameraLaneLine(frame)</code> 使用多项式拟合相机坐标系下的车道线
+<ul>
+<li><code>PolyFit(camera_pos_vec,...) return camera_coeff</code> 通过QR分解(eigen 3)进行线性最小二乘求解。</li>
+</ul></li>
+</ul>
+<hr>
+<h2 id="calibration_service">Calibration_service</h2>
+<p>算法接口文件<code>modules/perception/camera/lib/interface/base_calibration_service.h</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief query camera to world pose with refinement if any</span></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">QueryCameraToWorldPose</span><span class="params">(Eigen::Matrix4d *pose)</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// @brief query depth on ground plane given pixel coordinate</span></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">QueryDepthOnGroundPlane</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">double</span> *depth)</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// @brief query 3d point on ground plane given pixel coordinate</span></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">QueryPoint3dOnGroundPlane</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         Eigen::Vector3d *point3d)</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// @brief query ground plane in camera frame, parameterized as</span></span><br><span class="line">  <span class="comment">// [n^T, d] with n^T*x+d=0   ax+by+cz+d=0,法向量 n=(a,b,c)</span></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">QueryGroundPlaneInCameraFrame</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">      Eigen::Vector4d *plane_param)</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// @brief query camera to ground height and pitch angle</span></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">QueryCameraToGroundHeightAndPitchAngle</span><span class="params">(<span class="keyword">float</span> *<span class="built_in">height</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                      <span class="keyword">float</span> *pitch)</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">QueryCameraToGroundHeight</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> <span class="number">0.f</span>; &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">QueryPitchAngle</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> <span class="number">0.f</span>; &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// @brief using calibrator to update pitch angle</span></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Update</span><span class="params">(CameraFrame *frame)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// do nothing</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// @brief set camera height, pitch and project matrix</span></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">SetCameraHeightAndPitch</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">float</span>&gt; &amp;name_camera_ground_height_map,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">float</span>&gt; &amp;name_camera_pitch_angle_diff_map,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">const</span> <span class="keyword">float</span> &amp;pitch_angle_master_sensor)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// do nothing</span></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p><code>OnCalibrationService</code>通过车道线进行在线标定，标定参数主要包含了相机的高度和pitch角度。</p>
+<p>同时，标定服务实际对应的<code>calibrator</code>方法的接口为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseCalibrator</span> &#123;</span></span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="comment">// @brief: refine 3D location of detected obstacles.</span></span><br><span class="line">  <span class="comment">// @param [in]: options</span></span><br><span class="line">  <span class="comment">// @param [in/out]: pitch_angle</span></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">Calibrate</span><span class="params">(<span class="keyword">const</span> CalibratorOptions &amp;options,</span></span></span><br><span class="line"><span class="function"><span class="params">                         <span class="keyword">float</span> *pitch_angle)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;  <span class="comment">// class BaseCalibrator</span></span><br></pre></td></tr></table></figure>
+<p>该接口根据检测得到的车道线信息以及相机到世界坐标系的位姿变换矩阵，在线标定相机<code>pitch</code>轴角度，并最终用于障碍物3D位置的改善。</p>
+<h3 id="初始化-1">1. 初始化</h3>
+<p><strong>配置文件与配置信息</strong> <code>modules/perception/production/conf/perception/camera/obstacle.pt</code></p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">calibration_service_param &#123;</span><br><span class="line">  plugin_param &#123;</span><br><span class="line">      name : <span class="string">"OnlineCalibrationService"</span></span><br><span class="line">      root_dir : <span class="string">""</span></span><br><span class="line">      config_file : <span class="string">""</span></span><br><span class="line">  &#125;</span><br><span class="line">  calibrator_method : <span class="string">"LaneLineCalibrator"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">CalibrationServiceInitOptions</span> :</span> <span class="keyword">public</span> BaseInitOptions &#123;</span><br><span class="line">  <span class="keyword">int</span> image_width = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> image_height = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">double</span> timestamp = <span class="number">0</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">string</span> calibrator_working_sensor_name = <span class="string">""</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">string</span> calibrator_method = <span class="string">""</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, Eigen::Matrix3f&gt; name_intrinsic_map;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><strong>初始化程序</strong>： 在<code>ObstacleCameraPerception::Init()</code>中进行初始化<code>InitCalibrationService</code> 初始化过程配置在线标定的传感器为<code>front_6mm</code>,配置标定方法为:<code>LaneLineCalibrator</code>,同时加载内参矩阵和图像宽高,根据<code>plugin_param</code>中的<code>name</code>确定<code>calibration_service_</code>指向的算法实现类为<code>OnlineCalibrationService</code>。 在<code>OnlineCalibrationService::Init()</code>初始化过程中，进行标定方法<code>LaneLineCalibrator</code>的初始化,然后在初始过程中又进行了更底层实现<code>lane_based_calibrator</code>的初始化，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 标定方法初始化，loal_options包括（图像的宽高以及相机内参f_x,f_y,c_x,c_y）</span></span><br><span class="line">calibrator_.Init(local_options)</span><br></pre></td></tr></table></figure>
+<p>在<code>LaneLineCalibrator</code>初始过程中进行<code>HistogramEstimator</code>的初始化（<strong>注：默认参数在构造函数中加载</strong>）</p>
+<h3 id="算法实现-1">2. 算法实现</h3>
+<h4 id="online_calibration_serviceupdate">2.1 Online_Calibration_Service::Update</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief using calibrator to update pitch angle</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span><span class="params">(CameraFrame *frame)</span> <span class="keyword">override</span></span>;</span><br></pre></td></tr></table></figure>
+<p>该方法通过创建<code>calibrator</code>进行相机pitch角度的校正，<code>calibrator</code>的配置信息包括:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">CalibratorOptions</span> &#123;</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::LaneLine&gt;&gt; lane_objects; <span class="comment">//车道线检测检测信息</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Eigen::Affine3d&gt; camera2world_pose; <span class="comment">//相机到世界坐标系的转换矩阵</span></span><br><span class="line">  <span class="keyword">double</span> *timestamp = <span class="literal">nullptr</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>然后根据车道线检测信息和位姿变换矩阵，在线标定pitch轴角度：</p>
+<h5 id="lanelinecalibratorcalibrate">2.1.1 LaneLineCalibrator::Calibrate</h5>
+<p><code>bool updated = calibrator_-&gt;Calibrate(calibrator_options, &amp;pitch_angle)</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: estimate camera-ground plane pitch.</span></span><br><span class="line"><span class="comment">// @param [in]: options (包括车道线检测信息，相机到世界坐标系的转换矩阵)</span></span><br><span class="line"><span class="comment">// @param [in/out]: pitch_angle</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Calibrate</span><span class="params">(<span class="keyword">const</span> CalibratorOptions &amp;options, <span class="keyword">float</span> *pitch_angle)</span> <span class="keyword">override</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>LoadEgoLaneline()</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: load ego lane line from camera frame (获取车辆所在的车道线，用于标定)</span></span><br><span class="line"><span class="comment">// @param [in]: lane_objects (from model fitting)</span></span><br><span class="line"><span class="comment">// @param [out]: ego_lane (ego left_line,ego right_line)</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">LoadEgoLaneline</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::LaneLine&gt; &amp;lane_objects,</span></span></span><br><span class="line"><span class="function"><span class="params">                       EgoLane *ego_lane)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><strong>上述程序处理中存在问题，lane_objects.curve_image_coord并没有相关赋值，不知道它为何直接用了</strong></p></li>
+<li><p><code>GetYawVelocityInfo()</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 获取车辆速度和yaw轴角度变化率</span></span><br><span class="line"><span class="comment">// @param [in]: time_diff(两帧时间差),cam_coord_cur(当前相机在世界坐标系下位置)</span></span><br><span class="line"><span class="comment">// @param [in]: cam_coord_pre(上一帧相机在世界坐标下位置),cam_coord_pre_pre()</span></span><br><span class="line"><span class="comment">// @param [out]: yaw_rate(yaw角度变化率),velocity(车速)</span></span><br><span class="line"><span class="comment">// @note: 车辆速度通过两帧时间差的相机位置变化确定，yaw通过世界坐标系下相机位置计算得到</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">GetYawVelocityInfo</span><span class="params">(<span class="keyword">const</span> <span class="keyword">float</span> &amp;time_diff, <span class="keyword">const</span> <span class="keyword">double</span> cam_coord_cur[<span class="number">3</span>],</span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">const</span> <span class="keyword">double</span> cam_coord_pre[<span class="number">3</span>],</span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">const</span> <span class="keyword">double</span> cam_coord_pre_pre[<span class="number">3</span>], <span class="keyword">float</span> *yaw_rate,</span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">float</span> *velocity)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>LaneBasedCalibrator::Process()</code> 计算pitch_estimation,vanishing_row</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: Main function. process every frame, return true if get valid</span></span><br><span class="line"><span class="comment">// estimation. suppose the points in lane are already sorted.</span></span><br><span class="line"><span class="comment">// @param [in]: ego_lane(车辆所在车道线的左右车道线)</span></span><br><span class="line"><span class="comment">// @param [in]: velocity(相机世界坐标系下的速度)</span></span><br><span class="line"><span class="comment">// @param [in]: yaw_rate(相机世界坐标系下yaw变化率)</span></span><br><span class="line"><span class="comment">// @param [in]: time_diff(两帧之间的时间差) </span></span><br><span class="line"><span class="comment">// @out : pitch_estimation_, vanishing_row_</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Process</span><span class="params">(<span class="keyword">const</span> EgoLane &amp;lane, <span class="keyword">const</span> <span class="keyword">float</span> &amp;velocity,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="keyword">const</span> <span class="keyword">float</span> &amp;yaw_rate, <span class="keyword">const</span> <span class="keyword">float</span> &amp;time_diff)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>IsTravelingStraight()</code>判断当前yaw变化率是否小于3°，即判断是否直线行驶，若不为直线行驶，则不进行处理,return false。</p></li>
+<li><code>GetVanishingPoint()</code>根据ego Lane车道线获取消失点<code>vp_cur</code>
+<ul>
+<li><code>SelectTwoPointsFromLineForVanishingPoint(egoleftline/rightline)</code> 使用ego line的部分(或全部)线段，返回线段的起止索引。</li>
+<li><code>GetIntersectionFromTwoLineSegment()</code>使用上面的车道线线段获取消失点，即计算两条直线延长线的交点。 ref:https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect</li>
+</ul></li>
+<li><p><code>PushVanishingPoint()</code>将<code>vp_cur</code>添加到<code>vp_buffer_</code>中，<code>vp_buffer_</code>中最大容量1000，最先检测到的位于最后</p></li>
+<li><p><code>PopVanishingPoint()</code>计算<code>vp_buffer</code>累计前行的距离，判断是否大于最低前行距离要求(20m),若满足则将末尾（最新）的消失点提出来使用-&gt;<code>vp_work</code></p></li>
+<li><p><code>GetPitchFromVanishingPoint()</code>根据<code>vp_work</code>估计相机<code>Pitch</code>角度-&gt;<code>pitch_cur_</code> 空间中一条直线的消失点是一条与该直线平行且经过相机光心的射线与像平面的交点,由于车道线与地平面水平，因此可计算pitch(与地平面夹角)</p></li>
+<li><p><code>AddPitchToHistogram()</code>将pitch_cur添加到hist中。</p>
+<ul>
+<li><code>HistogramEstimator::Push(pitch_cur_)</code>,首先需要注意用于标定的直方图参数的设置是在 <code>CalibratorParams::Init()</code>中，通过将(-10,10°)区间平分为400份，然后计算输入的<code>pitch_cur_</code>所在区间的位置，并将该位置的计数值加1<code>hist_[index]++</code>。(直方图的数据分组数量为bin)</li>
+</ul></li>
+<li><p><code>HistogramEstimator::Process()</code> 当累计前行距离大于100m时，进行标定值的更新，流程可以概括为： <code>smooth -&gt; get peak &amp; check mass -&gt; shape analysis -&gt; update estimate -&gt; final decay</code>。</p>
+<ul>
+<li><p><code>Smooth(hist,nr_bins,hist_smoothed)</code> hist为之前添加的pitch角度计数，nr_bins为数据分组数量。原统计的直方图存在锯齿状波动，对直方图通过核&lt;1,3,5,3,1&gt;进行平滑以方便确定波峰和波谷。<code>hist_smoothed</code></p></li>
+<li><p><code>GetPeakIndexAndMass(hist_smoothed,nr_bins,max_index,mass)</code> 获得波峰对应的索引(表示该计算得到的pitch数量最多)以及所有计数值之和<code>mass</code>,若<code>mass</code>即对应采样点的个数少于100，则缺少足够数据。</p></li>
+<li><p><code>IsGoodShape(hist,nr_bins,max_index)</code>，对应于初始化时的先验<code>hist_hat_</code>判断当前的直方图形状是否正常 <span class="math display">\[
+hist\_hat(i)=e^{-\frac{(x-200)^2}{2\sigma ^2}}\ i\in[0,400],\sigma=6.25
+\]</span> <img src="/2020/04/04/apollo_calibration/C:/Users\jia_z\Desktop\blogrepo\source\_posts\apollo_calibration\hist_hat.jpg" style="zoom:30%;"></p>
+<p>判断标准<span class="math inline">\(hist(i)&gt;hist(max\_index)\times hist\_hat(i-(max\_index-200))\)</span> 则认为直方图形状<strong>不符合</strong>要求。</p></li>
+<li><code>GetValFromIndex(max_index)</code> 将对应直方图的索引值转换为角度值-&gt;<code>val_estimation</code></li>
+<li><p><code>Decay(hist,nr_bins)</code> 将直方图中的技术值逐步衰减 * 0.8908987</p></li>
+</ul></li>
+</ul></li>
+</ul>
+<blockquote>
+<p>总的来说，获取各个消失点所要求的最低直行距离为20m,而通过各个消失点计算的pitch角度更新标定值所需最低直行距离为100m,但是需要注意的是，一旦行驶过程中，出现不是直行的状态，则消失点缓存即刻清零，而用于更新标定值的累计前行距离只有到达可更新的阈值才会清零，不会因为没有直行而清零。</p>
+</blockquote>
+<p>通过上述标定得到的pitch角度，校正相机<code>CameraStatus</code> 其中相机状态(camera_status)主要包含以下信息：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">CameraStatus</span> &#123;</span></span><br><span class="line">  <span class="keyword">float</span> camera_ground_height = <span class="number">-1.f</span>;</span><br><span class="line">  <span class="keyword">float</span> pitch_angle = <span class="number">0.f</span>;</span><br><span class="line">  <span class="keyword">float</span> pitch_angle_diff = <span class="number">0.f</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; k_matrix = &#123;<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>&#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; ground_plane = &#123;<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">name_camera_status_map_[master_sensor_name_].pitch_angle = pitch_angle;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> iter = name_camera_status_map_.<span class="built_in">begin</span>();</span><br><span class="line">         iter != name_camera_status_map_.<span class="built_in">end</span>(); iter++) &#123;</span><br><span class="line">      <span class="comment">// update pitch angle</span></span><br><span class="line">      iter-&gt;second.pitch_angle =</span><br><span class="line">          iter-&gt;second.pitch_angle_diff + iter-&gt;second.pitch_angle;</span><br><span class="line">      <span class="comment">// update ground plane param</span></span><br><span class="line">      iter-&gt;second.ground_plane[<span class="number">1</span>] = <span class="built_in">cos</span>(iter-&gt;second.pitch_angle);</span><br><span class="line">      iter-&gt;second.ground_plane[<span class="number">2</span>] = -<span class="built_in">sin</span>(iter-&gt;second.pitch_angle);</span><br></pre></td></tr></table></figure>
+<h2 id="supplement-material">supplement material</h2>
+<p>网络结构SCNN :https://arxiv.org/pdf/1712.06080.pdf</p>
+<hr>
+<h2 id="参考文章">参考文章</h2>
+<blockquote>
+<p>[1]崔洪柳. 基于车道线检测的车载摄像机在线标定算法[D].东北大学,2015.</p>
+<p>多传感器标定：https://gitchat.blog.csdn.net/article/details/94420885</p>
+<p>传感器标定: https://blog.csdn.net/m0_38087936/article/details/88536345</p>
+</blockquote>
+<h3 id="单应性矩阵">单应性矩阵</h3>
+<p>由外参计算得到单应性矩阵 <code>visualizer</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Get homography from projection matrix</span></span><br><span class="line"><span class="comment">// ====</span></span><br><span class="line"><span class="comment">// Version 1. Direct</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// compute the homography matrix, such that H [u, v, 1]' ~ [X_l, Y_l, 1]</span></span><br><span class="line">Eigen::Matrix3d R = adjusted_camera2car_.block(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>);</span><br><span class="line">Eigen::Vector3d T = adjusted_camera2car_.block(<span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">1</span>);</span><br><span class="line">Eigen::Matrix3d H;</span><br><span class="line">Eigen::Matrix3d H_inv;</span><br><span class="line"></span><br><span class="line">H.block(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">2</span>) = (K_ * R.transpose()).block(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">2</span>);</span><br><span class="line">H.block(<span class="number">0</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>) = -K_ * R.transpose() * T;</span><br><span class="line">H_inv = H.inverse();</span><br><span class="line">homography_ground2image_ = H;</span><br><span class="line">homography_image2ground_ = H_inv;</span><br></pre></td></tr></table></figure>
+<p>https://blog.csdn.net/ganguowa/article/details/60765691</p>
+<h3 id="相机畸变校正brown模型">相机畸变校正　Brown模型</h3>
+<p>在摄影测量和计算机视觉中都需要对含有畸变的影像进行改正操作，常用到的模型是对透视影像改正的Brown模型</p>
+<h3 id="计算两直线交点坐标车道线消失点">计算两直线交点坐标（车道线消失点）</h3>
+<p>https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect</p>
+<h3 id="地平面参数和相机pitch角度之间的关系">地平面参数和相机pitch角度之间的关系</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iter-&gt;second.ground_plane[<span class="number">1</span>] = <span class="built_in">cos</span>(iter-&gt;second.pitch_angle);</span><br><span class="line">iter-&gt;second.ground_plane[<span class="number">2</span>] = -<span class="built_in">sin</span>(iter-&gt;second.pitch_angle);</span><br></pre></td></tr></table></figure>
+<p><strong>多传感器标定：</strong></p>
+<p>https://blog.csdn.net/qq_41204464/article/details/102945454</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag"># 感知</a>
+              <a href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag"># 标定</a>
+              <a href="/tags/%E8%A7%86%E8%A7%89/" rel="tag"># 视觉</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/04/apollo-transfom_wrapper/" rel="prev" title="Apollo坐标转换组件">
+      <i class="fa fa-chevron-left"></i> Apollo坐标转换组件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/04/shell_program/" rel="next" title="shell脚本编程基础">
+      shell脚本编程基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#lanedetector"><span class="nav-number">1.</span> <span class="nav-text">LaneDetector</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化"><span class="nav-number">1.1.</span> <span class="nav-text">1.初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法实现"><span class="nav-number">1.2.</span> <span class="nav-text">2. 算法实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#detect"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 Detect</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#postprocess-2d"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 Postprocess 2D</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#postprocess-3dprocess3d之前进行了calibration-service-中相机状态的更新"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 Postprocess 3D（Process3D之前进行了Calibration Service 中相机状态的更新）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#calibration_service"><span class="nav-number">2.</span> <span class="nav-text">Calibration_service</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化-1"><span class="nav-number">2.1.</span> <span class="nav-text">1. 初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法实现-1"><span class="nav-number">2.2.</span> <span class="nav-text">2. 算法实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#online_calibration_serviceupdate"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.1 Online_Calibration_Service::Update</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#lanelinecalibratorcalibrate"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">2.1.1 LaneLineCalibrator::Calibrate</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#supplement-material"><span class="nav-number">3.</span> <span class="nav-text">supplement material</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">4.</span> <span class="nav-text">参考文章</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单应性矩阵"><span class="nav-number">4.1.</span> <span class="nav-text">单应性矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相机畸变校正brown模型"><span class="nav-number">4.2.</span> <span class="nav-text">相机畸变校正　Brown模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算两直线交点坐标车道线消失点"><span class="nav-number">4.3.</span> <span class="nav-text">计算两直线交点坐标（车道线消失点）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#地平面参数和相机pitch角度之间的关系"><span class="nav-number">4.4.</span> <span class="nav-text">地平面参数和相机pitch角度之间的关系</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">198k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:31</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/04/04/apollo_calibration/";
+    this.page.identifier = "2020/04/04/apollo_calibration/";
+    this.page.title = "Apollo中的标定";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

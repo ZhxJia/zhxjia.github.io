@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="apollo中Camera，Radar，Lidar，Can等驱动程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="apollo相机雷达的驱动">
+<meta property="og:url" content="https://zhxjia.github.io/2020/04/04/apollo-driver/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="apollo中Camera，Radar，Lidar，Can等驱动程序">
+<meta property="article:published_time" content="2020-04-04T02:58:02.735Z">
+<meta property="article:modified_time" content="2020-04-04T02:58:02.735Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="apollo">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/04/04/apollo-driver/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>apollo相机雷达的驱动 | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo-driver/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          apollo相机雷达的驱动
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
+                    <span itemprop="name">perception</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/04/apollo-driver/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo-driver/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>apollo中Camera，Radar，Lidar，Can等驱动程序</p>
+<a id="more"></a>
+<h2 id="camera">1 Camera</h2>
+<p>Camera包基于V4L USB相机设备实现封装，提供图像采集及发布的功能。</p>
+<h3 id="camera_component">1.1 camera_component</h3>
+<p><strong>组件配置</strong> <code>modules/drivers/camera/dag/camera.dag</code> 每个相机建立一个组件，这里以<code>front_6mm</code>为例,对应于dag文件</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">module_config&#123;</span><br><span class="line">	module_library : <span class="string">"/apollo/bazel-bin/modules/drivers/camera/libcamera_component.so"</span></span><br><span class="line">	</span><br><span class="line">	components &#123;</span><br><span class="line">		class_name : <span class="string">"CameraComponent"</span></span><br><span class="line">		config &#123;</span><br><span class="line">			name : <span class="string">"camera_front_6mm"</span></span><br><span class="line">             config_file_path : <span class="string">"/apollo/modules/drivers/camera/conf/camera_front_6mm.pb.txt"</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由组件的配置文件路径可以得到该相机<code>front_6mm</code>组件对应于同级目录<code>proto/config.proto</code>中默认参数的修改。 <strong>组件初始化：</strong> 加载dag文件中config_file_path的参数<code>camera_config_</code>。 创建相机设备实例,并利用<code>camera_config_</code>来初始化该相机实例,相机类为<code>UsbCam</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">apollo::cyber::common::GetProtoFromFile(config_file_path_,camera_config_.<span class="built_in">get</span>());</span><br><span class="line">camera_device_.reset(<span class="keyword">new</span> UsbCam());</span><br><span class="line">camera_device_.init(camera_config_);</span><br><span class="line">raw_image.reset(<span class="keyword">new</span> CameraImage);</span><br></pre></td></tr></table></figure>
+<p>这里用到了两个类<code>UsbCam</code>和<code>CameraImage</code> 。其中<code>UsbCam</code>表示相机设备，该类包含了相机的硬件配置参数(像素编码格式，帧率，宽高，曝光及其他一些配置)。<code>CameraImage</code>则表示相机的图像结构信息（包括了图像的宽高和存储信息)。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">CameraImage</span> &#123;</span></span><br><span class="line">  <span class="keyword">int</span> <span class="built_in">width</span>;</span><br><span class="line">  <span class="keyword">int</span> <span class="built_in">height</span>;</span><br><span class="line">  <span class="keyword">int</span> bytes_per_pixel;</span><br><span class="line">  <span class="keyword">int</span> image_size;</span><br><span class="line">  <span class="keyword">int</span> is_new;</span><br><span class="line">  <span class="keyword">int</span> tv_sec;</span><br><span class="line">  <span class="keyword">int</span> tv_usec;</span><br><span class="line">  <span class="keyword">char</span>* <span class="built_in">image</span>;</span><br><span class="line">  ~CameraImage() &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">image</span> != <span class="literal">nullptr</span>) &#123;</span><br><span class="line">      <span class="built_in">free</span>(<span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">void</span>*&gt;(<span class="built_in">image</span>)); <span class="comment">//！！！！</span></span><br><span class="line">      <span class="built_in">image</span> = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;  </span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure>
+<p>然后为CameraImage中的image分配内存（长度为imagesize）:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">raw_image_-&gt;<span class="built_in">image</span> =</span><br><span class="line">    <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">char</span>*&gt;(<span class="built_in">calloc</span>(raw_image_-&gt;image_size, <span class="keyword">sizeof</span>(<span class="keyword">char</span>))); </span><br><span class="line"><span class="comment">//注意在CameraImage的析构函数中，一定不能忘记释放内存</span></span><br></pre></td></tr></table></figure>
+<p>根据<code>modules/driver/proto/sensor_iamge.proto</code>中定义的图像消息格式<code>&lt;Image&gt;</code>实例化<code>pb_iamge</code>进行相关参数的配置：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; buffer_size_; ++i) &#123; <span class="comment">//16</span></span><br><span class="line">  <span class="keyword">auto</span> pb_image = <span class="built_in">std</span>::make_shared&lt;Image&gt;();</span><br><span class="line">  pb_image-&gt;mutable_header()-&gt;set_frame_id(camera_config_-&gt;frame_id()); <span class="comment">//camera_front_6mm</span></span><br><span class="line">  pb_image-&gt;set_width(raw_image_-&gt;<span class="built_in">width</span>);</span><br><span class="line">  pb_image-&gt;set_height(raw_image_-&gt;<span class="built_in">height</span>);</span><br><span class="line">  pb_image-&gt;mutable_data()-&gt;reserve(raw_image_-&gt;image_size); <span class="comment">// 分配空间给data</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (camera_config_-&gt;output_type() == YUYV) &#123;</span><br><span class="line">    pb_image-&gt;set_encoding(<span class="string">"yuyv"</span>);</span><br><span class="line">    pb_image-&gt;set_step(<span class="number">2</span> * raw_image_-&gt;<span class="built_in">width</span>); <span class="comment">//每一行像素所占的空间</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (camera_config_-&gt;output_type() == RGB) &#123;</span><br><span class="line">    pb_image-&gt;set_encoding(<span class="string">"rgb8"</span>);</span><br><span class="line">    pb_image-&gt;set_step(<span class="number">3</span> * raw_image_-&gt;<span class="built_in">width</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  pb_image_buffer_.push_back(pb_image); <span class="comment">//缓存16个</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后在该节点上创建writer用于图像消息的发布,channel:&quot;/apollo/sensor/camera/front_6mm/image&quot;</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">writer_ = node_-&gt;CreateWriter&lt;Image&gt;(camera_config_-&gt;channel_name());</span><br><span class="line">async_result_ = cyber::Async(&amp;CameraComponent::<span class="built_in">run</span>, <span class="keyword">this</span>);</span><br></pre></td></tr></table></figure>
+<p>注意对于<code>CameraComponent</code>的运行使用了异步编程，执行的函数为<code>CameraComponent::run()</code>,这样各个摄像头组件将会在多线程中运行。</p>
+<p><strong>组件运行(run)</strong> <code>CameraComponent::run()</code>函数用于发布图像信息，该函数通过异步的方式运行(while{}循环一直执行,间隔1/200s)</p>
+<p>异步循环执行，首先查询相机设备的状态(是否正常连接)，如果未正常连接，等待2000ms再次检测。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!camera_device_-&gt;wait_for_device()) &#123;</span><br><span class="line">  <span class="comment">// sleep for next check</span></span><br><span class="line">  cyber::SleepFor(<span class="built_in">std</span>::chrono::milliseconds(device_wait_)); <span class="comment">//device_wait_ms: 2000</span></span><br><span class="line">  <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后通过<code>camera_device_-&gt;poll(raw_image_)</code>获取图像信息。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!camera_device_-&gt;poll(raw_image_)) &#123;</span><br><span class="line">  AERROR &lt;&lt; <span class="string">"camera device poll failed"</span>; <span class="comment">//轮询失败</span></span><br><span class="line">  <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后将图像和时间信息添加到<code>&lt;Image&gt;</code>数据结构中，通过writer发布，等待5000us-&gt;5ms再次执行。每秒200帧。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">message Image &#123;</span><br><span class="line">  optional apollo.common.Header header = <span class="number">1</span>;</span><br><span class="line">  optional <span class="built_in">string</span> frame_id = <span class="number">2</span>; <span class="comment">//传感器名称id</span></span><br><span class="line">  optional <span class="keyword">double</span> measurement_time = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">  optional uint32 <span class="built_in">height</span> = <span class="number">4</span>;  <span class="comment">// image height, that is, number of rows</span></span><br><span class="line">  optional uint32 <span class="built_in">width</span> = <span class="number">5</span>;   <span class="comment">// image width, that is, number of columns</span></span><br><span class="line"></span><br><span class="line">  optional <span class="built_in">string</span> encoding = <span class="number">6</span>;</span><br><span class="line">  optional uint32 <span class="built_in">step</span> = <span class="number">7</span>;  <span class="comment">// Full row length in bytes   = bytes_per_pixel*width</span></span><br><span class="line">  optional bytes data = <span class="number">8</span>;   <span class="comment">// actual matrix data, size is (step * rows)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="compress_component">1.2 compress_component</h3>
+<p><code>modules/drivers/camera/dag/camera.dag</code> <code>compress_component</code>的dag配置文件,同样以<code>front_6mm</code>为例：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">components &#123;</span><br><span class="line">  class_name : <span class="string">"CompressComponent"</span></span><br><span class="line">  config &#123;</span><br><span class="line">    name : <span class="string">"camera_front_6mm_compress"</span></span><br><span class="line">    config_file_path : <span class="string">"/apollo/modules/drivers/camera/conf/camera_front_6mm.pb.txt"</span></span><br><span class="line">    readers &#123;</span><br><span class="line">      channel: <span class="string">"/apollo/sensor/camera/front_6mm/image"</span></span><br><span class="line">      pending_queue_size: <span class="number">10</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>该组件接收camera_component发布的图像信息然后进行压缩，等待队列的大小设置为10。 <strong>组件初始化：</strong> 加载图像压缩的配置信息，以camera_front_6mm.pb.txt中为例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">compress_conf &#123;</span><br><span class="line">    output_channel: <span class="string">"/apollo/sensor/camera/front_6mm/image/compressed"</span></span><br><span class="line">    image_pool_size: <span class="number">100</span> <span class="comment">//对象池的大小</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>初始化<code>std::shared_ptr&lt;CCObjectPool&lt;CompressedImage&gt;&gt; image_pool_;</code>对象，这里用到对象池，在需要某个类的多个实例时使用，此处对象池的大小为100。 创建节点writer,通道名称为<code>output_channel</code>:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">writer_ = node_-&gt;CreateWriter&lt;CompressedImage&gt;(</span><br><span class="line">     config_.compress_conf().output_channel());</span><br></pre></td></tr></table></figure>
+<p><strong>组件处理程序Proc</strong> 当接收到原始的图像信息，设置<code>frame_id</code>,<code>header</code>,<code>measurement_time</code>与原图像信息一致，不同的是compress特有的 <code>format</code>设置为：<code>image-&gt;encoding() + &quot;; jpeg compressed bgr8&quot;</code></p>
+<blockquote>
+<p>原始图像的encoding为配置文件中的 output_type决定，默认为RGB</p>
+</blockquote>
+<p>接下来就是通过opencv将图像重新编码压缩</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; params;</span><br><span class="line">params.resize(<span class="number">3</span>, <span class="number">0</span>);</span><br><span class="line">params[<span class="number">0</span>] = CV_IMWRITE_JPEG_QUALITY;</span><br><span class="line">params[<span class="number">1</span>] = <span class="number">95</span>; <span class="comment">//压缩图像 100表示不压缩</span></span><br></pre></td></tr></table></figure>
+<p>利用图像编码函数,压缩为jpeg格式，且RGB-&gt;bgr8</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::imencode(<span class="string">".jpg"</span>, tmp_mat, compress_buffer, params);</span><br><span class="line">compressed_image-&gt;set_data(compress_buffer.data(), compress_buffer.<span class="built_in">size</span>());</span><br></pre></td></tr></table></figure>
+<p>然后将压缩的图像通过writer发布,通道名称为<code>&quot;/apollo/sensor/camera/front_6mm/image/compressed&quot;</code> 但是貌似好像实际<code>FusionCameraDetectionComponent</code>的接收图像信息还是未压缩的图像，即通道： <code>&quot;/apollo/sensor/camera/front_6mm/image&quot;</code> ,但是高清地图信息采集时貌似用的时压缩的图像。</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">CompressedImage</span> </span>&#123;</span><br><span class="line">  <span class="keyword">optional</span> apollo.common.Header header = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">string</span> frame_id = <span class="number">2</span>; <span class="comment">//对应的传感器的名称</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Specifies the format of the data</span></span><br><span class="line">  <span class="comment">//  Acceptable values: jpeg, png</span></span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">string</span> format = <span class="number">3</span>; <span class="comment">//压缩的图像类型,eg. jpeg</span></span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">bytes</span> data = <span class="number">4</span>;  <span class="comment">// Compressed image buffer</span></span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">double</span> measurement_time = <span class="number">5</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">uint32</span> frame_type = <span class="number">6</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="video_component">1.3 video_component</h3>
+<p>首先看一下该组件的dag配置文件：(基本被注释了，表示正常情况下，该组件并没有运行)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># Define all coms in DAG streaming.</span><br><span class="line">module_config &#123;</span><br><span class="line">    module_library : <span class="string">"/apollo/bazel-bin/modules/drivers/video/libvideo_driver_component.so"</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#    components &#123;</span></span><br><span class="line">#      class_name : <span class="string">"CompCameraH265Compressed"</span></span><br><span class="line"><span class="meta">#      config &#123;</span></span><br><span class="line"><span class="meta">#        name : <span class="meta-string">"camera_front_6mm_compress"</span></span></span><br><span class="line">#        config_file_path : <span class="string">"/apollo/modules/drivers/video/conf/video_front_6mm.pb.txt"</span></span><br><span class="line">#      &#125;</span><br><span class="line">#    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#    components &#123;</span></span><br><span class="line">#      class_name : <span class="string">"CompCameraH265Compressed"</span></span><br><span class="line"><span class="meta">#      config &#123;</span></span><br><span class="line"><span class="meta">#        name : <span class="meta-string">"camera_front_12mm_compress"</span></span></span><br><span class="line">#        config_file_path : <span class="string">"/apollo/modules/drivers/video/conf/video_front_12mm.pb.txt"</span></span><br><span class="line">#       &#125;</span><br><span class="line">#    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>组件初始化</strong> 根据配置文件创建<code>CameraDriver</code>实例<code>camera_device_</code>，然后进行CameraDriver初始化：</p>
+<ul>
+<li><code>CameraDriver::Init()</code> 创建<code>ScoketInput</code>实例，并通过配置文件中的<code>udp_port</code>进行初始化，初始化<code>sock_fd</code>和<code>port</code>,即生成套接字文件描述符和端口号</li>
+</ul>
+<blockquote>
+<p>udp_port：为UDP 数据传输协议的端口，程序中从2000开始，每一个相机递增1</p>
+</blockquote>
+<ul>
+<li><code>CameraDriver::Record()</code>返回配置文件中的record，若值为1，则使用环境变量<code>H265_SAVE_FOLDER</code>（当环境变量没有设置，则使用当前路径位置）位置创建文件路径用于保存record文件。</li>
+<li>创建<code>&lt;CompressedImage&gt;</code>实例，并创建节点<code>writer</code>用于传输压缩的图像数据。</li>
+<li>创建线程执行<code>CompCameraH265Compressed::VideoPoll</code></li>
+</ul>
+<p><strong>组件处理函数</strong> 循环执行下列程序，直到系统退出。</p>
+<ul>
+<li><p><code>CameraDriver::Poll(std::shared_ptr&lt;CompressedImage&gt; h265)</code></p>
+<ul>
+<li><p><code>PollByFrame(h265)</code> 轮询获取压缩图像信息</p>
+<ul>
+<li><p><code>SocketInput::GetFramePacket(h265)</code> 通过socket底层库<code>recvfrom</code>经socket获取数据到缓冲区<code>pdu_data</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//成功则返回实际接收到的字符数，失败返回-1</span></span><br><span class="line"><span class="keyword">ssize_t</span> pdu_len = recvfrom(sockfd_, pdu_data, H265_PDU_SIZE, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure></li>
+</ul></li>
+</ul></li>
+</ul>
+<p>然后将接收到压缩图像通过节点发布，并记录二进制图像数据到record文件中，文件名：<code>encode_{端口号}.h265</code></p>
+<hr>
+<h3 id="image_decompress">1.4 image_decompress</h3>
+<p>组件的<code>dag</code>配置文件：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">module_config &#123;</span><br><span class="line">    module_library : <span class="string">"/apollo/bazel-in/modules/drivers/tools/image_decompress/libimage_decompress.so"</span></span><br><span class="line">    components &#123;</span><br><span class="line">      class_name : <span class="string">"ImageDecompressComponent"</span></span><br><span class="line">      config &#123;</span><br><span class="line">        name : <span class="string">"camera_front_6mm_decompress"</span></span><br><span class="line">        config_file_path : 	</span><br><span class="line">        	   <span class="string">"/apollo/modules/drivers/tools/image_decompress/conf/camera_front_6mm.pb.txt"</span></span><br><span class="line">        readers &#123;</span><br><span class="line">          channel: <span class="string">"/apollo/sensor/camera/front_6mm/image/compressed"</span></span><br><span class="line">          pending_queue_size: <span class="number">10</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>该组件接收压缩图像通道的信息，并进行解压缩，最后将图像信息发布到<code>&quot;/apollo/sensor/camera/front_6mm/image&quot;</code>通道中。</p>
+<p><strong>组件初始化</strong> 创建该节点的消息发布通道例如，<code>channel_name: &quot;/apollo/sensor/camera/front_6mm/image&quot;</code></p>
+<p><strong>组件处理函数Proc</strong> 当接受到<code>&quot;/apollo/sensor/camera/front_6mm/image/compressed&quot;</code>通道发布的压缩图像数据，进行解压缩操作： 方法是压缩图像(Compressed Component)的逆向操作，通过opencv函数<code>cv::imdecode()</code>解码获得cv::Mat格式图像,然后将图像由bgr转换为rgb，最后通过writer发布出去。</p>
+<p>编码解码的用到的函数有：</p>
+<ol type="1">
+<li><p>将原始的<code>&lt;Image&gt;</code>格式的图像转存到<code>cv::Mat</code>数据结构中。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">cv::Mat <span class="title">mat_image</span><span class="params">(<span class="built_in">image</span>-&gt;<span class="built_in">height</span>(), <span class="built_in">image</span>-&gt;<span class="built_in">width</span>(), CV_8UC3,</span></span></span><br><span class="line"><span class="function"><span class="params">                      <span class="keyword">const_cast</span>&lt;<span class="keyword">char</span>*&gt;(<span class="built_in">image</span>-&gt;data().data()), <span class="built_in">image</span>-&gt;<span class="built_in">step</span>())</span></span>;</span><br><span class="line"><span class="comment">//注意image data在proto中的定义为bytes,实际c++中对应std::string(可以包含任意顺序的字节数据)，</span></span><br><span class="line"><span class="comment">//string.data()返回char*指向数据的首地址，这里Mat的构造方法</span></span><br><span class="line"><span class="comment">//Mat::Mat(int rows, int cols, int type, void* data, size_t step=AUTO_STEP) </span></span><br><span class="line"><span class="comment">//step指一行元素的字节数</span></span><br></pre></td></tr></table></figure></li>
+<li><p>将Mat格式图像编码为<code>std::vector&lt;uint8_t&gt;</code>压缩格式(byte格式的数组，用于方便传输)，即将图像数据转为二进制数据。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint8_t</span>&gt; compress_buffer;</span><br><span class="line">cv::imencode(<span class="string">".jpg"</span>, tmp_mat, compress_buffer, params)</span><br></pre></td></tr></table></figure></li>
+<li><p>将byte格式的数组解码恢复到Mat,将内存中的二进制图像数据转换为opencv可处理的格式，首先创建一个byte数组用于存储二进制数据，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint8_t</span>&gt; <span class="title">compressed_raw_data</span><span class="params">(compressed_image-&gt;data().<span class="built_in">begin</span>(),</span></span></span><br><span class="line"><span class="function"><span class="params">                                         compressed_image-&gt;data().<span class="built_in">end</span>())</span></span>;</span><br><span class="line">cv::Mat mat_image = cv::imdecode(compressed_raw_data, CV_LOAD_IMAGE_COLOR);</span><br></pre></td></tr></table></figure></li>
+<li><p>最后将Mat结构数据转存到内部数据结构中<code>&lt;Image&gt;</code>中</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> <span class="built_in">size</span> = mat_image.<span class="built_in">step</span> * mat_image.rows;</span><br><span class="line"><span class="built_in">image</span>-&gt;set_data(&amp;(mat_image.data[<span class="number">0</span>]), <span class="built_in">size</span>);</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><strong>注意：</strong> <strong>std::string 与字符数组并不是意味着文本格式，而是将string 作为二进制存储的容器。</strong></p>
+<p>参考：https://blog.csdn.net/qq_37406130/article/details/78820176?depth_1-utm_source=distribute.pc_relevant.none-task&amp;utm_source=distribute.pc_relevant.none-task</p>
+<hr>
+<h3 id="启动脚本">1.5 启动脚本</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># in docker</span></span><br><span class="line">bash /apollo/scripts/camera.sh</span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="built_in">cd</span> /apollo &amp;&amp; cyber_launch start modules/drivers/camera/launch/camera.launch</span><br></pre></td></tr></table></figure>
+<p>如果报错： <code>sh: 1: v4l2-ctl: not found</code>,需要安装v4l2库。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install v4l-utils</span><br></pre></td></tr></table></figure>
+<p>如果图像被压缩了，运行image decompression module:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cyber_launch start modules/drivers/tools/image_decompress/launch/image_decompress.launch</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="参考">参考</h3>
+<p>https://www.cnblogs.com/hgl0417/p/9190835.html</p>
+<p>v4l2 API： https://baike.baidu.com/item/V4L2?sefr=enterbtn</p>
+<p>https://www.cnblogs.com/aquafly/p/6474555.html</p>
+<p>颜色空间的表示方法 https://www.cnblogs.com/x_wukong/p/4919774.html</p>
+<p>c++异步编程： https://blog.csdn.net/u012372584/article/details/97108417</p>
+<p>并发对象池： http://ifeve.com/generic-concurrent-object-pool/</p>
+<p>Opencv压缩图像格式： https://www.jianshu.com/p/fed6a8a99625</p>
+<p>UDP socket</p>
+<p>https://www.cnblogs.com/HpeMephisto/p/11312193.html</p>
+<p>protobuf :序列化与反序列化</p>
+<p>https://cloud.tencent.com/developer/article/1176660</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/apollo/" rel="tag"># apollo</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/04/apollo-lidar_driver/" rel="prev" title="apollo lidar驱动组件">
+      <i class="fa fa-chevron-left"></i> apollo lidar驱动组件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/04/apollo-transfom_wrapper/" rel="next" title="Apollo坐标转换组件">
+      Apollo坐标转换组件 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#camera"><span class="nav-number">1.</span> <span class="nav-text">1 Camera</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#camera_component"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 camera_component</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compress_component"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 compress_component</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#video_component"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 video_component</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#image_decompress"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 image_decompress</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动脚本"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 启动脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">1.6.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">198k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:31</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/04/04/apollo-driver/";
+    this.page.identifier = "2020/04/04/apollo-driver/";
+    this.page.title = "apollo相机雷达的驱动";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

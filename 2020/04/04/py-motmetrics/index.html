@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="记录pymotmetric的使用方法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="py-motmetric使用">
+<meta property="og:url" content="https://zhxjia.github.io/2020/04/04/py-motmetrics/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="记录pymotmetric的使用方法">
+<meta property="article:published_time" content="2020-04-04T02:58:02.811Z">
+<meta property="article:modified_time" content="2020-04-04T02:58:02.811Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="MOT">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/04/04/py-motmetrics/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>py-motmetric使用 | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/py-motmetrics/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          py-motmetric使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" itemprop="url" rel="index">
+                    <span itemprop="name">目标跟踪</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/%E5%A4%9A%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" itemprop="url" rel="index">
+                    <span itemprop="name">多目标跟踪</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/04/py-motmetrics/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/py-motmetrics/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>15 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>记录pymotmetric的使用方法</p>
+<a id="more"></a>
+<p><code>import motmetrics as mm</code></p>
+<p>介绍几个主要的功能接口：</p>
+<h3 id="motaccumulator创建及更新填充">MOTAccumulator创建及更新(填充)</h3>
+<p>创建<code>MOTAccumulator</code>类对象，用于一个跟踪序列中frame by frame的计算（注：一个数据集可能有多个序列）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">acc &#x3D; mm.MOTAccumulator(auto_id&#x3D;True)</span><br></pre></td></tr></table></figure>
+<p>然后每一帧往<code>accumulator</code>中填充跟踪结果的相关信息,每一帧都有<code>ground truth/hypotheses id</code>的列表和它们两两之间的距离<code>dists</code>矩阵，例如: oids(真值):[1,2] //ground truth objects id list in this frame hids(估计):[1,2,3] //detector hypotheses id list in this frame dists:[[0.1, np.nan,0.3], //distance from oid 1 to hid1,2,3 [0.5, 0.2 ,0.3]] //distance from oid 2 to hid1,2,3 <code>np.nan</code>表示object 1 不能与 hypothesis 2 配对。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">Params</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">oids : N array</span></span><br><span class="line"><span class="string">    Array of object ids.</span></span><br><span class="line"><span class="string">hids : M array</span></span><br><span class="line"><span class="string">    Array of hypothesis ids.</span></span><br><span class="line"><span class="string">dists: NxM array</span></span><br><span class="line"><span class="string">    Distance matrix. np.nan values to signal do-not-pair constellations.</span></span><br><span class="line"><span class="string">    See `distances` module for support methods.</span></span><br><span class="line"><span class="string">@ optional :</span></span><br><span class="line"><span class="string">frame id (optional when MOTAccumulator.auto_id is specified)</span></span><br><span class="line"><span class="string">vf: file to log details</span></span><br><span class="line"><span class="string">-----</span></span><br><span class="line"><span class="string">Returns</span></span><br><span class="line"><span class="string">-----</span></span><br><span class="line"><span class="string">frame_events:pd.DataFrame(containing generated events)</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line">acc.update(oids,hids,dists,frameid,vf)</span><br></pre></td></tr></table></figure>
+<p>上述update过程通过<code>the CLEAR MOT merics</code>中的相关指标，判断<code>Match,SWITCH,MISS,FP</code>,想要查看 <code>accumulator</code>中发生的事件，通过打印对应<code>accumulator</code>的events即可,event通过pandas.Dataframe的格式输出。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">print(acc.events) <span class="comment"># a pandas DataFrame containing all events</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">                Type  OId  HId    D</span></span><br><span class="line"><span class="string">FrameId Event                      </span></span><br><span class="line"><span class="string">0       0        RAW  NaN  NaN  NaN</span></span><br><span class="line"><span class="string">        1        RAW  1.0  1.0  0.1</span></span><br><span class="line"><span class="string">        2        RAW  1.0  3.0  0.3</span></span><br><span class="line"><span class="string">        3        RAW  2.0  1.0  0.5</span></span><br><span class="line"><span class="string">        4        RAW  2.0  2.0  0.2</span></span><br><span class="line"><span class="string">        5        RAW  2.0  3.0  0.3</span></span><br><span class="line"><span class="string">        6      MATCH  1.0  1.0  0.1</span></span><br><span class="line"><span class="string">        7      MATCH  2.0  2.0  0.2</span></span><br><span class="line"><span class="string">        8         FP  NaN  3.0  NaN</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+<p>其中<code>RAW</code>表示原始数据(oid,hid,dist),关于mot匹配的事件为oid1和hid1以距离0.1<code>MATCH</code>,oid2和hid2以距离0.2<code>MATCH</code>,同时由于hid3没有oid与之匹配,判断为<code>FP</code>，当然如果仅仅只是想打印mot匹配的相关事件，不想要原始匹配信息，可通过<code>mot_events</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">print(acc.mot_events) <span class="comment"># a pandas DataFrame containing MOT only events</span></span><br><span class="line"></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">                Type  OId HId    D</span></span><br><span class="line"><span class="string">FrameId Event</span></span><br><span class="line"><span class="string">0       6      MATCH    1   1  0.1</span></span><br><span class="line"><span class="string">        7      MATCH    2   2  0.2</span></span><br><span class="line"><span class="string">        8         FP  NaN   3  NaN</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<p>通过每一帧一次update的填充更新，最终得到整个数据集各帧的所有<code>events</code>。 可能发生的事件有：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">Each event type is one of the following</span></span><br><span class="line"><span class="string">        - `'MATCH'` a match between a object and hypothesis was found</span></span><br><span class="line"><span class="string">        - `'SWITCH'` a match between a object and hypothesis was found but differs from previous assignment (hypothesisid != previous)</span></span><br><span class="line"><span class="string">        - `'MISS'` no match for an object was found</span></span><br><span class="line"><span class="string">        - `'FP'` no match for an hypothesis was found (spurious detections)</span></span><br><span class="line"><span class="string">        - `'RAW'` events corresponding to raw input</span></span><br><span class="line"><span class="string">        - `'TRANSFER'` a match between a object and hypothesis was found but differs from previous assignment (objectid != previous)</span></span><br><span class="line"><span class="string">        - `'ASCEND'` a match between a object and hypothesis was found but differs from previous assignment  (hypothesisid is new)</span></span><br><span class="line"><span class="string">        - `'MIGRATE'` a match between a object and hypothesis was found but differs from previous assignment  (objectid is new)</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+<h3 id="metric的创建计算">2.Metric的创建计算</h3>
+<p>根据已经填充的<code>MOTAccumulator</code>,创建<code>metrics</code>计算并显示指标。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">mh = mm.metrics.create()</span><br><span class="line">summary = mh.compute(acc, metrics=[<span class="string">'num_frames'</span>, <span class="string">'mota'</span>, <span class="string">'motp'</span>], name=<span class="string">'acc'</span>)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">compute(self, df, ana=None, metrics=None, return_dataframe=True, return_cached=False, name=None)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">@brief</span></span><br><span class="line"><span class="string">Compute metrics on the dataframe / accumulator</span></span><br><span class="line"><span class="string">Params</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">df : MOTAccumulator or pandas.DataFrame</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Kwargs(optional)</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">ana(dict) :cache results for fast computation</span></span><br><span class="line"><span class="string">metrics(string,list of string or None):the identifiers of the metrics(想要计算的指标的标识符，none全计算)</span></span><br><span class="line"><span class="string">return_dataframe(bool):return the results as pandas.DataFrame</span></span><br><span class="line"><span class="string">return_cached(bool):return metrics</span></span><br><span class="line"><span class="string">name(string):when return a pandas.DataFrame this is the index of the row containing the computed metric valuse</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+<p>通过<code>print(summary)</code>，我们可以得到我们给定的<code>metrics</code>列表中对应的指标计算结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">     num_frames  mota  motp</span><br><span class="line">acc           3   0.5  0.34</span><br></pre></td></tr></table></figure>
+<p>上面是计算单个<code>accumulator</code>，如果要同时计算多个数据集的指标，则通过<code>mh.compute_many()</code>进行计算：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">summary = mh.compute_many(</span><br><span class="line">    [acc, acc.events.loc[<span class="number">0</span>:<span class="number">1</span>]],</span><br><span class="line">    metrics=[<span class="string">'num_frames'</span>, <span class="string">'mota'</span>, <span class="string">'motp'</span>],</span><br><span class="line">    names=[<span class="string">'full'</span>, <span class="string">'part'</span>])</span><br><span class="line">print(summary)</span><br><span class="line"></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">def compute_many(self, dfs, anas=None, metrics=None, names=None, generate_overall=False):</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">@brief:</span></span><br><span class="line"><span class="string">Compute metrics on multiple dataframe / accumulators.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Params</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">dfs(list)： list of MOTAccumulator or list of pandas.DataFrame</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Kwargs</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">names(list of string): the names of individual rows in the resulting dataframe. </span></span><br><span class="line"><span class="string">...其余与compute类似，省略</span></span><br><span class="line"><span class="string">Returns</span></span><br><span class="line"><span class="string">-------</span></span><br><span class="line"><span class="string">df : pandas.DataFrame</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+<p>通过<code>print(summary)</code>,可得到各<code>accumulator</code>的指标计算结果的显示,<code>full,part</code>对应<code>names</code>，行名称</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">      num_frames  mota      motp</span><br><span class="line">full           <span class="number">3</span>   <span class="number">0.5</span>  <span class="number">0.340000</span></span><br><span class="line">part           <span class="number">2</span>   <span class="number">0.5</span>  <span class="number">0.166667</span></span><br></pre></td></tr></table></figure>
+<h3 id="格式化输出最终结果">3.格式化输出最终结果</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">strsummary = mm.io.render_summary(</span><br><span class="line">    summary,</span><br><span class="line">    formatters=&#123;<span class="string">'mota'</span> : <span class="string">'&#123;:.2%&#125;'</span>.format&#125;,</span><br><span class="line">    namemap=&#123;<span class="string">'mota'</span>: <span class="string">'MOTA'</span>, <span class="string">'motp'</span> : <span class="string">'MOTP'</span>&#125;</span><br><span class="line">)</span><br><span class="line">print(strsummary)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">def render_summary(summary, formatters=None, namemap=None, buf=None):</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">@brief:</span></span><br><span class="line"><span class="string">Render metrics summary to console friendly tabular output</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Params</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">summary :pd.DataFrame Dataframe containing summaries in rows(compute_many/compute的返回值)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Kwargs</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">buf : StringIO-like Buffer to writer to </span></span><br><span class="line"><span class="string">formatters(dict): define custorm formatters for individual metrics.you can get preset formatters from</span></span><br><span class="line"><span class="string">				MetricsHost.formatters</span></span><br><span class="line"><span class="string">namemap(dict): Dictornary defining new metric names for display I.e`&#123;'num_false_positives': 'FP'&#125;`</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Returns</span></span><br><span class="line"><span class="string">-------</span></span><br><span class="line"><span class="string">string : Formatted string</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+<p>通过打印<code>print(strsummary)</code>可打印指标计算结果，并于未格式化之前进行比较：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># unformatted</span></span><br><span class="line">     num_frames  mota      motp</span><br><span class="line">full           <span class="number">3</span>   <span class="number">0.5</span>  <span class="number">0.340000</span></span><br><span class="line">part           <span class="number">2</span>   <span class="number">0.5</span>  <span class="number">0.166667</span></span><br><span class="line"><span class="comment"># formatted</span></span><br><span class="line">	 num_frames   MOTA      MOTP</span><br><span class="line">full           <span class="number">3</span> <span class="number">50.00</span>%  <span class="number">0.340000</span></span><br><span class="line">part           <span class="number">2</span> <span class="number">50.00</span>%  <span class="number">0.166667</span></span><br></pre></td></tr></table></figure>
+<p>pymotmetric中包含了预定义的输出格式，其中metrics即我们想要衡量的计算指标直接使用预设的<code>motchallenge_metrics</code> 输出格式使用预定义的<code>mh.formatters</code>,指标名称映射使用<code>mm.io.motchallenge_metric_names</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">summary &#x3D; mh.compute_many(</span><br><span class="line">    [acc, acc.events.loc[0:1]],</span><br><span class="line">    metrics&#x3D;mm.metrics.motchallenge_metrics,</span><br><span class="line">    names&#x3D;[&#39;full&#39;, &#39;part&#39;])</span><br><span class="line"></span><br><span class="line">strsummary &#x3D; mm.io.render_summary(</span><br><span class="line">    summary,</span><br><span class="line">    formatters&#x3D;mh.formatters,</span><br><span class="line">    namemap&#x3D;mm.io.motchallenge_metric_names</span><br><span class="line">)</span><br><span class="line">print(strsummary)</span><br></pre></td></tr></table></figure>
+<p>可得到预定义的输出格式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">      IDF1   IDP   IDR  Rcll  Prcn GT MT PT ML FP FN IDs  FM  MOTA  MOTP IDt IDa IDm</span><br><span class="line">full <span class="number">83.3</span>% <span class="number">83.3</span>% <span class="number">83.3</span>% <span class="number">83.3</span>% <span class="number">83.3</span>%  <span class="number">2</span>  <span class="number">1</span>  <span class="number">1</span>  <span class="number">0</span>  <span class="number">1</span>  <span class="number">1</span>   <span class="number">1</span>   <span class="number">1</span> <span class="number">50.0</span>% <span class="number">0.340</span>   <span class="number">0</span>   <span class="number">1</span>   <span class="number">0</span></span><br><span class="line">part <span class="number">75.0</span>% <span class="number">75.0</span>% <span class="number">75.0</span>% <span class="number">75.0</span>% <span class="number">75.0</span>%  <span class="number">2</span>  <span class="number">1</span>  <span class="number">1</span>  <span class="number">0</span>  <span class="number">1</span>  <span class="number">1</span>   <span class="number">0</span>   <span class="number">0</span> <span class="number">50.0</span>% <span class="number">0.167</span>   <span class="number">0</span>   <span class="number">0</span>   <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>如果先要获取各个数据集(在MOT中可能是一个数据集的各个sequence)最终的总体指标,将<code>mh.compute()</code>或 <code>mh.compute_many()</code>中的参数<code>generate_overall=True</code>,则在计算完各个序列的指标后，最后会计算一个总的overall指标：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">summary = mh.compute_many(</span><br><span class="line">    [acc, acc.events.loc[<span class="number">0</span>:<span class="number">1</span>]],</span><br><span class="line">    metrics=mm.metrics.motchallenge_metrics,</span><br><span class="line">    names=[<span class="string">'full'</span>, <span class="string">'part'</span>],</span><br><span class="line">    generate_overall=<span class="literal">True</span>                 <span class="comment">##计算整个数据集的指标</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">strsummary = mm.io.render_summary(</span><br><span class="line">    summary,</span><br><span class="line">    formatters=mh.formatters,</span><br><span class="line">    namemap=mm.io.motchallenge_metric_names</span><br><span class="line">)</span><br><span class="line">print(strsummary)</span><br><span class="line"></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">         IDF1   IDP   IDR  Rcll  Prcn GT MT PT ML FP FN IDs  FM  MOTA  MOTP</span></span><br><span class="line"><span class="string">full    83.3% 83.3% 83.3% 83.3% 83.3%  2  1  1  0  1  1   1   1 50.0% 0.340</span></span><br><span class="line"><span class="string">part    75.0% 75.0% 75.0% 75.0% 75.0%  2  1  1  0  1  1   0   0 50.0% 0.167</span></span><br><span class="line"><span class="string">OVERALL 80.0% 80.0% 80.0% 80.0% 80.0%  4  2  2  0  2  2   1   1 50.0% 0.275</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<h3 id="获取update中的distance距离矩阵">获取update中的distance距离矩阵</h3>
+<p><code>pymotmetric</code>中提供的工具为<code>motmetrics.distance</code>模块</p>
+<p><strong>Euclidean norm squared on points</strong> 欧氏距离的平方</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Object related points</span></span><br><span class="line">o = np.array([</span><br><span class="line">    [<span class="number">1.</span>, <span class="number">2</span>],</span><br><span class="line">    [<span class="number">2.</span>, <span class="number">2</span>],</span><br><span class="line">    [<span class="number">3.</span>, <span class="number">2</span>],</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Hypothesis related points</span></span><br><span class="line">h = np.array([</span><br><span class="line">    [<span class="number">0.</span>, <span class="number">0</span>],</span><br><span class="line">    [<span class="number">1.</span>, <span class="number">1</span>],</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">C = mm.distances.norm2squared_matrix(o, h, max_d2=<span class="number">5.</span>)</span><br><span class="line"></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">[[  5.   1.]</span></span><br><span class="line"><span class="string"> [ nan   2.]</span></span><br><span class="line"><span class="string"> [ nan   5.]]</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<p><code>mm.distance.norm2squared_matrix(objs,hyps,max_d2=float('inf'))</code> ,<code>max_d2</code>为距离阈值，超过此距离则不进行匹配，设为<code>np.nan</code> ,<code>objs</code>和<code>hyps</code>为列数同一维度的坐标点(ie. 都是二维点)，但是点的数量可以不一致</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""Computes the squared Euclidean distance matrix between object and hypothesis points.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Params</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">objs : NxM array</span></span><br><span class="line"><span class="string">    Object points of dim M in rows</span></span><br><span class="line"><span class="string">hyps : KxM array</span></span><br><span class="line"><span class="string">    Hypothesis points of dim M in rows</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Kwargs</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">max_d2 : float</span></span><br><span class="line"><span class="string">    Maximum tolerable squared Euclidean distance. Object / hypothesis points</span></span><br><span class="line"><span class="string">    with larger distance are set to np.nan signalling do-not-pair. Defaults</span></span><br><span class="line"><span class="string">    to +inf</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Returns</span></span><br><span class="line"><span class="string">-------</span></span><br><span class="line"><span class="string">C : NxK array</span></span><br><span class="line"><span class="string">    Distance matrix containing pairwise distances or np.nan.</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<p><strong>Intersection over union norm for 2D rectangles</strong> :2D框的交并比作为距离衡量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">a &#x3D; np.array([</span><br><span class="line">    [0, 0, 1, 2],    # Format X, Y, Width, Height</span><br><span class="line">    [0, 0, 0.8, 1.5],</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">b &#x3D; np.array([</span><br><span class="line">    [0, 0, 1, 2],</span><br><span class="line">    [0, 0, 1, 1],</span><br><span class="line">    [0.1, 0.2, 2, 2],</span><br><span class="line">])</span><br><span class="line">mm.distances.iou_matrix(a, b, max_iou&#x3D;0.5)</span><br><span class="line"></span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">[[ 0.          0.5                nan]</span><br><span class="line"> [ 0.4         0.42857143         nan]]</span><br><span class="line">&quot;&quot;&quot;</span><br></pre></td></tr></table></figure>
+<p><code>mm.distance.iou_matrix(objs,hyps,max_iou=1.)</code> 计算iou距离=1-iou，输入格式要求为(x,y,w,h),其中<code>max_iou</code>,当计算的iou距离大于<code>max_iou</code>，距离置为<code>np.nan</code>不进行匹配</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""Computes 'intersection over union (IoU)' distance matrix between object and hypothesis rectangles.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">The IoU is computed as</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    IoU(a,b) = 1. - isect(a, b) / union(a, b)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">where isect(a,b) is the area of intersection of two rectangles and union(a, b) the area of union. The</span></span><br><span class="line"><span class="string">IoU is bounded between zero and one. 0 when the rectangles overlap perfectly and 1 when the overlap is</span></span><br><span class="line"><span class="string">zero.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Params</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">objs : Nx4 array</span></span><br><span class="line"><span class="string">    Object rectangles (x,y,w,h) in rows</span></span><br><span class="line"><span class="string">hyps : Kx4 array</span></span><br><span class="line"><span class="string">    Hypothesis rectangles (x,y,w,h) in rows</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Kwargs</span></span><br><span class="line"><span class="string">------</span></span><br><span class="line"><span class="string">max_iou : float</span></span><br><span class="line"><span class="string">    Maximum tolerable overlap distance. Object / hypothesis points</span></span><br><span class="line"><span class="string">    with larger distance are set to np.nan signalling do-not-pair. Defaults</span></span><br><span class="line"><span class="string">    to 0.5</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Returns</span></span><br><span class="line"><span class="string">-------</span></span><br><span class="line"><span class="string">C : NxK array</span></span><br><span class="line"><span class="string">    Distance matrix containing pairwise distances or np.nan.</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<h3 id="直接利用mot数据集格式的检测结果进行衡量">直接利用mot数据集格式的检测结果进行衡量</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'idf1'</span>: <span class="string">'IDF1'</span>,</span><br><span class="line"><span class="string">'idp'</span>: <span class="string">'IDP'</span>,</span><br><span class="line"><span class="string">'idr'</span>: <span class="string">'IDR'</span>,</span><br><span class="line"><span class="string">'recall'</span>: <span class="string">'Rcll'</span>,</span><br><span class="line"><span class="string">'precision'</span>: <span class="string">'Prcn'</span>,</span><br><span class="line"><span class="string">'num_unique_objects'</span>: <span class="string">'GT'</span>,</span><br><span class="line"><span class="string">'mostly_tracked'</span>: <span class="string">'MT'</span>,</span><br><span class="line"><span class="string">'partially_tracked'</span>: <span class="string">'PT'</span>,</span><br><span class="line"><span class="string">'mostly_lost'</span>: <span class="string">'ML'</span>,</span><br><span class="line"><span class="string">'num_false_positives'</span>: <span class="string">'FP'</span>,</span><br><span class="line"><span class="string">'num_misses'</span>: <span class="string">'FN'</span>,</span><br><span class="line"><span class="string">'num_switches'</span>: <span class="string">'IDs'</span>,</span><br><span class="line"><span class="string">'num_fragmentations'</span>: <span class="string">'FM'</span>,</span><br><span class="line"><span class="string">'mota'</span>: <span class="string">'MOTA'</span>,</span><br><span class="line"><span class="string">'motp'</span>: <span class="string">'MOTP'</span>,</span><br><span class="line"><span class="string">'num_transfer'</span>: <span class="string">'IDt'</span>,</span><br><span class="line"><span class="string">'num_ascend'</span>: <span class="string">'IDa'</span>,</span><br><span class="line"><span class="string">'num_migrate'</span>: <span class="string">'IDm'</span>,</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- &#96;&#39;MATCH&#39;&#96; a match between a object and hypothesis was found</span><br><span class="line">- &#96;&#39;SWITCH&#39;&#96; a match between a object and hypothesis was found but differs from previous assignment (hypothesisid !&#x3D; previous)</span><br><span class="line">- &#96;&#39;MISS&#39;&#96; no match for an object was found</span><br><span class="line">- &#96;&#39;FP&#39;&#96; no match for an hypothesis was found (spurious detections)</span><br><span class="line">- &#96;&#39;RAW&#39;&#96; events corresponding to raw input</span><br><span class="line">- &#96;&#39;TRANSFER&#39;&#96; a match between a object and hypothesis was found but differs from previous assignment (objectid !&#x3D; previous)</span><br><span class="line">- &#96;&#39;ASCEND&#39;&#96; a match between a object and hypothesis was found but differs from previous assignment  (hypothesisid is new)</span><br><span class="line">- &#96;&#39;MIGRATE&#39;&#96; a match between a object and hypothesis was found but differs from previous assignment  (objectid is new)</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MOT/" rel="tag"># MOT</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/04/shell_program/" rel="prev" title="shell脚本编程基础">
+      <i class="fa fa-chevron-left"></i> shell脚本编程基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/04/multiple_object_tracking_review/" rel="next" title="multiple_object_tracking_review">
+      multiple_object_tracking_review <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#motaccumulator创建及更新填充"><span class="nav-number">1.</span> <span class="nav-text">MOTAccumulator创建及更新(填充)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#metric的创建计算"><span class="nav-number">2.</span> <span class="nav-text">2.Metric的创建计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#格式化输出最终结果"><span class="nav-number">3.</span> <span class="nav-text">3.格式化输出最终结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取update中的distance距离矩阵"><span class="nav-number">4.</span> <span class="nav-text">获取update中的distance距离矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#直接利用mot数据集格式的检测结果进行衡量"><span class="nav-number">5.</span> <span class="nav-text">直接利用mot数据集格式的检测结果进行衡量</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">198k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:31</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/04/04/py-motmetrics/";
+    this.page.identifier = "2020/04/04/py-motmetrics/";
+    this.page.title = "py-motmetric使用";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

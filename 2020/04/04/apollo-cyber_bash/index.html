@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Apollo中Cyber RT组件脚本启动流程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apollo中Cyber RT脚本启动流程">
+<meta property="og:url" content="https://zhxjia.github.io/2020/04/04/apollo-cyber_bash/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="Apollo中Cyber RT组件脚本启动流程">
+<meta property="og:image" content="https://zhxjia.github.io/2020/04/04/apollo-cyber_bash/cyber_monitor.png">
+<meta property="article:published_time" content="2020-04-04T02:58:02.731Z">
+<meta property="article:modified_time" content="2020-04-04T02:58:02.731Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="apollo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhxjia.github.io/2020/04/04/apollo-cyber_bash/cyber_monitor.png">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/04/04/apollo-cyber_bash/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Apollo中Cyber RT脚本启动流程 | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo-cyber_bash/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Apollo中Cyber RT脚本启动流程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/Cyber-RT/" itemprop="url" rel="index">
+                    <span itemprop="name">Cyber RT</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/04/apollo-cyber_bash/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo-cyber_bash/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>19k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>31 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Apollo中Cyber RT组件脚本启动流程</p>
+<a id="more"></a>
+<h2 id="cyberrt功能模块启动过程">1. CyberRT功能模块启动过程</h2>
+<p>Apollo通过组件注册的形式构建</p>
+<p>https://zhuanlan.zhihu.com/p/116782645</p>
+<h2 id="cyber-api">2. Cyber API</h2>
+<h3 id="talk-listener">2.1 Talk-Listener</h3>
+<p>首先引入三个概念：<code>node</code>(base unit),<code>reader</code>(facility to read message),<code>writer</code> (facility to write message)，即<code>reader</code>和<code>writer</code>是建立在<code>node</code>上的。 <strong>创建node</strong>： 在CyberRT框架下，node是最基本的单元（wirter和reader的基础），创建node的接口如下:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Node&gt; apollo::cyber::CreateNode(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; node_name, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name_space = <span class="string">""</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Parameters:
+<ul>
+<li>node_name:<code>node</code>的名称，需要是全局唯一的标识符（名字不能重复）</li>
+<li>name_space: 表明<code>node</code>位于的命名空间,默认为空，它最终与<code>node_name</code>相连接作为最终节点名，形式 是<code>/namespace/node_name</code></li>
+</ul></li>
+<li>Return value - 指向<code>Node</code>的指针(unique_ptr)</li>
+<li>Error Conditions - 当<code>Cyber::Init()</code>没有执行，系统没有进行初始化，则不能创建节点，会返回<code>nullptr</code></li>
+</ul>
+<blockquote>
+<p>注意，一般一个功能组件仅仅只有一个node,但是在node上可以创建多个writer和reader。</p>
+</blockquote>
+<p><strong>创建writer</strong>: <code>writer</code>是CyberRT中用于消息发送的&quot;设备&quot;，每一个<code>writer</code>都与一个对应特定数据类型的<code>channel</code>关联。<code>writer</code>通过<code>Node</code>类中的<code>CreateWriter</code>接口创建，接口(位于node.h)如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> MessageT&gt;</span><br><span class="line">	<span class="function"><span class="keyword">auto</span> <span class="title">CreateWriter</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; channel_name)</span></span></span><br><span class="line">		-&gt; std::shared_ptr&lt;Writer&lt;MessageT&gt;&gt;;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> MessageT&gt;</span><br><span class="line">	<span class="function"><span class="keyword">auto</span> <span class="title">CreateWriter</span><span class="params">(<span class="keyword">const</span> proto::RoleAttributes&amp; role_attr)</span></span></span><br><span class="line">		-&gt; std::shared_ptr&lt;Writer&lt;MessageT&gt;&gt;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Parameters:
+<ul>
+<li>channel_name: 发布消息的channel名称</li>
+<li>MessageT:发送消息的类型</li>
+</ul></li>
+<li>Return value - 指向<code>Writer</code>类实例的指针</li>
+</ul>
+<p><strong>创建reader:</strong> <code>reader</code>的创建与<code>writer</code>类似，是CyberRT中用于接收消息的&quot;设备&quot;，<code>reader</code>在创建的时候必须与一个回调函数绑定，当channel中新的消息到来时，将会调用回调函数。<code>reader</code>的创建的函数接口为(node.h)：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> MessageT&gt;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">CreateReader</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; channel_name,<span class="keyword">const</span> <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;MessageT&gt;&amp;)&gt;&amp; reader_func)</span></span></span><br><span class="line">	-&gt; std::shared_ptr&lt;Reader&lt;MessageT&gt;&gt;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> MessageT&gt;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">CreateReader</span><span class="params">(<span class="keyword">const</span> ReaderConfig&amp; <span class="built_in">config</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                  <span class="keyword">const</span> CallbackFunc&lt;MessageT&gt;&amp; reader_func = <span class="literal">nullptr</span>)</span></span></span><br><span class="line">    -&gt; std::shared_ptr&lt;cyber::Reader&lt;MessageT&gt;&gt;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> MessageT&gt;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">CreateReader</span><span class="params">(<span class="keyword">const</span> proto::RoleAttributes&amp; role_attr,</span></span></span><br><span class="line"><span class="function"><span class="params">                  <span class="keyword">const</span> CallbackFunc&lt;MessageT&gt;&amp; reader_func = <span class="literal">nullptr</span>)</span></span></span><br><span class="line">-&gt; std::shared_ptr&lt;cyber::Reader&lt;MessageT&gt;&gt;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>CallbackFunc 封装了<code>std:function&lt;void(const std::shared_ptr&lt;M0&gt;&amp;)&gt;</code></p>
+</blockquote>
+<ul>
+<li>Parameters:
+<ul>
+<li>MessageT: 读取的消息类型</li>
+<li>channel_name:对应接收消息来自哪个channel</li>
+<li>reader_func:回调函数用于处理接收到的消息</li>
+</ul></li>
+<li>Return value:指向Reader类实例的指针</li>
+</ul>
+<hr>
+<h3 id="service-creation-and-use">2.2 Service Creation and Use</h3>
+<p>在自动驾驶场景中，往往需要多个模块之间的信息交换，除了上述的接收和发送消息的方式。<code>Service</code>是<code>node</code>间通信的另一种方式。与channel的方式不同，<code>service</code>实现了<code>two-way</code>交流，例如一个node通过发送一个请求来获得一个回复。</p>
+<p>下面举例说明通过创建<code>client-server</code>模型将<code>Driver.proto</code>信息来回传递，当client发送一个请求，对应的server解析或处理请求并进行回复。通过以下几个步骤即可实现：</p>
+<p><strong>定义request and response messages</strong> 在cyber中所有的信息传递通过<code>protobuf</code>的形式传递。任何的protobuf消息通过序列化/反序列化(相关函数接口实现)可以作为<code>service</code>的请求 回复的消息格式，例如这里采用的Driver消息类型位于examples.proto:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// filename: examples.proto</span></span><br><span class="line">syntax = <span class="string">"proto2"</span>;</span><br><span class="line">package apollo.cyber.examples.proto;</span><br><span class="line">message Driver &#123;</span><br><span class="line">    optional <span class="built_in">string</span> content = <span class="number">1</span>;</span><br><span class="line">    optional uint64 msg_id = <span class="number">2</span>;</span><br><span class="line">    optional uint64 timestamp = <span class="number">3</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><strong>Create a service and a client</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//filename: cyber/examples/service.cc</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/cyber.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/examples/proto/examples.pb.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> apollo::cyber::examples::proto::Driver;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc ,<span class="keyword">char</span>* argv[])</span></span>&#123;</span><br><span class="line">    apollo::cyber::Init(argv[<span class="number">0</span>]);</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;apollo::cyber::Node&gt; <span class="title">node</span><span class="params">(apollo::cyber::CreatNode(<span class="string">"strat_node"</span>))</span></span>;</span><br><span class="line">    atuo server = node-&gt;CreateService&lt;Driver,Driver&gt;(<span class="string">"test_server"</span>,[](<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Driver&gt;&amp; request,<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Drive&gt;&amp; response))&#123;</span><br><span class="line">        AINFO &lt;&lt; <span class="string">"server: I am driver server"</span>;</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">uint64_t</span> id = <span class="number">0</span>;</span><br><span class="line">        ++id;</span><br><span class="line">        response-&gt;set_msg_id(id);</span><br><span class="line">        response-&gt;set_timestamp(<span class="number">0</span>);</span><br><span class="line">      &#125;); <span class="comment">//lambda函数实现回调信息</span></span><br><span class="line">    </span><br><span class="line">      <span class="keyword">auto</span> client = node-&gt;CreateClient&lt;Driver, Driver&gt;(<span class="string">"test_server"</span>);</span><br><span class="line">  <span class="keyword">auto</span> driver_msg = <span class="built_in">std</span>::make_shared&lt;Driver&gt;();</span><br><span class="line">  driver_msg-&gt;set_msg_id(<span class="number">0</span>);</span><br><span class="line">  driver_msg-&gt;set_timestamp(<span class="number">0</span>);</span><br><span class="line">  <span class="keyword">while</span> (apollo::cyber::OK()) &#123;</span><br><span class="line">    <span class="keyword">auto</span> res = client-&gt;SendRequest(driver_msg);</span><br><span class="line">    <span class="keyword">if</span> (res != <span class="literal">nullptr</span>) &#123;</span><br><span class="line">      AINFO &lt;&lt; <span class="string">"client: response: "</span> &lt;&lt; res-&gt;ShortDebugString();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      AINFO &lt;&lt; <span class="string">"client: service may not ready."</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    sleep(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  apollo::cyber::WaitForShutdown();</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Bazel编译文件的构建：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cc_binary(</span><br><span class="line">    name = <span class="string">"service"</span>,</span><br><span class="line">    srcs = [ <span class="string">"service.cc"</span>, ],</span><br><span class="line">    deps = [</span><br><span class="line">        <span class="string">"//cyber"</span>,</span><br><span class="line">        <span class="string">"//cyber/examples/proto:examples_cc_proto"</span>,</span><br><span class="line">    ],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><strong>编译运行：</strong></p>
+<ul>
+<li>编译service/client: <code>bazel build cyber/examples/...</code></li>
+<li>运行：<code>./bazel-bin/cyber/examoles/service</code></li>
+<li>结果：<code>apollo/data/log/service.INFO</code>中可以查看<code>AINFO</code>的信息。</li>
+</ul>
+<p><strong>注意事项：</strong></p>
+<ul>
+<li>在注册<code>service</code>，<code>node</code>时 注意不能出现重复的名称</li>
+</ul>
+<hr>
+<h3 id="parameter-service">2.3 Parameter service</h3>
+<p>参数服务用于节点之间的参数共享，提供的基本操作为<code>set</code>,<code>get</code>以及<code>list</code>。参数共享是基于上面<code>Service</code>(包含<code>service</code>和<code>client</code>)实现的。</p>
+<p><strong>Parameter Object:</strong> <strong>（1）支持的数据类型：</strong> 通过cyber的所有参数传递是基于<code>apollo::cyber::Parameter</code>类型，下表给出了支持的5种参数类型：</p>
+<table>
+<thead>
+<tr class="header">
+<th>参数类型</th>
+<th>C++数据类型</th>
+<th>protobuf数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>apollo::cyber::proto::ParamType::INT</td>
+<td>int64_t</td>
+<td>int64</td>
+</tr>
+<tr class="even">
+<td>apollo::cyber::proto::ParamType::DOUBLE</td>
+<td>double</td>
+<td>double</td>
+</tr>
+<tr class="odd">
+<td>apollo::cyber::proto::ParamType::BOOL</td>
+<td>bool</td>
+<td>bool</td>
+</tr>
+<tr class="even">
+<td>apollo::cyber::proto::ParamType::STRING</td>
+<td>std::string</td>
+<td>string</td>
+</tr>
+<tr class="odd">
+<td>apollo::cyber::proto::ParamType::PROTOBUF</td>
+<td>std::string</td>
+<td>string</td>
+</tr>
+<tr class="even">
+<td>apollo::cyber::proto::ParamType::NOT_SET</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p>除了以上五种类型，Parameter同时还有支持protobuf对象作为输入参数的接口。通过序列化处理对象将其转换为STRING类型用于传递。 <strong>（2）创建Parameter对象：</strong> 支持的构造方法</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Parameter();  <span class="comment">// Name is empty, type is NOT_SET</span></span><br><span class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">Parameter</span><span class="params">(<span class="keyword">const</span> Parameter&amp; parameter)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">Parameter</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name)</span></span>;  <span class="comment">// type为NOT_SET</span></span><br><span class="line">Parameter(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> <span class="keyword">bool</span> bool_value);</span><br><span class="line">Parameter(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> <span class="keyword">int</span> int_value);</span><br><span class="line">Parameter(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> <span class="keyword">int64_t</span> int_value);</span><br><span class="line">Parameter(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> <span class="keyword">float</span> double_value);</span><br><span class="line">Parameter(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> <span class="keyword">double</span> double_value);</span><br><span class="line">Parameter(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; string_value);</span><br><span class="line">Parameter(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> <span class="keyword">char</span>* string_value);</span><br><span class="line">Parameter(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; msg_str,</span><br><span class="line">          <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; full_name, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; proto_desc);</span><br><span class="line">Parameter(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">const</span> google::protobuf::Message&amp; msg);</span><br></pre></td></tr></table></figure>
+<p>具体使用举例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Parameter <span class="title">a</span><span class="params">(<span class="string">"int"</span>, <span class="number">10</span>)</span></span>;</span><br><span class="line"><span class="comment">// proto message Chatter</span></span><br><span class="line">Chatter chatter;</span><br><span class="line"><span class="function">Parameter <span class="title">f</span><span class="params">(<span class="string">"chatter"</span>, chatter)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><strong>（3）接口和数据读取：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> ParamType <span class="title">type</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">TypeName</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">Descriptor</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">Name</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">bool</span> <span class="title">AsBool</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">int64_t</span> <span class="title">AsInt64</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">double</span> <span class="title">AsDouble</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">AsString</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">DebugString</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Parameter <span class="title">a</span><span class="params">(<span class="string">"int"</span>, <span class="number">10</span>)</span></span>;</span><br><span class="line">a.Name();  <span class="comment">// return int</span></span><br><span class="line">a.Type();  <span class="comment">// return apollo::cyber::proto::ParamType::INT</span></span><br><span class="line">a.TypeName();  <span class="comment">// return string: INT</span></span><br><span class="line">a.DebugString();  <span class="comment">// return string: &#123;name: "int", type: "INT", value: 10&#125;</span></span><br><span class="line"><span class="keyword">int</span> x = a.AsInt64();  <span class="comment">// x = 10</span></span><br><span class="line">x = a.value&lt;<span class="keyword">int64_t</span>&gt;();  <span class="comment">// x = 10</span></span><br><span class="line">x = a.AsString();  <span class="comment">// Undefined behavior, error log prompt</span></span><br><span class="line">f.TypeName();  <span class="comment">// return string: chatter</span></span><br><span class="line"><span class="keyword">auto</span> chatter = f.value&lt;Chatter&gt;();</span><br></pre></td></tr></table></figure>
+<p><strong>Parameter Service</strong> 如果一个node 想要提供Parameter Service给其他节点，则需要创建<code>ParameterService</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Construct a new ParameterService object</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param node shared_ptr of the node handler</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">ParameterService</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Node&gt;&amp; node)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>因为参数存储在<code>parameter service object</code>中，因此可以在ParameterService直接处理，而不需要service request。 <strong>(1）设置parameter对象：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Set the Parameter object</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param parameter parameter to be set</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SetParameter</span><span class="params">(<span class="keyword">const</span> Parameter&amp; parameter)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><strong>(2) 获取parameters对象中参数：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Get the Parameter object</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param param_name</span></span><br><span class="line"><span class="comment"> * @param parameter the pointer to store</span></span><br><span class="line"><span class="comment"> * @return true</span></span><br><span class="line"><span class="comment"> * @return false call service fail or timeout</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">GetParameter</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; param_name, Parameter* parameter)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><strong>（3）获取parameters对象列表：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Get all the Parameter objects</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param parameters pointer of vector to store all the parameters</span></span><br><span class="line"><span class="comment"> * @return true</span></span><br><span class="line"><span class="comment"> * @return false call service fail or timeout</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ListParameters</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Parameter&gt;* parameters)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><strong>Parameter Client:</strong> 如果一个node想要使用其他节点的parameter services,则需要创建一个<code>ParamterClient</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Construct a new ParameterClient object</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param node shared_ptr of the node handler</span></span><br><span class="line"><span class="comment"> * @param service_node_name node name which provide a param services</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">ParameterClient(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Node&gt;&amp; node, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; service_node_name);</span><br></pre></td></tr></table></figure>
+<p>与<code>Parameter Service</code>类似，也可以使用<code>SetParameter</code>,<code>GetParameter</code>和<code>ListParamters</code>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span> </span>&#123;</span><br><span class="line">  apollo::cyber::Init(*argv);</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;apollo::cyber::Node&gt; node =</span><br><span class="line">      apollo::cyber::CreateNode(<span class="string">"parameter"</span>);</span><br><span class="line">  <span class="keyword">auto</span> param_server = <span class="built_in">std</span>::make_shared&lt;ParameterServer&gt;(node);</span><br><span class="line">  <span class="keyword">auto</span> param_client = <span class="built_in">std</span>::make_shared&lt;ParameterClient&gt;(node, <span class="string">"parameter"</span>);</span><br><span class="line">  param_server-&gt;SetParameter(Parameter(<span class="string">"int"</span>, <span class="number">1</span>));</span><br><span class="line">  Parameter parameter;</span><br><span class="line">  param_server-&gt;GetParameter(<span class="string">"int"</span>, &amp;parameter);</span><br><span class="line">  AINFO &lt;&lt; <span class="string">"int: "</span> &lt;&lt; parameter.AsInt64();</span><br><span class="line">  param_client-&gt;SetParameter(Parameter(<span class="string">"string"</span>, <span class="string">"test"</span>));</span><br><span class="line">  param_client-&gt;GetParameter(<span class="string">"string"</span>, &amp;parameter);</span><br><span class="line">  AINFO &lt;&lt; <span class="string">"string: "</span> &lt;&lt; parameter.AsString();</span><br><span class="line">  param_client-&gt;GetParameter(<span class="string">"int"</span>, &amp;parameter);</span><br><span class="line">  AINFO &lt;&lt; <span class="string">"int: "</span> &lt;&lt; parameter.AsInt64();</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="log-api">2.4 Log API</h3>
+<p>Cyber的log库建立在<code>glog</code>的基础上，需要包含以下头文件：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/common/log.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/init.h"</span></span></span><br></pre></td></tr></table></figure>
+<p><strong>Log configuration:</strong> 默认的配置路径<code>cyber/setup.sh</code> 以下的配置信息可以由开发者自行更改：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> GLOG_log_dir=/apollo/data/<span class="built_in">log</span></span><br><span class="line"><span class="built_in">export</span> GLOG_alsologtostderr=0</span><br><span class="line"><span class="built_in">export</span> GLOG_colorlogtostderr=1</span><br><span class="line"><span class="built_in">export</span> GLOG_minloglevel=0</span><br></pre></td></tr></table></figure>
+<p><strong>Log initialization:</strong> 在代码入口调用<code>Init</code>来初始化log:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apollo::cyber::cyber::Init(argv[<span class="number">0</span>]) is initialized.</span><br><span class="line">If no macro definition is made in the previous component, the corresponding <span class="built_in">log</span> is printed to the binary <span class="built_in">log</span>.</span><br></pre></td></tr></table></figure>
+<p><strong>Log output macro:</strong> 封装的log输出宏：(严重程度依次递推)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ADEBUG &lt;&lt; <span class="string">"hello cyber."</span>;</span><br><span class="line">AINFO  &lt;&lt; <span class="string">"hello cyber."</span>;</span><br><span class="line">AWARN  &lt;&lt; <span class="string">"hello cyber."</span>;</span><br><span class="line">AERROR &lt;&lt; <span class="string">"hello cyber."</span>;</span><br><span class="line">AFATAL &lt;&lt; <span class="string">"hello cyber."</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>Log输出Format:</strong> <code>&lt;MODULE_NAME&gt;.log.&lt;LOG_LEVEL&gt;.&lt;datetime&gt;.&lt;process_id&gt;</code></p>
+<p><strong>关于Log文件：</strong> 与原始<code>glog</code>不一样的仅仅在于不同的log级别将会写入相同的log文件中。</p>
+<hr>
+<h3 id="building-a-module-based-on-component">2.5 Building a module based on Component</h3>
+<h4 id="component">2.5.1 component</h4>
+<p><code>component</code>是CyberRT提供用于构建应用模块的基础类。每一个特定功能的应用模块都可以继承<code>Component</code>类并定义它们自己的<code>Init</code>和<code>Proc</code>函数，这样该模块将会被加载到<code>Cyber</code>框架中运行。</p>
+<h4 id="binary-vs-component">2.5.2 Binary vs Component</h4>
+<p>在CyberRT框架下应用有两种配置方式：</p>
+<ul>
+<li><p>基于Binary:各个应用模块被分别编译成不同的binary(二进制可执行文件)，然后通过创建各自的<code>Reader</code>和<code>Writer</code>进行信息交换。</p></li>
+<li><p>基于Component:各个应用模块被编译成shared library。通过继承Component类,并编写相应的dag描述文件,CyberRT框架将会动态的加载运行该应用模块。</p>
+<p><strong>Component的基本组件接口：</strong></p>
+<ul>
+<li><code>Init()</code> 用于算法组件的初始化，是算法组件的入口(相当于各个组件的main)</li>
+<li><code>Proc()</code> 当需要的通道信息发布时，Cyber框架将会调用该函数(实际是一个Reader的回调函数)</li>
+</ul>
+<p><strong>使用Component的优势：</strong></p>
+<ul>
+<li>组件可以通过<code>launch</code>文件加载到不同的进程中，部署更加灵活</li>
+<li>组件可以通过修改<code>dag</code>文件更改接收通道的名称，而不需要重新编译</li>
+<li>组件支持接收多种类型的数据</li>
+<li>组件支持提供多种融合策略</li>
+</ul></li>
+</ul>
+<h4 id="dag文件的形式">2.5.3 Dag文件的形式</h4>
+<p>An example dag file:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># Define all coms in DAG streaming.</span><br><span class="line">module_config &#123;</span><br><span class="line">    module_library : &quot;lib&#x2F;libperception_component.so&quot;</span><br><span class="line">    components &#123;</span><br><span class="line">        class_name : &quot;PerceptionComponent&quot;</span><br><span class="line">        config &#123;</span><br><span class="line">            name : &quot;perception&quot;</span><br><span class="line">            readers &#123;</span><br><span class="line">                channel: &quot;perception&#x2F;channel_name&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    timer_components &#123;</span><br><span class="line">        class_name : &quot;DriverComponent&quot;</span><br><span class="line">        config &#123;</span><br><span class="line">            name : &quot;driver&quot;</span><br><span class="line">            interval : 100</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>module_library:</strong> 用于加载<code>.so</code>库的路径，其根路径是Cyber的工作路径(与<code>setup.sh</code>相同的路径)</li>
+<li><strong>components/timer_components:</strong> 选择基础组件类型(是否是定时发布,一般传感器的组件用timer_component)</li>
+<li><strong>class_name:</strong> 加载的组件类的名称</li>
+<li><strong>name:</strong> 加载的组件类的标识符（同一组件类可能有不同的配置方式，比如16线，64线激光雷达）</li>
+<li><strong>readers:</strong> 被当前组件接受的数据(Proc函数中处理)，支持1-3各不同通道的数据</li>
+</ul>
+<h4 id="timercomponent-example">2.5.4 (timer)component example</h4>
+<ul>
+<li><p>common_component_example 可以查看<code>cyber/examples/common_component_example/</code>中的示例程序 头文件基本组成：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/class_loader/class_loader.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/examples/proto/examples.pb.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> apollo::cyber::examples::proto::Driver;</span><br><span class="line"><span class="keyword">using</span> apollo::cyber::Component;</span><br><span class="line"><span class="keyword">using</span> apollo;:cyber::ComponentBase;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CommontestComponent</span> :</span> <span class="keyword">public</span> Component&lt;Driver,Driver&gt; &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">    	<span class="function"><span class="keyword">bool</span> <span class="title">Init</span><span class="params">()</span> <span class="keyword">override</span></span>;</span><br><span class="line">    	<span class="function"><span class="keyword">bool</span> <span class="title">Proc</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Driver&gt;&amp; msg0,</span></span></span><br><span class="line"><span class="function"><span class="params">                  <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Driver&gt;&amp; msg1)</span> <span class="keyword">override</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line">CYBER_REGISTER_COMPONENT(Commontestcomponent)</span><br></pre></td></tr></table></figure>
+<p>源文件：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/examples/common_component_sample/common_component_example.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/class_loader/class_loader.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/component/component.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Commontestcomponent::Init</span><span class="params">()</span></span>&#123;</span><br><span class="line">    AINFO &lt;&lt; <span class="string">"Commontest component init"</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Commontestcomponent::Proc</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Driver&gt;&amp; msg0,</span></span></span><br><span class="line"><span class="function"><span class="params">                              <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Driver&gt;&amp; msg1)</span></span>&#123;</span><br><span class="line">    AINFO &lt;&lt; <span class="string">"Start commontest component Proc ["</span> &lt;&lt; msg0-&gt;msg_id() &lt;&lt; <span class="string">"] ["</span></span><br><span class="line">        &lt;&lt; msg1-&gt;msg_id() &lt;&lt; <span class="string">"]"</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>timer_component_example 参考<code>cyber/examples/timer_component_example/</code> 头文件：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/class_loader/class_loader.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/component/component.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/component/timer_component.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/examples/proto/examples.pb.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> apollo::cyber::examples::proto::Driver;</span><br><span class="line"><span class="keyword">using</span> apollo::cyber::Component;</span><br><span class="line"><span class="keyword">using</span> apollo::cyber::ComponentBase;</span><br><span class="line"><span class="keyword">using</span> apollo::cyber::TimerComponent;</span><br><span class="line"><span class="keyword">using</span> apollo::cyber::Writer;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TimertestComponent</span> :</span> <span class="keyword">public</span> TimerComponent&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">bool</span> <span class="title">Init</span><span class="params">()</span> <span class="keyword">override</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">bool</span> <span class="title">Proc</span><span class="params">()</span> <span class="keyword">override</span></span>;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Writer&lt;Driver&gt;&gt; driver_writer_ = <span class="literal">nullptr</span>;</span><br><span class="line">&#125;;</span><br><span class="line">CYBER_REGISTER_COMPONENT(TimertestComponent)</span><br></pre></td></tr></table></figure>
+<p>源文件：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/examples/timer_component_example/timer_component_example.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/class_loader/class_loader.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/component/component.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/examples/proto/examples.pb.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">TimertestComponent::Init</span><span class="params">()</span></span>&#123;</span><br><span class="line">	driver_writer_ = node_-&gt;CreateWriter&lt;Driver&gt;(<span class="string">"/carstatus/channel"</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">TimertestComponent::Proc</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">auto</span> out_msg = <span class="built_in">std</span>::make_shared&lt;Driver&gt;();</span><br><span class="line">    out_msg-&gt;set_msg_id(i++);</span><br><span class="line">    driver_writer_-&gt;Write(out_msg);</span><br><span class="line">    AINFO &lt;&lt; <span class="string">"timertestcomponent: Write drivemsg-&gt;"</span></span><br><span class="line">        &lt;&lt;out_msg-&gt;ShortDebugString();</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后通过bazel编译BUILD文件生成<code>.so</code>文件，通过<code>timer.dag</code>即可运行组件</p></li>
+</ul>
+<p>需要注意的是：</p>
+<ul>
+<li><p>需要注册组件，才能够从通过<code>SharedLiabray</code>加载功能类，注册的接口：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CYBER_REGISTER_COMPONENT(DriverComponent)</span><br></pre></td></tr></table></figure>
+<p>在组件类的头文件的最后添加,如果在注册时使用了<code>namespace</code>，那么在dag文件中也要添加对应的<code>namespace</code></p></li>
+<li><p>Component和TimerComponent的配置是不同的，不要将它们搞混</p></li>
+</ul>
+<h3 id="launch">2.6 Launch</h3>
+<p><code>cyber_launch</code>是CyberRT框架的启动程序。它根据<code>launch</code>文件启动<code>mainboards</code>进程(一个launch文件对应一个进程),并将不同的组件根据dag文件加载到不同的<code>mainboard</code>进程中。<code>cyber_launch</code>支持动态加载组件或启动二进制文件两种场景。 launch文件的格式：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">cyber</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">module</span>&gt;</span></span><br><span class="line">    	<span class="tag">&lt;<span class="name">name</span>&gt;</span>driver<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dag_conf</span>&gt;</span>driver.dag<span class="tag">&lt;/<span class="name">dag_conf</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">process_name</span>&gt;</span><span class="tag">&lt;/<span class="name">process_name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">exception_handler</span>&gt;</span>exit<span class="tag">&lt;/<span class="name">exception_handler</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span></span><br><span class="line">    	<span class="tag">&lt;<span class="name">name</span>&gt;</span>perception<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dag_conf</span>&gt;</span>perception.dag<span class="tag">&lt;/<span class="name">dag_conf</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">process_name</span>&gt;</span><span class="tag">&lt;/<span class="name">process_name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">exception_handler</span>&gt;</span>respawn<span class="tag">&lt;/<span class="name">exception_handler</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span></span><br><span class="line">    	<span class="tag">&lt;<span class="name">name</span>&gt;</span>planning<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dag_conf</span>&gt;</span>planning.dag<span class="tag">&lt;/<span class="name">dag_conf</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">process_name</span>&gt;</span><span class="tag">&lt;/<span class="name">process_name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">cyber</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>Module:</strong> 每一个被加载的组件或二进制文件都是一个module</p>
+<ul>
+<li><strong>name</strong> 被加载的模块的名称</li>
+<li><strong>dag_conf</strong> 对应组件的dag文件</li>
+<li><strong>process_name</strong> 是mainboard开启后对应的进程名称。相同的process_name的组件将会被加载和运行在同一进程中，如果没有设置，将会使用默认的进程。</li>
+<li><strong>exception_handler</strong> 是当进程发生异常是的处理方法。值可以是<code>exit</code>或者<code>respawn</code>，为空则不进行处理。
+<ul>
+<li>exit ,当异常发生时整个进程需要停止运行。</li>
+<li>respawn，当异常发生时，进程需要重启。</li>
+</ul></li>
+</ul>
+<hr>
+<h3 id="timer">2.7 Timer</h3>
+<p>Timer可用于创建定时任务，以定期运行或只运行一次。</p>
+<h4 id="timer-interface">2.7.1 Timer Interface</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * @brief Construct a new Timer object</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * @param period The period of the timer, unit is ms</span></span><br><span class="line"><span class="comment">  * @param callback The tasks that the timer needs to perform</span></span><br><span class="line"><span class="comment">  * @param oneshot True: perform the callback only after the first timing cycle</span></span><br><span class="line"><span class="comment">  *                False: perform the callback every timed period</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> Timer(<span class="keyword">uint32_t</span> period, <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt; callback, <span class="keyword">bool</span> oneshot);</span><br></pre></td></tr></table></figure>
+<p>另一种构造方法是，先封装Timer的配置参数，然后调用构造函数： period对应定时器周期，单位为ms,范围(1~512*64ms), callback:对应定时器的回调函数，即周期执行的任务 oneshot:是否只执行一次</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">TimerOption</span> &#123;</span></span><br><span class="line">  <span class="keyword">uint32_t</span> period;                 <span class="comment">// The period of the timer, unit is ms</span></span><br><span class="line">  <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt; callback;  <span class="comment">// The tasks that the timer needs to perform</span></span><br><span class="line">  <span class="keyword">bool</span> oneshot;  <span class="comment">// True: perform the callback only after the first timing cycle</span></span><br><span class="line">                 <span class="comment">// False: perform the callback every timed period</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Construct a new Timer object</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param opt Timer option</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">Timer</span><span class="params">(TimerOption opt)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="start-timer">2.7.2 Start Timer</h4>
+<p>在创建一个Timer实例后，通过<code>Timer::Start()</code>来开启定时器</p>
+<h4 id="stop-timer">2.7.3 Stop Timer</h4>
+<p>通过<code>Timer::Stop()</code>来手动停止一个已经开启的定时器</p>
+<p><strong>Demo：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/cyber.h"</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span>** argv)</span></span>&#123;</span><br><span class="line">    cyber::Init(argv[<span class="number">0</span>]);</span><br><span class="line">    <span class="function">cyber::Timer <span class="title">timer</span><span class="params">(<span class="number">100</span>,[]()&#123;</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; cyber::Time::Now() &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span></span></span><br><span class="line"><span class="function"><span class="params">    &#125;，<span class="literal">false</span>)</span></span>;</span><br><span class="line">    timer.Start();</span><br><span class="line">    sleep(<span class="number">1</span>); <span class="comment">//单位s</span></span><br><span class="line">    Timer.Stop();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="time-api">2.8 Time API</h3>
+<p>Time是用于管理时间的类（<strong>注意不不同于Timer</strong>），可以用于当前时间的获取，耗时的计算，时间转换等等。 Time类接口如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// constructor, passing in a different value to construct Time</span></span><br><span class="line">Time(<span class="keyword">uint64_t</span> nanoseconds); <span class="comment">//uint64_t, in nanoseconds</span></span><br><span class="line">Time(<span class="keyword">int</span> nanoseconds); <span class="comment">// int type, unit: nanoseconds</span></span><br><span class="line">Time(<span class="keyword">double</span> seconds); <span class="comment">// double, in seconds</span></span><br><span class="line">Time(<span class="keyword">uint32_t</span> seconds, <span class="keyword">uint32_t</span> nanoseconds);</span><br><span class="line"><span class="comment">// seconds seconds + nanoseconds nanoseconds</span></span><br><span class="line"><span class="function">Static Time <span class="title">Now</span><span class="params">()</span></span>; <span class="comment">// Get the current time</span></span><br><span class="line"><span class="function">Double <span class="title">ToSecond</span><span class="params">()</span> <span class="keyword">const</span></span>; <span class="comment">// convert to seconds</span></span><br><span class="line"><span class="function">Uint64_t <span class="title">ToNanosecond</span><span class="params">()</span> <span class="keyword">const</span></span>; <span class="comment">// Convert to nanoseconds</span></span><br><span class="line"><span class="function">Std::<span class="built_in">string</span> <span class="title">ToString</span><span class="params">()</span> <span class="keyword">const</span></span>; <span class="comment">// Convert to a string in the format "2018-07-10 20:21:51.123456789"</span></span><br><span class="line"><span class="function">Bool <span class="title">IsZero</span><span class="params">()</span> <span class="keyword">const</span></span>; <span class="comment">// Determine if the time is 0</span></span><br></pre></td></tr></table></figure>
+<p><strong>Demo:</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/cyber.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cyber/duration.h"</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span>&#123;</span><br><span class="line">	cyber::Init(argv[<span class="number">0</span>]);</span><br><span class="line">    <span class="function">Time <span class="title">t1</span><span class="params">(<span class="number">1531225311123456789U</span>L)</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; t1.ToString() &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;<span class="comment">// 2018-07-10 20:21:51.123456789</span></span><br><span class="line">    <span class="comment">//duration time interval</span></span><br><span class="line">    <span class="function">Time <span class="title">t1</span><span class="params">(<span class="number">100</span>)</span></span>;</span><br><span class="line">    <span class="function">Duration <span class="title">d</span><span class="params">(<span class="number">200</span>)</span></span>;</span><br><span class="line">    <span class="function">Time <span class="title">t2</span><span class="params">(<span class="number">300</span>)</span></span>;</span><br><span class="line">    assert(d == (t2-t1)); <span class="comment">//true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="record-flieread-and-write">2.9 Record flie:Read and Write</h3>
+<h4 id="reading-the-reader-file">2.9.1 Reading the Reader file</h4>
+<p><strong>RecordReader</strong>用于组件在Cyber框架下读取消息。每一个RecordReader可以打开一个已经存在的record文件通过该类的<code>open</code>方法，线程将异步读取recode文件中的信息。用户仅需要执行<code>ReadMessage</code>提取<code>RecordReader</code>中的最新信息，然后通过<code>GetCurrentMessageChannelName</code>,<code>GetCurrentRawMessage</code>,<code>GetCurrentMessageTime</code>来获取信息。 <strong>RecordWriter</strong>用于组件在Cyber框架下记录信息。每一个RecordWriter可以创建一个新的record文件通过<code>Open</code>方法。用户通过<code>WriteMessage</code>和<code>WriteChannel</code>来将<code>message</code>和<code>channel</code>信息写入到record中。</p>
+<h3 id="c-api-directory">2.10 C++ API Directory</h3>
+<h2 id="cyberrt提供的工具">3. CyberRT提供的工具</h2>
+<p>Apollo CyberRT提供了一个可视化工具<code>cyber_visualizer</code>和两个命令行工具<code>cyber_monitor</code>和<code>cyber_recorder</code> 注意：使用工具需要使用apollo docker环境，同时由于所有来自CyberRT的工具都依赖于CyberRT库，因此，在使 用CyberRT的工具之前，需要使用<code>setup.bash</code>为环境设置源文件，如下所示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> /your-path-to-apollo-install-dir/cyber/setup.bash</span><br></pre></td></tr></table></figure>
+<p><strong>Cyber_visualizer:</strong> 运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cyber_visualizer</span><br></pre></td></tr></table></figure>
+<p>交互： 当数据在Cyber RT中通过通道时，所有通道的列表显示在通道名称下，可以通过Cyber RT的record tool(<code>cyber_recorder</code>)从另一个终端重放数据，则<code>cyber_visualizer</code>将接收所有活动通道的信息（来自重放数据）并显示出来。通过单击工具栏中的选项，可以启用参考网格，显示点云，添加图像，或同时显示多个相机的数据。</p>
+<p><strong>Cyber_monitor：</strong> 命令行工具<code>cyber_monitor</code>提供了一个清晰的视图，显示终端中的Apollo Cyber RT实时通道列表信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cyber_monitor</span><br></pre></td></tr></table></figure>
+<p>通过<code>-h</code>选项可以获得<code>cyber_monitor</code>的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cyber_monitor -h</span><br></pre></td></tr></table></figure>
+<p>通过<code>-c</code>选项，可以指定<code>cyber_monitor</code>的监视通道，：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cyber_monitor -c ChannelName</span><br></pre></td></tr></table></figure>
+<p><img src="/2020/04/04/apollo-cyber_bash/cyber_monitor.png"></p>
+<p>启动命令行工具后，显示通道名称和通道的数据类型，默认显示为红色，若有数据流经某通道，则通道的相应行显示为绿色。</p>
+<p><strong>Cyber_recorder:</strong> <code>cyber_recorder</code>是Apollo Cyber RT提供的一种录制/回放工具，它提供了许多有用的功能，包括录制，回放，分割，检查录制文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ cyber_recorder</span><br><span class="line">usage: cyber_recorder &lt;<span class="built_in">command</span>&gt;&gt; [&lt;args&gt;]</span><br><span class="line">The cyber_recorder commands are:</span><br><span class="line">info                               Show information of an exist record.</span><br><span class="line">play                               Play an exist record.</span><br><span class="line">record                             Record same topic.</span><br><span class="line">split                              Split an exist record.</span><br><span class="line">recover                            Recover an exist record.</span><br></pre></td></tr></table></figure>
+<p>同时，Apollo提供了<strong>Rosbag_to_record</strong>将rosbag转换为Apollo Cyber rt提供的记录器文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ rosbag_to_record</span><br><span class="line">Usage:</span><br><span class="line">rosbag_to_record input.bag output.record</span><br></pre></td></tr></table></figure>
+<h2 id="参考资料">参考资料</h2>
+<p>Apollo技术文档</p>
+<p>https://github.com/ApolloAuto/apollo/tree/master/docs/cyber</p>
+<p>https://github.com/ApolloAuto/apollo/blob/master/cyber/README.md</p>
+<p>https://mp.weixin.qq.com/s?__biz=MzI1NjkxOTMyNQ==&amp;mid=2247489447&amp;idx=1&amp;sn=23269b689ce753dd541ea95309806d67&amp;chksm=ea1e05d5dd698cc30f044e3496a2d6e35b3fc674fb5ed56a2dd2da7372268abd2eb0b23df173&amp;mpshare=1&amp;scene=1&amp;srcid=0323lDwCkxxrmpZFEo8U6gZk&amp;sharer_sharetime=1584973075048&amp;sharer_shareid=65219e3b4371d83c28538a4abcff3ebf&amp;key=fee875bb7eca81fa43f2e06e9e7810d275a43a15d157bba99821fd3b9c932a98326c26ca8fee73c2d1c4f10cc1a6d3d374d349f695d11f1a66ce172b7899d78e5ba756bbc353a3067fc471e155a455a5&amp;ascene=1&amp;uin=MjU0MTcyMzYzNw%3D%3D&amp;devicetype=Windows+10&amp;version=62080079&amp;lang=zh_CN&amp;exportkey=A6kdZxOOUE6g8mo3vOd%2BUcM%3D&amp;pass_ticket=oa8DHbLwjRZM4plOFN%2FM7RSGCCQVqNI9RMXwkHnIZDXY%2FJDdElalj3amy8OEJd3j</p>
+<p>Apollo社区：</p>
+<p>https://mp.weixin.qq.com/s/GEmCpKv1S5wSgJFIhr9PgQ</p>
+<p>github:</p>
+<p>https://github.com/daohu527/Dig-into-Apollo</p>
+<p>知乎：</p>
+<p>https://zhuanlan.zhihu.com/p/115046708</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/apollo/" rel="tag"># apollo</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/13/apollo-radar-algorithm/" rel="prev" title="Apollo中radar的相关算法">
+      <i class="fa fa-chevron-left"></i> Apollo中radar的相关算法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/04/apollo-sensor_calibration/" rel="next" title="Apollo中多传感器标定与坐标系统">
+      Apollo中多传感器标定与坐标系统 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cyberrt功能模块启动过程"><span class="nav-number">1.</span> <span class="nav-text">1. CyberRT功能模块启动过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cyber-api"><span class="nav-number">2.</span> <span class="nav-text">2. Cyber API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#talk-listener"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Talk-Listener</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#service-creation-and-use"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Service Creation and Use</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#parameter-service"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 Parameter service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#log-api"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 Log API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#building-a-module-based-on-component"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 Building a module based on Component</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#component"><span class="nav-number">2.5.1.</span> <span class="nav-text">2.5.1 component</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#binary-vs-component"><span class="nav-number">2.5.2.</span> <span class="nav-text">2.5.2 Binary vs Component</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dag文件的形式"><span class="nav-number">2.5.3.</span> <span class="nav-text">2.5.3 Dag文件的形式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#timercomponent-example"><span class="nav-number">2.5.4.</span> <span class="nav-text">2.5.4 (timer)component example</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#launch"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 Launch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#timer"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 Timer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#timer-interface"><span class="nav-number">2.7.1.</span> <span class="nav-text">2.7.1 Timer Interface</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#start-timer"><span class="nav-number">2.7.2.</span> <span class="nav-text">2.7.2 Start Timer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stop-timer"><span class="nav-number">2.7.3.</span> <span class="nav-text">2.7.3 Stop Timer</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#time-api"><span class="nav-number">2.8.</span> <span class="nav-text">2.8 Time API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#record-flieread-and-write"><span class="nav-number">2.9.</span> <span class="nav-text">2.9 Record flie:Read and Write</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#reading-the-reader-file"><span class="nav-number">2.9.1.</span> <span class="nav-text">2.9.1 Reading the Reader file</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#c-api-directory"><span class="nav-number">2.10.</span> <span class="nav-text">2.10 C++ API Directory</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cyberrt提供的工具"><span class="nav-number">3.</span> <span class="nav-text">3. CyberRT提供的工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">198k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:31</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/04/04/apollo-cyber_bash/";
+    this.page.identifier = "2020/04/04/apollo-cyber_bash/";
+    this.page.title = "Apollo中Cyber RT脚本启动流程";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Apollo中毫米波雷达的初始化相关配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apollo中毫米波雷达的初始化配置">
+<meta property="og:url" content="https://zhxjia.github.io/2020/03/11/apollo-radar-init/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="Apollo中毫米波雷达的初始化相关配置">
+<meta property="article:published_time" content="2020-03-11T15:39:50.600Z">
+<meta property="article:modified_time" content="2020-03-16T16:17:08.637Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="radar">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/03/11/apollo-radar-init/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Apollo中毫米波雷达的初始化配置 | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/03/11/apollo-radar-init/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Apollo中毫米波雷达的初始化配置
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-11 23:39:50" itemprop="dateCreated datePublished" datetime="2020-03-11T23:39:50+08:00">2020-03-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-17 00:17:08" itemprop="dateModified" datetime="2020-03-17T00:17:08+08:00">2020-03-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
+                    <span itemprop="name">perception</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/11/apollo-radar-init/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/11/apollo-radar-init/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>13 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Apollo中毫米波雷达的初始化相关配置</p>
+<a id="more"></a>
+<h2 id="初始化">初始化</h2>
+<h3 id="外部配置文件">外部配置文件</h3>
+<ol type="1">
+<li><p>radar component 配置文件 <code>modules/perception/onboard/proto/radar_component_config.proto</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">message RadarComponentConfig &#123;</span><br><span class="line">  optional <span class="built_in">string</span> radar_name = <span class="number">1</span>;</span><br><span class="line">  optional <span class="built_in">string</span> tf_child_frame_id = <span class="number">2</span>;</span><br><span class="line">  optional <span class="keyword">double</span> radar_forward_distance = <span class="number">3</span>;</span><br><span class="line">  optional <span class="built_in">string</span> radar_preprocessor_method = <span class="number">4</span>;</span><br><span class="line">  optional <span class="built_in">string</span> radar_perception_method = <span class="number">5</span>;</span><br><span class="line">  optional <span class="built_in">string</span> radar_pipeline_name = <span class="number">6</span>;</span><br><span class="line">  optional <span class="built_in">string</span> odometry_channel_name = <span class="number">7</span>;</span><br><span class="line">  optional <span class="built_in">string</span> output_channel_name = <span class="number">8</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置接口：这种读取<code>.pb.txt</code>进行配置的方式是通过<code>GetProtoConfig()</code>函数读取。 这种配置文件一般用于组件的初始化配置，具体是通过<code>cyber</code>进行<code>Component</code>创建时，读取的<code>config_file</code>信息: 可参见文件<code>cyber/proto/component_conf.proto</code>,那么对于具体的每个<code>Component</code>的conf是怎么加载的呢？这个是通过对应功能组件的<code>dag</code>文件进行加载，例如radar的<code>pb.txt</code>加载，其存在前向和后向两种组件：</p>
+<p><code>modules/perception/production/conf/perception/radar/front_radar_component_conf.pb.txt</code></p>
+<p><code>modules/perception/production/conf/perception/radar/rear_radar_component_conf.pb.txt</code></p>
+<p>以<code>front_radar</code>为例，在其<code>front_radar_component_conf.pb.txt</code>中的相关配置如下,</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">radar_name: <span class="string">"radar_front"</span></span><br><span class="line">tf_child_frame_id: <span class="string">"radar_front"</span></span><br><span class="line">radar_forward_distance: <span class="number">200.0</span></span><br><span class="line">radar_preprocessor_method: <span class="string">"ContiArsPreprocessor"</span></span><br><span class="line">radar_perception_method: <span class="string">"RadarObstaclePerception"</span></span><br><span class="line">radar_pipeline_name: <span class="string">"FrontRadarPipeline"</span></span><br><span class="line">odometry_channel_name: <span class="string">"/apollo/localization/pose"</span></span><br><span class="line">output_channel_name: <span class="string">"/perception/inner/PrefusedObjects"</span></span><br></pre></td></tr></table></figure>
+<p>那么该配置文件是通过何种方式加载到的程序中呢？正如前面所提到的，是通过 <code>production/dag/dag_sreamimg_perception.dag</code>加载到组件中，作为组件<code>Initialize</code>的参数，并最终在<code>Init()</code></p>
+<p>中载入。</p>
+<p><strong>组件配置总结如下</strong></p>
+<p><strong>Component name</strong>:<code>RadarDetectionComponent</code> <strong>config</strong>: name: <code>&quot;FrontRadarDetection&quot;</code> //组件的node 名称,用于通信 config_file:<code>production/conf/perception/radar/front_radar_component_conf.pb.txt</code> reader_channel: <code>&quot;/apollo/sensor/radar/front&quot;</code> writer_channel: <code>&quot;/perception/inner/PrefusedObjects&quot;</code></p>
+<p><strong>Component name</strong>:<code>RadarDetectionComponent</code> <strong>config</strong>: name: <code>&quot;RearRadarDetection&quot;</code> config_file:<code>production/conf/perception/radar/rear_radar_component_conf.pb.txt</code> reader_channel: <code>&quot;/apollo/sensor/radar/rear&quot;</code><br>
+writer_channel: <code>&quot;/Preception/inner/PrefusedObjects&quot;</code></p>
+<p>上述两个<code>reader</code>对应<code>conti_radar</code>的<code>Topic</code> 。</p></li>
+<li><p><code>conti_radar</code>硬件驱动配置文件</p>
+<p>conti_radar驱动基于Apollo cyber开发，支持continental ARS。</p>
+<p>radar的默认配置:<code>conf/conti_radar_conf.pb.txt</code>，在<code>radar</code>启动时，会先根据上述配置文件，向can卡发送指令，对<code>radar</code>进行配置，当接收到<code>radar</code>状态信息与用户信息一致是，才开始解析数据并发送消息。</p>
+<p><code>modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt</code> (也有其对应的proto定义)</p>
+<p>运行过程如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># in docker</span></span><br><span class="line"><span class="built_in">cd</span> /apollo</span><br><span class="line"><span class="built_in">source</span> scripts/apollo_base.sh</span><br><span class="line"><span class="comment"># 启动</span></span><br><span class="line">./scripts/conti_radar.sh start</span><br><span class="line"><span class="comment"># 停止</span></span><br><span class="line">./scripts/conti_radar.sh stop</span><br></pre></td></tr></table></figure>
+<p>对应的信息<code>Topic</code></p>
+<p><strong>topic name</strong>:<code>/apollo/sensor/conti_radar</code> <strong>data type</strong>: <code>apollo::drivers::ContiRadar</code> <strong>channel ID</strong>:<code>CHANNEL_ID_ONE</code> <strong>proto file</strong>:<code>modules/drivers/proto/conti_radar.proto</code> (消息格式)</p>
+<p>通过<code>conti_radar.dag</code>加载<code>ContiRadarCanbusComponent</code>和<code>ContiRadarCanbusComponent</code>这两个组件初始化<code>Initialize()</code>中所需的配置文件：</p>
+<p><code>modules/drivers/radar/conti_radar/conf/radar_front_conf.pb.txt</code></p>
+<p><code>modules/drivers/radar/conti_radar/conf/radar_rear_conf.pb.txt</code></p></li>
+</ol>
+<h3 id="初始化程序">初始化程序</h3>
+<ol type="1">
+<li><p><code>radar_detection_component</code>初始化程序</p>
+<p>通过<code>dag_sreaming_perception.dag</code>导入组件初始化的参数和配置，分别创建front和rear两个雷达组件，并建立其对应的节点node_，并在此节点上创建一个<code>Topic</code>(output_channel_name),同时通过<code>SensorManager</code>类查找是否有该传感器信息，以上是基本配置。</p>
+<p>然后进行算法插件的初始化：<code>InitAlgorithmPlugin()</code> 其中主要包括了以下几个部分：</p>
+<ul>
+<li><p><strong>hdmap</strong>输入初始化 首先需要判断全局标志位<code>FLAGS_obs_enable_hdmap_input</code>是否设置为true,然后进行<code>hdmap_input</code>的初始化， 初始化配置文件亦通过<code>ConfigManager</code>加载<code>hdmap_input.config</code>:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">model_configs &#123;</span><br><span class="line">    name: <span class="string">"HDMapInput"</span></span><br><span class="line">    version: <span class="string">"1.0.0"</span></span><br><span class="line">    integer_params &#123;</span><br><span class="line">        name: <span class="string">"hdmap_sample_step"</span></span><br><span class="line">        value: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    string_params &#123;</span><br><span class="line">        name: <span class="string">"hdmap_file"</span></span><br><span class="line"><span class="meta">#        value: <span class="meta-string">"/home/caros/adu_data/map/base_map.bin"</span></span></span><br><span class="line">        value: <span class="string">"/apollo/modules/map/data/sunnyvale_big_loop/base_map.bin"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>里面包含了<code>hdmap_file</code>路径，然而程序里貌似使用的是<code>modules/common/configs/config_gflag.cc</code>中的路径,然后加载对应<code>hdmap</code>中的信息,用于后续的<code>roi_filter</code></p></li>
+<li><p><strong>preprocessor</strong> 预处理模块初始化 该算法组件的接口文件位于<code>../radar/lib/interface/base_preprocessor.h</code>中，用于校正<code>radar</code>原始的障碍物输出信息。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: correct radar raw obstacles.</span></span><br><span class="line"><span class="comment">// @param [in]: raw obstacles from radar driver.</span></span><br><span class="line"><span class="comment">// @param [in]: options.</span></span><br><span class="line"><span class="comment">// @param [out]: corrected radar obstacles</span></span><br><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">Preprocess</span><span class="params">(<span class="keyword">const</span> drivers::ContiRadar&amp; raw_obstacles,</span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">const</span> PreprocessorOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">                        drivers::ContiRadar* corrected_obstacles)</span> </span>= <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p>根据配置文件中的<code>radar_preprocessor_method</code>建立对应的preprocessor实例<code>ContiArsPreprocessor</code>。</p>
+<p>这里<code>ContiArsPreprocessor</code>的配置文件加载用的是<code>config_manager.cc</code>中的<code>ConfigManager</code>这个类（这个类通过查找<code>perception_gflags.cc</code>中声明的路径&quot;production/conf/&quot;来载入配置文件<code>*.conf</code>）来载入配置文件 <code>production/conf/perception/radar/modules/conti_ars_preprocessor.config</code>中的参数 &quot;delay_time = 0.07&quot;</p>
+<blockquote>
+<p>注意Apollo中感知部分的全局标志位设置位于<code>../onboard/common_flags_common_flags.cc</code></p>
+<p>默认启用HdMap:<code>DEFINE_bool(obs_enable_hdmap_input, true, &quot;enable hdmap input for roi filter&quot;);</code></p>
+</blockquote></li>
+<li><p><strong>perception</strong>感知模块初始化 该算法组件的接口文件位于<code>../radar/lib/interface/base_radar_obstacle_perception.h</code>中，用于校正<code>radar</code>感知主体算法。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">Perceive</span><span class="params">(<span class="keyword">const</span> drivers::ContiRadar&amp; corrected_obstacles,</span></span></span><br><span class="line"><span class="function"><span class="params">                      <span class="keyword">const</span> RadarPerceptionOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">                      <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::ObjectPtr&gt;* objects)</span> </span>= <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p>同样由组件配置文件的参数<code>radar_perception_method: &quot;RadarObstaclePerception&quot;</code>确定实例化的类。</p>
+<p>类似地，该功能模块的参数配置文件为<code>*.config</code>类型，因此也通过<code>ConfigManager</code>类来进行参数加载,</p>
+<p>对于不同的radar，需要加载不同的参数，通过组件配置类中的<code>radar_pipeline_name</code>来确定具体加载的参数配置文件： 对于rear_radar: <code>radar_pipeline_name: &quot;RearRadarPipeline&quot;</code>对应于配置文件<code>rear_radar_pipeline.config</code> 对于<code>front_radar</code>:</p>
+<p>​ <code>radar_pipeline_name:&quot;FrontRadarPipeline&quot;</code>对应配置文件<code>front_radar_pipeline.config</code></p>
+<p>根据对应的配置文件加载参数到<code>RadarObsaclePerception</code>类中,以<code>front_radar</code>为例:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">model_configs &#123;</span><br><span class="line">  name: <span class="string">"RearRadarPipeline"</span></span><br><span class="line">  version: <span class="string">"1.0.0"</span></span><br><span class="line">  string_params &#123;</span><br><span class="line">    name: <span class="string">"Detector"</span></span><br><span class="line">    value: <span class="string">"ContiArsDetector"</span></span><br><span class="line">  &#125;</span><br><span class="line">  string_params &#123;</span><br><span class="line">    name: <span class="string">"RoiFilter"</span></span><br><span class="line">    value: <span class="string">"HdmapRadarRoiFilter"</span></span><br><span class="line">  &#125;</span><br><span class="line">  string_params &#123;</span><br><span class="line">    name: <span class="string">"Tracker"</span></span><br><span class="line">    value: <span class="string">"ContiArsTracker"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中包含了三个参数分别对应<code>Percepiton</code>中的三个主要算法的实现类:</p>
+<ul>
+<li><strong>Detector</strong> -&gt; <strong>ContiArsDetector</strong></li>
+<li><strong>RoiFilter</strong> -&gt; <strong>HdmapRadarRoiFilter</strong></li>
+<li><strong>Tracker</strong> -&gt; <strong>ContiArsTracker</strong></li>
+</ul>
+<p>对应的算法接口如下(<code>modules/perception/radar/lib/interface/..</code>)：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: detect the objects from the corrected obstacles</span></span><br><span class="line"><span class="comment">// @param [in]: corrected obstacles.</span></span><br><span class="line"><span class="comment">// @param [in]: options.</span></span><br><span class="line"><span class="comment">// @param [out]: detected objects.</span></span><br><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">Detect</span><span class="params">(<span class="keyword">const</span> drivers::ContiRadar&amp; corrected_obstacles,</span></span></span><br><span class="line"><span class="function"><span class="params">                    <span class="keyword">const</span> DetectorOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">                    base::FramePtr detected_frame)</span> </span>= <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: fliter the objects outside the ROI</span></span><br><span class="line"><span class="comment">// @param [in]: options.</span></span><br><span class="line"><span class="comment">// @param [in / out]: origin total objects / the objects in the ROI.</span></span><br><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">RoiFilter</span><span class="params">(<span class="keyword">const</span> RoiFilterOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">                       base::FramePtr radar_frame)</span> </span>= <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: tracking objects.</span></span><br><span class="line"><span class="comment">// @param [in]: current object frame.</span></span><br><span class="line"><span class="comment">// @param [in]: options.</span></span><br><span class="line"><span class="comment">// @param [out]: current tracked objects frame.</span></span><br><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">Track</span><span class="params">(<span class="keyword">const</span> base::Frame &amp;detected_frame,</span></span></span><br><span class="line"><span class="function"><span class="params">                   <span class="keyword">const</span> TrackerOptions &amp;options,</span></span></span><br><span class="line"><span class="function"><span class="params">                   base::FramePtr tracked_frame)</span> </span>= <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p><code>Detect</code>和<code>RoiFilter</code>初始化过程较为简单，而<code>Track</code>的初始化则稍显复杂，其又包括了两个比较重要的实现类</p>
+<p><code>matcher</code>和<code>track_manager</code>。</p>
+<p>​ 进一步地，<code>ContiArsTracker</code>的初始化的参数配置也是由<code>*.config</code>加载的，由<code>ConfigManager</code>加载文件</p>
+<p><code>production/conf/../radar/modules/conti_ars_tracker.config</code>,参数包括：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">model_configs &#123;</span><br><span class="line">  name:<span class="string">"ContiArsTracker"</span></span><br><span class="line">  version: <span class="string">"1.0.0"</span></span><br><span class="line">  double_params &#123;</span><br><span class="line">    name: <span class="string">"tracking_time_window"</span></span><br><span class="line">    value: <span class="number">0.06</span></span><br><span class="line">  &#125;</span><br><span class="line">  string_params &#123;</span><br><span class="line">    name: <span class="string">"macher_name"</span></span><br><span class="line">    value: <span class="string">"HMMatcher"</span></span><br><span class="line">  &#125;</span><br><span class="line">  string_params &#123;</span><br><span class="line">    name: <span class="string">"chosen_filter"</span></span><br><span class="line">    value: <span class="string">"AdaptiveKalmanFilter"</span></span><br><span class="line">  &#125;</span><br><span class="line">  integer_params &#123;</span><br><span class="line">    name: <span class="string">"tracked_times_threshold"</span></span><br><span class="line">    value: <span class="number">3</span></span><br><span class="line">  &#125;</span><br><span class="line">  bool_params &#123;</span><br><span class="line">    name: <span class="string">"use_filter"</span></span><br><span class="line">    value: <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>初始化<code>HMMatcher</code>:</strong> 同样由<code>ConfigManager</code>根据模型名称加载配置文件<code>hm_matcher.config</code>:</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">model_configs &#123;</span><br><span class="line">  name: <span class="string">"HMMatcher"</span></span><br><span class="line">  version: <span class="string">"1.0.0"</span></span><br><span class="line">  string_params &#123;</span><br><span class="line">    name: <span class="string">"root_path"</span></span><br><span class="line">    value: <span class="string">"./data/perception/radar/models/tracker"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该路径下对应的文件<code>hm_matcher.conf</code>对应参数载入到<code>HMMatcher</code>类内成员变量。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">max_match_distance : <span class="number">2.5</span></span><br><span class="line">bound_match_distance : <span class="number">10.0</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>最后，进行<code>TransformWrapper</code>类的初始化,包括<code>radar2world</code>和<code>radar2novatel</code>,和坐标转换相关。</p>
+<p>需要注意的是，<code>radar</code>这里订阅了<code>localization</code>的消息，消息通道名称为：<code>/apollo/localization/pose</code>,</p>
+<p><code>MsgBuffer&lt;LocalizationEstimate&gt; localization_subscriber_;</code>由MsgBuffer根据Component中的 <code>odometry_channel_name</code>创建<code>node</code>,名称为<code>pose_radar_front_subscriber</code>并由此node创建reader，以及消息的回调函数,在消息回调函数<code>MsgCallback</code>中，将消息及对应的时间戳存入到<code>buffer_queue_</code>中。</p>
+<p><strong>至此，<code>radar_detection_component</code></strong>的初始化完成,主体算法将在<code>Proc</code>中周期执行。</p>
+<p>​</p></li>
+<li><p><code>conti_radar_canbus_component</code>初始化程序</p>
+<p>通过<code>conti_radar.dag</code>注册组件类<code>conti_radar_canbus_component</code>，其中组件类的参数配置文件为 <code>radar_front(rear)_conf.pb.txt</code>。</p>
+<p>(1)首先，通过配置文件中的<code>can_card_parameter</code>初始化对应的<code>can_client</code>,创建对应的<code>can_client</code>实例。 (2)然后，创建该节点的writer和reader,这里包含两类：</p>
+<ul>
+<li>节点消息发布radar数据:<code>node_-&gt;CreateWriter&lt;ContiRadar&gt;(conti_radar_conf_.radar_channel())</code></li>
+<li>节点消息接收定位信息:<code>pose_reader_ = node_-&gt;CreateReader&lt;LocalizationEstimate&gt;()</code>对应的回调函数为<code>PoseCallback()</code></li>
+</ul>
+<p>(3)创建<code>ContiRadar</code>消息管理管理器<code>sensor_message_manager</code>,并管理radar配置文件和已创建的<code>can_client</code>。 (4)通过<code>can_client</code>和<code>sensor_message_manager</code>初始化创建<code>can_receiver</code>用于接受can信息。</p></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/radar/" rel="tag"># radar</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/10/deep_crf_tracking/" rel="prev" title="Deep CRF with Inter-Object Constraints论文阅读">
+      <i class="fa fa-chevron-left"></i> Deep CRF with Inter-Object Constraints论文阅读
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/13/apollo-radar-algorithm/" rel="next" title="Apollo中radar的相关算法">
+      Apollo中radar的相关算法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化"><span class="nav-number">1.</span> <span class="nav-text">初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#外部配置文件"><span class="nav-number">1.1.</span> <span class="nav-text">外部配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化程序"><span class="nav-number">1.2.</span> <span class="nav-text">初始化程序</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">198k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:31</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/03/11/apollo-radar-init/";
+    this.page.identifier = "2020/03/11/apollo-radar-init/";
+    this.page.title = "Apollo中毫米波雷达的初始化配置";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
