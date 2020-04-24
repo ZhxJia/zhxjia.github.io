@@ -210,6 +210,960 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/24/apollo-lidar_driver/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/24/apollo-lidar_driver/" class="post-title-link" itemprop="url">apollo lidar驱动组件</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-24 13:41:25" itemprop="dateCreated datePublished" datetime="2020-04-24T13:41:25+08:00">2020-04-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/lidar/" itemprop="url" rel="index">
+                    <span itemprop="name">lidar</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/24/apollo-lidar_driver/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/24/apollo-lidar_driver/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>13k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>22 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Lidar的驱动程序组件</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/24/apollo-lidar_driver/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/24/apollo-lidar_recognition/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/24/apollo-lidar_recognition/" class="post-title-link" itemprop="url">apollo lidar算法--recognition component</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-24 13:41:25" itemprop="dateCreated datePublished" datetime="2020-04-24T13:41:25+08:00">2020-04-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/24/apollo-lidar_recognition/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/24/apollo-lidar_recognition/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+<h2 id="配置文件">配置文件</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/24/apollo-lidar_tracker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/24/apollo-lidar_tracker/" class="post-title-link" itemprop="url">apollo lidar算法--recognition component（一）</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-24 13:41:25" itemprop="dateCreated datePublished" datetime="2020-04-24T13:41:25+08:00">2020-04-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/24/apollo-lidar_tracker/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/24/apollo-lidar_tracker/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>该组件实现lidar的目标跟踪算法，该组件接收segment得到的检测物体信息，然后建立帧与帧之间的联系以实现帧间同一目标速度等动态信息的预测。</p>
+<p><code>Init-&gt;Preprocess-&gt;MapManager-&gt;Segmentaion-&gt;ObjectBuilder-&gt;ObjectFilter-&gt;Classifier-&gt;Tracker</code></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/24/apollo-lidar_tracker/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/24/pr_MV3D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/24/pr_MV3D/" class="post-title-link" itemprop="url">Multi-View 3D Object Detection Network for Autonomous Driving</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-24 13:41:25" itemprop="dateCreated datePublished" datetime="2020-04-24T13:41:25+08:00">2020-04-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" itemprop="url" rel="index">
+                    <span itemprop="name">论文阅读</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/24/pr_MV3D/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/24/pr_MV3D/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>论文阅读：自动驾驶场景下的3D障碍物检测网络</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/24/pr_MV3D/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/24/apollo-lidar_segmentor/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/24/apollo-lidar_segmentor/" class="post-title-link" itemprop="url">apollo lidar算法--segmentaion component（二）</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-24 13:41:25" itemprop="dateCreated datePublished" datetime="2020-04-24T13:41:25+08:00">2020-04-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/24/apollo-lidar_segmentor/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/24/apollo-lidar_segmentor/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>17k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>28 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>apollo中lidar的分割模型，接上篇初始化之后，本篇主要总结apollo segmentation component的<code>InternalProc</code>函数内的相关功能实现。从<code>lidar_error_code.h</code>中我们可以一窥lidar处理的主要流程阶段：</p>
+<p><code>Init-&gt;Preprocess-&gt;MapManager-&gt;Segmentaion-&gt;ObjectBuilder-&gt;ObjectFilter-&gt;Classifier-&gt;Tracker</code></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/24/apollo-lidar_segmentor/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/24/apollo-liadr_segmentation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/24/apollo-liadr_segmentation/" class="post-title-link" itemprop="url">apollo lidar算法--segmentaion component（一）</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-24 13:41:25" itemprop="dateCreated datePublished" datetime="2020-04-24T13:41:25+08:00">2020-04-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apollo/" itemprop="url" rel="index">
+                    <span itemprop="name">apollo</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/24/apollo-liadr_segmentation/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/24/apollo-liadr_segmentation/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>13 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+<h2 id="配置文件">配置文件</h2>
+<p>SegmentationComponent以128线Velodyne128为例：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#组件dag配置文件：</span><br><span class="line">components &#123;</span><br><span class="line">   class_name : <span class="string">"SegmentationComponent"</span></span><br><span class="line">   config &#123;</span><br><span class="line">     name: <span class="string">"Velodyne128Segmentation"</span></span><br><span class="line">     config_file_path: <span class="string">"/apollo/modules/perception/production/conf/perception/lidar/velodyne128_segmentation_conf.pb.txt"</span></span><br><span class="line">     flag_file_path: <span class="string">"/apollo/modules/perception/production/conf/perception/perception_common.flag"</span></span><br><span class="line">     readers &#123;</span><br><span class="line">         channel: <span class="string">"/apollo/sensor/lidar128/compensator/PointCloud2"</span></span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>参数配置文件：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sensor_name: <span class="string">"velodyne128"</span></span><br><span class="line">enable_hdmap: <span class="literal">true</span></span><br><span class="line">lidar_query_tf_offset: <span class="number">0</span></span><br><span class="line">lidar2novatel_tf2_child_frame_id: <span class="string">"velodyne128"</span></span><br><span class="line">output_channel_name: <span class="string">"/perception/inner/SegmentationObjects"</span></span><br></pre></td></tr></table></figure>
+<h2 id="初始化程序">初始化程序</h2>
+<p><strong>SegmentationComponent::Init()</strong></p>
+<ul>
+<li><p>1.根据参数配置文件初始化成员变量，创建输出节点 ，通道为<code>/perception/inner/SegmentationObjects</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">writer_ &#x3D; node_-&gt;CreateWriter&lt;LidarFrameMessage&gt;(output_channel_name_);</span><br></pre></td></tr></table></figure></li>
+<li><p>2.<code>InitAlgorithmPlugin()</code></p>
+<p>初始化算法组件（<code>module/perception/lidar/..</code>下的各个功能模块）</p>
+<ul>
+<li><p>2.1创建<code>&lt;LidarObstacleSegmentation&gt;</code>功能实例<code>segmentator_</code> 然后初始化<code>segmentor_-&gt;Init(init_options)</code></p>
+<ul>
+<li><p>2.1.1通过<code>config_manager</code>获取功能模块的配置信息<code>model_config</code>,模块参数配置文件位于： <code>production/conf/perception/lidar/modules/lidar_obstacle_pipeline.config</code> 根据该文件中的根路径结合传感器名称可得配置信息如下：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 定义于lidar/app/proto/lidar_obstacle_segmentation_config.proto</span><br><span class="line">segmentor: <span class="string">"CNNSegmentation"</span></span><br><span class="line">use_map_manager: <span class="literal">true</span></span><br><span class="line">use_object_filter_bank: <span class="literal">true</span></span><br></pre></td></tr></table></figure></li>
+<li><p>2.1.2 创建<code>&lt;SceneManager&gt;</code>类实例，并根据<code>SceneManagerInitOptions</code>进行初始化。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: initialize scene manager with lock</span></span><br><span class="line"><span class="comment">// @param [in]: initialization options</span></span><br><span class="line"><span class="comment">// @return: status</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">SceneManager::Init</span><span class="params">(<span class="keyword">const</span> SceneManagerInitOptions&amp; options = SceneManagerInitOptions())</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>通过<code>config_manager</code>获取该功能模块的配置信息，直接给出配置文件信息：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># ./data/perception/lidar/models/scene_manager/scene_manager.conf</span><br><span class="line">service_name: <span class="string">"GroundService"</span></span><br><span class="line">service_name: <span class="string">"ROIService"</span></span><br></pre></td></tr></table></figure>
+<p>然后由这两个service动态继承<code>&lt;SceneService&gt;</code>类创建实例，并进行初始化：<code>service-&gt;Init()</code></p>
+<ul>
+<li><p><code>GroundService::Init()</code> 创建<code>&lt;GroundServiceContent&gt;</code>类实例<code>ground_content_ref_</code>，并通过<code>config manager</code>获取配置参数进行初始化，包括以下配置：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># <span class="string">"./data/perception/lidar/models/ground_service"</span></span><br><span class="line">roi_rad_x: <span class="number">120.0</span></span><br><span class="line">roi_rad_y: <span class="number">120.0</span></span><br><span class="line">grid_size: <span class="number">16</span></span><br></pre></td></tr></table></figure>
+<p>通过以上配置信息，初始化<code>ground_content_ref_</code>实例。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// note: rows,cols = grid_size</span></span><br><span class="line">ground_content_ref_-&gt;Init(roi_region_rad_x, roi_region_rad_y, rows, cols);</span><br></pre></td></tr></table></figure>
+<p>最终得到<code>resolution,grid_size,...</code> 地平面上网格的行、列数，网格的尺寸及分辨率，由此初始化<code>&lt;GroundGrid&gt;</code>类实例 <code>grid_.Init(rows_, cols_)</code></p></li>
+<li><p><code>ROIService::Init()</code> 创建<code>&lt;ROIServiceContent&gt;</code>类实例<code>roi_content_ref_</code>，并通过<code>config manager</code>获取配置参数进行初始化，包括以下配置,并设置<code>roi_content_ref_</code>的参数为下列值</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># ./data/perception/lidar/models/roi_service</span><br><span class="line">range: <span class="number">120.0</span></span><br><span class="line">cell_size: <span class="number">0.25</span></span><br></pre></td></tr></table></figure></li>
+</ul></li>
+<li><p>向Scene Manager中添加初始化后的service：<code>services_.emplace(name, service);</code></p></li>
+</ul></li>
+<li><p>2.1.3 初始化点云预处理的功能类<code>&lt;PointCloudPreprocessor&gt;</code>实例<code>cloud_preprocessor_</code></p>
+<ul>
+<li><p><code>PointCloudPreprocessor::Init()</code></p>
+<p>通过<code>config manager</code>获取该功能的配置参数，直接给出配置文件信息：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># ./data/perception/lidar/models/pointcloud_preprocessor</span><br><span class="line">filter_naninf_points: <span class="literal">false</span></span><br><span class="line">filter_nearby_box_points: <span class="literal">true</span></span><br><span class="line">box_forward_x: <span class="number">2.0</span></span><br><span class="line">box_backward_x: -<span class="number">2.0</span></span><br><span class="line">box_forward_y: <span class="number">3.0</span></span><br><span class="line">box_backward_y: -<span class="number">5.0</span></span><br><span class="line">filter_high_z_points: <span class="literal">false</span></span><br><span class="line">z_threshold: <span class="number">5.0</span></span><br></pre></td></tr></table></figure></li>
+</ul></li>
+<li><p>2.1.4 初始化地图管理类<code>&lt;MapManager&gt;</code>实例<code>map_manager_</code>,</p>
+<ul>
+<li><p><code>MapManager::Init()</code></p>
+<p>通过<code>config manager</code>获取该功能的配置参数，直接给出配置文件信息：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># ./data/perception/lidar/models/map_manager/map_manager.conf</span><br><span class="line">update_pose: <span class="literal">false</span></span><br><span class="line">roi_search_distance: <span class="number">120.0</span></span><br></pre></td></tr></table></figure>
+<p>然后获取<code>HDMapInput::Instance()</code>实例<code>hdmap_input_</code>，并进行初始化，主要就是加载高清地图的文件路径，此处省略。</p></li>
+</ul></li>
+<li><p>2.1.5 根据2.1.1中的segmentor创建分割器接口类<code>&lt;BaseSegmentation&gt;</code>派生类<code>CNNSegmentation</code>,然后初始化 <code>segmentor_-&gt;Init(segmentation_init_options)</code></p>
+<ul>
+<li><p><code>CNNSegmentation::Init()</code> 初始化该网络模型，首先获取网络的结构，参数，权重的文件路径。</p>
+<ul>
+<li><p><code>CNNSegmentation::GetConfigs()</code> 依然是通过<code>config manager</code>和对应的proto获取参数，此处直接给出文件中的参数：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># ./data/perception/lidar/models/cnnseg/cnnseg.conf</span><br><span class="line">use_paddle: <span class="literal">false</span></span><br><span class="line">param_file: <span class="string">"./data/perception/lidar/models/cnnseg/velodyne128/cnnseg_param.conf"</span></span><br><span class="line">proto_file: <span class="string">"./data/perception/lidar/models/cnnseg/velodyne128/deploy.prototxt"</span></span><br><span class="line">weight_file: <span class="string">"./data/perception/lidar/models/cnnseg/velodyne128/deploy.caffemodel"</span></span><br><span class="line">paddle_param_file: <span class="string">"./data/perception/lidar/models/cnnseg/velodyne128/cnnseg_param_paddle.conf"</span></span><br><span class="line">paddle_proto_file: <span class="string">"./data/perception/lidar/models/cnnseg/velodyne128/model"</span></span><br><span class="line">paddle_weight_file: <span class="string">"./data/perception/lidar/models/cnnseg/velodyne128/params"</span></span><br><span class="line">engine_file: <span class="string">"./data/perception/lidar/models/cnnseg/velodyne128/engine.conf"</span></span><br></pre></td></tr></table></figure>
+<p>分别对应网络参数，模型的结构和权重三个文件路径。</p></li>
+<li><p>创建前向推断器，构建网络模型</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">inference_.reset(inference::CreateInferenceByName(cnnseg_param_.model_type(),</span><br><span class="line">                                                    proto_file, weight_file,</span><br><span class="line">                                                    output_names, input_names));</span><br></pre></td></tr></table></figure></li>
+<li><p>初始化前向推断器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">input_shape &#x3D; &#123;1, 8, height_, width_&#125;; 1*8*864*864</span><br><span class="line">inference_-&gt;Init(input_shapes)</span><br></pre></td></tr></table></figure></li>
+<li><p>创建输入输出的blob_,用于数据的写入和读取</p></li>
+<li><p>初始化特征生成器<code>&lt;FeatureGenerator&gt;</code>实例，并初始化 <code>feature_generator_-&gt;Init(feature_param, feature_blob_.get()</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Init</span><span class="params">(<span class="keyword">const</span> FeatureParam&amp; feature_param, base::Blob&lt;<span class="keyword">float</span>&gt;* out_blob)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>创建变量<code>std::vector&lt;int&gt; point2grid_</code>保存每个点在特征图中的一维索引，空间申请为120000 对应特征图的参数信息为：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">feature_param &#123;</span><br><span class="line">            width: <span class="number">864</span></span><br><span class="line">            height: <span class="number">864</span></span><br><span class="line">    point_cloud_range: <span class="number">90</span></span><br><span class="line">            min_height: -<span class="number">5.0</span></span><br><span class="line">            max_height: <span class="number">5.0</span></span><br><span class="line">    use_intensity_feature: <span class="literal">false</span></span><br><span class="line">            use_constant_feature: <span class="literal">false</span></span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>CNNSegmentation::InitClusterAndBackgroundSegmentation()</code> 初始化聚类和背景分割方法：</p>
+<ul>
+<li><p>初始化地平面检测器<code>ground detector</code> 通过<code>&lt;BaseGroundDetectorRegister&gt;</code>接口类创建<code>&lt;SpatioTemporalGroundDetector&gt;</code>实现类，然后初始化：<code>ground_detector_-&gt;Init(ground_detector_init_options)</code></p>
+<ul>
+<li><p><code>SpatioTemporalGroundDetector::Init(）</code> 通过<code>config manager</code>和对应的proto获取配置参数，此处直接给出配置文件的内容：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">        #./data/perception/lidar/models/spatio_temporal_ground_detector/</span><br><span class="line">        grid_size: <span class="number">16</span></span><br><span class="line">        ground_thres: <span class="number">0.25</span></span><br><span class="line">        roi_rad_x: <span class="number">120.0</span></span><br><span class="line">        roi_rad_y: <span class="number">120.0</span></span><br><span class="line">        roi_rad_z: <span class="number">120.0</span></span><br><span class="line">        nr_smooth_iter: <span class="number">5</span></span><br><span class="line"><span class="comment">//以上参数为PlaneFitGroundDetectionParam</span></span><br><span class="line">        use_roi: <span class="literal">false</span></span><br><span class="line">use_ground_service: <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>通过以上参数初始化<code>&lt;PlaneFileGroundDetectorParam&gt;</code>类实例(定义位于common/i_ground)</p>
+<ul>
+<li><code>PlaneFitGroundDetectorParam::Validate()</code> 判断输入参数是否有效</li>
+<li>创建<code>vg_fine_ = new VoxelGridXY&lt;float&gt;()</code>体素栅格用于对点云数据进行降采样</li>
+<li></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>初始化<code>roi filter</code> 通过<code>&lt;BaseROIFilter&gt;</code>接口类创建<code>&lt;HdmapROIFilter&gt;</code>实现类然后初始化，用于从点云中提取roi区域的点云：</p>
+<pre><code>    - `HdmapROIFilter::Init()`通过`config manager`加载配置参数：</code></pre>
+<p><figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#./data/perception/lidar/models/roi_filter/hdmap_roi_filter</span><br><span class="line">range: <span class="number">120.0</span></span><br><span class="line">cell_size: <span class="number">0.25</span></span><br><span class="line">extend_dist: <span class="number">0.0</span></span><br><span class="line">no_edge_table: <span class="literal">false</span></span><br><span class="line">set_roi_service: <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
+<pre><code>      通过以上参数创建`&lt;Bitmap2D&gt;`类实例并初始化。
+
+  - 初始化`spp engine`
+获取分割网络的相关输出用于后处理聚类,相关参数配置见本文最后。
+
+  - 初始化 `thread worker` ,
+  若存在HDMap输入，则进行ROIFilter，最终得到`roi_cloud_`和`roi_world_cloud_`
+    roifilter之后则进行地平面检测
+
+    <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ground_detector_-&gt;Detect(ground_detector_options, lidar_frame_ref_);</span><br></pre></td></tr></table></figure></code></pre>
+<ul>
+<li><p>2.1.6 点云分割初始化之后，创建<code>&lt;ObjectBuilder&gt;</code>类，用于根据点云创建物体的相关属性。</p></li>
+<li><p>2.1.7 初始化<code>&lt;ObjectFilterBank&gt;</code> 用于过滤得到的object,初始化通过<code>config manager</code>及对应的proto加载对应的参数：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># ./data/perception/lidar/models/object_filter_bank/filter_bank.conf</span><br><span class="line">filter_name: <span class="string">"ROIBoundaryFilter"</span></span><br></pre></td></tr></table></figure>
+<p>通过接口类<code>&lt;BaseObjectFilterRegister&gt;</code>根据<code>filter_name</code>创建类<code>&lt;ROIBoundaryFilter&gt;</code> 对该类进行通过<code>config mangaer</code>进行下列参数的加载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># .&#x2F;data&#x2F;perception&#x2F;lidar&#x2F;models&#x2F;object_filter_bank&#x2F;roi_boundary_filter.conf</span><br><span class="line">distance_to_boundary_threshold: -1.0</span><br><span class="line">confidence_threshold: 0.5</span><br><span class="line">cross_roi_threshold: 0.6</span><br><span class="line">inside_threshold: 1.0</span><br></pre></td></tr></table></figure></li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>至此，segmentation初始化部分的大体流程就完成了，主要集中于segmentator的初始化，简要总结如下：</strong></p>
+<p>LidarObstacleSegmentation的初始化包括：</p>
+<ul>
+<li>SceneManager类初始化：
+<ul>
+<li>GroundService初始化</li>
+<li>ROIService初始化</li>
+</ul></li>
+<li>PointCloudPreprocessor类初始化 :点云的预处理，包括</li>
+<li>MapManager类初始化 :管理HDMap</li>
+<li>CNNSegmentation网络类初始化
+<ul>
+<li>inference 推断器（Caffe,RTNet...）初始化 用于网络的前向推断和原始数据的获取</li>
+<li>FeatureGenerator类初始化 ： 特征提取器初始化</li>
+<li>SpatioTemporalGroundDetector 类初始化 ：地面检测器和聚类的相关方法</li>
+<li>HdmapROIFilter 类初始化：根据ROIMap过滤点云</li>
+<li>SppEngine类初始化：</li>
+</ul></li>
+<li>ObjectBuilder 类初始化： 用于构建object的相关属性</li>
+<li>ROIBoundaryFilter 类初始化 ：用于过滤object</li>
+</ul>
+<hr>
+<p>参数配置文件及参数配置信息汇总：</p>
+<p><strong>spp_engine:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>参数名称</th>
+<th>默认值（default）</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>height_gap</td>
+<td>0.5</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>confidence_range</td>
+<td>85.0</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>width</td>
+<td>864</td>
+<td>特征图宽</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>height</td>
+<td>864</td>
+<td>特征图高</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>range</td>
+<td>90.0</td>
+<td>特征图对应的范围(米)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>sppdata:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>参数名称</th>
+<th>默认值</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>objectness_threshold</td>
+<td>0.5</td>
+<td>用于过滤无效的cluster</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>confidence_threshold</td>
+<td>0.1</td>
+<td>用于过滤无效的cluster</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>top_z_threshold</td>
+<td>0.5</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>class_num</td>
+<td>5</td>
+<td>类别数量，用于计算cluster的类别 位于util.h</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>obj_prob_data_ref</td>
+<td></td>
+<td>类别概率map(特征图各行首节点的prob地址)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>feature_generator:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>参数名称</th>
+<th>默认值</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>point_cloud_range</td>
+<td>90</td>
+<td>点云的范围（米）</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>width</td>
+<td>864</td>
+<td>构建的特征图网格的宽</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>height</td>
+<td>864</td>
+<td>构建的特征图网格的高</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>min_height</td>
+<td>-5.0</td>
+<td>最低高度(米)</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>max_height</td>
+<td>5.0</td>
+<td>最大高度(米)用于选取特征图中的点云</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>SppCCDetector:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>参数名称</th>
+<th>默认值</th>
+<th>作用</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>prob_map</td>
+<td>obj_prob_data_ref</td>
+<td>网络输出的是否是object的概率</td>
+<td>float** [height]</td>
+</tr>
+<tr class="even">
+<td>offset_map</td>
+<td>instance_pt_blob的数据指针</td>
+<td>中心偏移 用于聚类</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>scale</td>
+<td>864/(2x90)</td>
+<td>对应尺度，每米对应的格数</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>objectness_threshold</td>
+<td>0.5</td>
+<td>是目标object的阈值</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>cnnseg:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>参数名称</th>
+<th>默认值</th>
+<th>作用</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>min_pts_num</td>
+<td>3</td>
+<td>cluster所需要包含的最小点云数量</td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/blog-mark/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -602,667 +1556,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo_calibration/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/04/apollo_calibration/" class="post-title-link" itemprop="url">Apollo中的标定</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/" itemprop="url" rel="index">
-                    <span itemprop="name">apollo</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
-                    <span itemprop="name">perception</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/04/04/apollo_calibration/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo_calibration/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>15k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>25 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Apollo中的在线标定：用于获取实时外参(针对由于路面颠簸等情况造成相机位姿改变的校正)，由于在线标定算法用到车道线信息，因此此处将车道线检测的相关算法一并说明。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/04/apollo_calibration/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo-transfom_wrapper/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/04/apollo-transfom_wrapper/" class="post-title-link" itemprop="url">Apollo坐标转换组件</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/" itemprop="url" rel="index">
-                    <span itemprop="name">apollo</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/transform/" itemprop="url" rel="index">
-                    <span itemprop="name">transform</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/04/04/apollo-transfom_wrapper/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo-transfom_wrapper/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>10k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>17 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Apollo 中的坐标转换组件 Transform和感知部分transform wrapper的相关内容</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/04/apollo-transfom_wrapper/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo-driver/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/04/apollo-driver/" class="post-title-link" itemprop="url">apollo相机雷达的驱动</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/" itemprop="url" rel="index">
-                    <span itemprop="name">apollo</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
-                    <span itemprop="name">perception</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/04/04/apollo-driver/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo-driver/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>9.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>16 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>apollo中Camera，Radar，Lidar，Can等驱动程序</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/04/apollo-driver/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo-lidar_driver/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/04/apollo-lidar_driver/" class="post-title-link" itemprop="url">apollo lidar驱动组件</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-07 00:06:04" itemprop="dateModified" datetime="2020-04-07T00:06:04+08:00">2020-04-07</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/lidar/" itemprop="url" rel="index">
-                    <span itemprop="name">lidar</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/04/04/apollo-lidar_driver/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo-lidar_driver/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>4.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>8 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Lidar的驱动程序组件</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/04/apollo-lidar_driver/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo-sensor_calibration/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/04/apollo-sensor_calibration/" class="post-title-link" itemprop="url">Apollo中多传感器标定与坐标系统</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/" itemprop="url" rel="index">
-                    <span itemprop="name">apollo</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/perception/" itemprop="url" rel="index">
-                    <span itemprop="name">perception</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/04/04/apollo-sensor_calibration/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo-sensor_calibration/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>5.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>10 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>apollo中的坐标系统和多传感器标定及坐标转换(transform组件)</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/04/apollo-sensor_calibration/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/04/apollo-cyber_bash/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/jd.png">
-      <meta itemprop="name" content="ZhxJia">
-      <meta itemprop="description" content="行则将至">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZhxJia's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/04/apollo-cyber_bash/" class="post-title-link" itemprop="url">Apollo中Cyber RT脚本启动流程</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-04 10:58:02" itemprop="dateCreated datePublished" datetime="2020-04-04T10:58:02+08:00">2020-04-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/" itemprop="url" rel="index">
-                    <span itemprop="name">apollo</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/apollo/Cyber-RT/" itemprop="url" rel="index">
-                    <span itemprop="name">Cyber RT</span>
-                  </a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/04/04/apollo-cyber_bash/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/04/apollo-cyber_bash/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>19k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>31 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Apollo中Cyber RT组件脚本启动流程</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/04/apollo-cyber_bash/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1335,7 +1628,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-count">47</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1348,7 +1641,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1377,7 +1670,7 @@
           <h3 class="widget-title">Tag Cloud</h3>
           <div id="myCanvasContainer" class="widget tagcloud">
               <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" rel="tag">lidar目标检测</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">lidar目标跟踪</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
         </canvas>
        </div>
      </div>
@@ -1407,12 +1700,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">200k</span>
+    <span title="站点总字数">240k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:33</span>
+    <span title="站点阅读时长">6:41</span>
 </div>
 
 <span id="sitetime"></span>

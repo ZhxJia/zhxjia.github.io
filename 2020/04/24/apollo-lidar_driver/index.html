@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Lidar的驱动程序组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="apollo lidar驱动组件">
+<meta property="og:url" content="https://zhxjia.github.io/2020/04/24/apollo-lidar_driver/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="Lidar的驱动程序组件">
+<meta property="article:published_time" content="2020-04-24T05:41:25.893Z">
+<meta property="article:modified_time" content="2020-04-24T05:41:25.893Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="感知">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/04/24/apollo-lidar_driver/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>apollo lidar驱动组件 | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/24/apollo-lidar_driver/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          apollo lidar驱动组件
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-24 13:41:25" itemprop="dateCreated datePublished" datetime="2020-04-24T13:41:25+08:00">2020-04-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/lidar/" itemprop="url" rel="index">
+                    <span itemprop="name">lidar</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/04/24/apollo-lidar_driver/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/24/apollo-lidar_driver/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>13k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>22 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Lidar的驱动程序组件</p>
+<a id="more"></a>
+<p>先搬运一下官方的velodyne驱动组件[说明文档][https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/velodyne/README_cn.md],激光雷达的驱动主要包含了四个组件：</p>
+<ul>
+<li><p>数据读取打包 --&gt;/driver (输出数据包) channel: /apollo/sensor/lidar128/Scan type：apollo::drivers::velodyne::VelodyneScan</p>
+<p>proto: <a href="https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/velodyne/proto/velodyne.proto" target="_blank" rel="noopener">modules/drivers/velodyne/proto/velodyne.proto</a></p></li>
+<li><p>生成点云 --&gt; /convert</p>
+<p>channel: /apollo/sensor/lidar128/PointCloud2 type: apollo::drivers::PointCloud proto:[modules/drivers/proto/pointcloud.proto][https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/proto/pointcloud.proto]</p></li>
+<li><p>点云融合 --&gt; /fusion 点云融合主要将多个激光雷达数据融合成一张点云</p></li>
+<li><p>运动补偿 --&gt; /compensator 运动补偿依赖<code>tf</code>来进行坐标转换查询，因此需要和<code>gnss_driver</code>一起运行才能正常工作 channel: /apollo/sensor/lidar128/copensator/PointCloud2 type : apollo::drivers::PointCloud proto: [modules/drivers/proto/pointcloud.proto][https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/proto/pointcloud.proto]</p></li>
+</ul>
+<p>启动<code>velodyne</code>驱动： <strong>需要先修改并确认launch文件中的参数与实际车辆相对应</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># in docker</span></span><br><span class="line">cd /apollo &amp;&amp; cyber_launch start modules/drivers/velodyne/launch/velodyne.launch</span><br></pre></td></tr></table></figure>
+<p>实际根据感知5.0的[说明文档][https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md]，Lidar的输出数据包括：</p>
+<ul>
+<li>128 线Lidar数据，(cyber channel : /apollo/sensor/velodyne128)</li>
+<li>16 线Lidar数据 ，(cyber channel: /apollo/sensor/lidar_front ,lidar_rear_left,lidar_rear_right)</li>
+</ul>
+<p>下面简单介绍驱动部分四个组件的处理：</p>
+<h2 id="drivervelodyne_driver_component">driver(velodyne_driver_component)</h2>
+<p>BUILD文件 组件编译为动态链接库</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cc_binary(</span><br><span class="line">    name = <span class="string">"libvelodyne_driver_component.so"</span>,</span><br><span class="line">    linkopts = [<span class="string">"-shared"</span>],</span><br><span class="line">    linkstatic = <span class="keyword">False</span>,</span><br><span class="line">    deps = [<span class="string">":velodyne_driver_component_lib"</span>],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>对应组件的dag文件（<code>modules/drivers/velodyne/dag/velodyne.dag</code>）中的Driver部分：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">module_config &#123;</span><br><span class="line">    module_library : <span class="string">"/apollo/bazel-bin/modules/drivers/velodyne/driver/libvelodyne_driver_component.so"</span></span><br><span class="line"></span><br><span class="line">    # <span class="number">128</span></span><br><span class="line">    components &#123;</span><br><span class="line">      class_name : <span class="string">"VelodyneDriverComponent"</span></span><br><span class="line">      config &#123;</span><br><span class="line">        name : <span class="string">"velodyne_128_driver"</span></span><br><span class="line">        config_file_path : <span class="string">"/apollo/modules/drivers/velodyne/conf/velodyne128_conf.pb.txt"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    # <span class="number">16</span>_front_up</span><br><span class="line">    components &#123;</span><br><span class="line">      class_name : <span class="string">"VelodyneDriverComponent"</span></span><br><span class="line">      config &#123;</span><br><span class="line">        name : <span class="string">"velodyne_16_front_up_driver"</span></span><br><span class="line">        config_file_path : <span class="string">"/apollo/modules/drivers/velodyne/conf/velodyne16_front_up_conf.pb.txt"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    # <span class="number">16</span>_front_center</span><br><span class="line">    components &#123;</span><br><span class="line">      class_name : <span class="string">"VelodyneDriverComponent"</span></span><br><span class="line">      config &#123;</span><br><span class="line">        name : <span class="string">"velodyne_16_front_center_driver"</span></span><br><span class="line">        config_file_path : <span class="string">"/apollo/modules/drivers/velodyne/conf/velodyne16_front_center_conf.pb.txt"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    # <span class="number">16</span>_rear_left</span><br><span class="line">    components &#123;</span><br><span class="line">      class_name : <span class="string">"VelodyneDriverComponent"</span></span><br><span class="line">      config &#123;</span><br><span class="line">        name : <span class="string">"velodyne_16_rear_left_driver"</span></span><br><span class="line">        config_file_path : <span class="string">"/apollo/modules/drivers/velodyne/conf/velodyne16_rear_left_conf.pb.txt"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    # <span class="number">16</span>_rear_right</span><br><span class="line">    components &#123;</span><br><span class="line">      class_name : <span class="string">"VelodyneDriverComponent"</span></span><br><span class="line">      config &#123;</span><br><span class="line">        name : <span class="string">"velodyne_16_rear_right_driver"</span></span><br><span class="line">        config_file_path : <span class="string">"/apollo/modules/drivers/velodyne/conf/velodyne16_rear_right_conf.pb.txt"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面以128线激光雷达为例，对应的配置文件</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">frame_id: <span class="string">"velodyne128"</span></span><br><span class="line">scan_channel: <span class="string">"/apollo/sensor/lidar128/Scan"</span></span><br><span class="line">rpm: <span class="number">600.0</span></span><br><span class="line">model: VLS128</span><br><span class="line">mode: STRONGEST</span><br><span class="line">prefix_angle: <span class="number">18000</span></span><br><span class="line">firing_data_port: <span class="number">2368</span>  <span class="comment">//velodyne socket 端口</span></span><br><span class="line">positioning_data_port: <span class="number">8308</span> <span class="comment">//定位数据 socket端口</span></span><br><span class="line">use_sensor_sync: <span class="literal">false</span></span><br><span class="line">max_range: <span class="number">100.0</span></span><br><span class="line">min_range: <span class="number">0.9</span></span><br><span class="line">use_gps_time: <span class="literal">true</span></span><br><span class="line">calibration_online: <span class="literal">false</span></span><br><span class="line">calibration_file: <span class="string">"/apollo/modules/drivers/velodyne/params/velodyne128_VLS_calibration.yaml"</span></span><br><span class="line">organized: <span class="literal">false</span></span><br><span class="line">convert_channel_name: <span class="string">"/apollo/sensor/lidar128/PointCloud2"</span></span><br><span class="line">use_poll_sync: <span class="literal">true</span></span><br><span class="line">is_main_frame: <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<h3 id="程序">程序：</h3>
+<ul>
+<li><p>VelodyneDriverComponent::Init() 加载配置文件：<code>velodyne128_conf.pb.txt -&gt; proto:/modules/drivers/velodyne/proto/config.proto</code> 创建节点：type:<code>&lt;VelodyneScan&gt;</code> name:<code>&quot;/apollo/sensor/lidar128/Scan&quot;</code> ,proto:<code>./velodyne/proto/velodyne.proto</code> 根据配置文件<code>model</code>参数通过<code>VelodyneDriverFactory::CreateDriver</code>创建对应的驱动类<code>VelodyneDriver</code> 激光雷达的驱动类<code>VelodyneDriver</code>包含了两个主要的接口：</p>
+<ul>
+<li><p><code>Init()</code></p>
+<ul>
+<li><p><code>SocketInput::init(const int &amp;port)</code> 连接Velodyne UDP接口</p></li>
+<li><p>创建<code>PollPositioningPacket</code>包接收线程,(以Gps的时间为基准)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// raw data output topic</span></span><br><span class="line">positioning_thread_ =</span><br><span class="line">    <span class="built_in">std</span>::thread(&amp;VelodyneDriver::PollPositioningPacket, <span class="keyword">this</span>);</span><br></pre></td></tr></table></figure></li>
+</ul></li>
+<li><p><code>Poll(std::shared_ptr&lt;VelodyneScan&gt; scan)</code></p></li>
+</ul>
+<p>开启设备线程：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">device_thread_ = <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="built_in">std</span>::thread&gt;(</span><br><span class="line">    <span class="keyword">new</span> <span class="built_in">std</span>::thread(<span class="built_in">std</span>::bind(&amp;VelodyneDriverComponent::device_poll, <span class="keyword">this</span>)));</span><br><span class="line">device_thread_-&gt;<span class="built_in">detach</span>();</span><br></pre></td></tr></table></figure></li>
+<li>VelodyneDriverComponent::device_poll() 在线程中，循环执行该函数拉取Lidar数据
+<ul>
+<li><code>VelodyneDriver::Poll(const std::shared_ptr&lt;VelodyneScan&gt;&amp; scan)</code></li>
+<li><code>writer-&gt;Write(scan)</code> 点云数据发布通道<code>/apollo/sensor/lidar128/Scan</code></li>
+</ul></li>
+</ul>
+<hr>
+<p>##　convert(velodyne_convert_component)</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">module_config &#123;</span><br><span class="line">    module_library : <span class="string">"/apollo/bazel-bin/modules/drivers/velodyne/parser/libvelodyne_convert_component.so"</span></span><br><span class="line"></span><br><span class="line">    components &#123;</span><br><span class="line">      class_name : <span class="string">"VelodyneConvertComponent"</span></span><br><span class="line">      config &#123;</span><br><span class="line">        name : <span class="string">"velodyne_convert"</span></span><br><span class="line">        config_file_path : <span class="string">"/apollo/modules/drivers/velodyne/conf/velodyne128_conf.pb.txt"</span></span><br><span class="line">        readers &#123;channel: <span class="string">"/apollo/sensor/lidar128/Scan"</span>&#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接受<code>driver</code>组件发布的原始Velodyne数据，在该组件中转换为点云结构数据。</p>
+<h3 id="初始化">初始化：</h3>
+<p>创建Convert类对象(根据不同的lidar模型创建<code>VelodyneParser</code> 和Writer对象(对象类型:<code>&lt;PointCloud&gt;</code>,发布通道：<code>//apollo/sensor/lidar128/PointCloud2</code>) 创建<code>PointCloud</code>对象池(大小为8) <code>CCObjectPool&lt;PointCloud&gt; point_cloud_pool_</code> 并将对象池中的 PointCloud对象中的点数设置为140000</p>
+<h3 id="处理函数">处理函数：</h3>
+<p>接收<code>&quot;/apollo/sensor/lidar128/Scan&quot;</code>通道的原始Velodyne数据</p>
+<p><strong>Convert::ConvertPacketsToPointCloud(scan_msg, point_cloud_out)</strong></p>
+<ul>
+<li><p><code>Velodyne128Parser::GeneratePointcloud(scan_msg, point_cloud)</code> 该函数接收Scan_msg返回点云数据格式的point_cloud。</p>
+<ul>
+<li><p><code>Velodyne128Parser::Unpack(scan_msg-&gt;firing_pkts(i), out_msg)</code> 循环读取<code>scan_msg</code>所有的原始数据信息，通过该函数进行解析，每个packet有12个blocks，根据数据协议可以得到激光点的水平角度值（azimuth）,然后每个block有32个channel，结合校正文件，进一步得到每一个点的距离(distance)</p>
+<ul>
+<li><p><code>is_scan_valid(azimuth,distance)</code> 根据距离判断点是否有效：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (range &lt; config_.min_range() || range &gt; config_.max_range()) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125; <span class="comment">//该函数目测貌似没啥用</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>然后获取点的强度<code>intensity</code>, 这样由水平角度，垂直角度(在标定文件中)，距离三个信息可以换算得到三维直角坐标系中的点云坐标</p>
+<ul>
+<li><p><code>ComputeCoords(real_distance, corrections, azimuth_corrected, point_new);</code> 三维点云坐标以ROS右手坐标系为基准建立。</p></li>
+<li><p><code>Velodyne128Parser::IntensityCompensate()</code></p>
+<p>对反射强度进行补偿，根据标定文件中的<code>focal_distace</code>,<code>focal_slope</code> 。</p></li>
+</ul></li>
+</ul></li>
+<li><p><code>writer_-&gt;Write(point_cloud_out)</code> 输出<code>&lt;PointCloud&gt;</code>格式的数据，发布通道为： <code>/apollo/sensor/lidar128/PointCloud2</code></p></li>
+</ul>
+<hr>
+<h2 id="prisecfusioncomponent">PrisecFusionComponent()</h2>
+<p><strong>以16线front center为基准融合rear left ,rear right的点云数据</strong></p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#dag组件配置</span><br><span class="line">module_config &#123;</span><br><span class="line">    module_library : <span class="string">"/apollo/bazel-bin/modules/drivers/velodyne/fusion/libvelodyne_fusion_component.so"</span></span><br><span class="line"></span><br><span class="line">    components &#123;</span><br><span class="line">      class_name : <span class="string">"PriSecFusionComponent"</span></span><br><span class="line">      config &#123;</span><br><span class="line">        name : <span class="string">"velodyne_fusion"</span></span><br><span class="line">        config_file_path : <span class="string">"/apollo/modules/drivers/velodyne/conf/velodyne_fusion_conf.pb.txt"</span></span><br><span class="line">        readers &#123;channel: <span class="string">"/apollo/sensor/lidar16/front/center/PointCloud2"</span>&#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Component参数：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># velodyne_fusion_conf.pb.txt</span><br><span class="line">max_interval_ms: <span class="number">50</span></span><br><span class="line">drop_expired_data : <span class="literal">true</span></span><br><span class="line">fusion_channel: <span class="string">"/apollo/sensor/lidar16/fusion/PointCloud2"</span></span><br><span class="line">input_channel: [</span><br><span class="line">    <span class="string">"/apollo/sensor/lidar16/rear/left/PointCloud2"</span>,</span><br><span class="line">    <span class="string">"/apollo/sensor/lidar16/rear/right/PointCloud2"</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># wait time after main channel receive msg, unit second</span><br><span class="line">wait_time_s: <span class="number">0.02</span></span><br></pre></td></tr></table></figure>
+<p><strong>初始化Init()</strong></p>
+<ul>
+<li><p><strong>Init</strong></p>
+<ul>
+<li><p>创建transform::Buffer实例，用于查询坐标转换信息</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">buffer_ptr_ = apollo::transform::Buffer::Instance();</span><br></pre></td></tr></table></figure></li>
+<li><p>创建节点writer，用于发布点云融合数据：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fusion_writer_ = node_-&gt;CreateWriter&lt;PointCloud&gt;(conf_.fusion_channel());</span><br></pre></td></tr></table></figure></li>
+<li><p>创建节点reader,用于监听另外两个16线雷达的数据信息。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; channel : conf_.input_channel()) &#123;</span><br><span class="line">  <span class="keyword">auto</span> reader = node_-&gt;CreateReader&lt;PointCloud&gt;(channel);</span><br><span class="line">  readers_.emplace_back(reader);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>主通道数据通过组件Proc接收<code>front_center</code>位置的16线雷达数据，通过Proc处理。</p></li>
+</ul></li>
+<li><p><strong>Proc</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">PriSecFusionComponent::Proc</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PointCloud&gt;&amp; point_cloud)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">auto</span> target = point_cloud;</span><br><span class="line">  <span class="keyword">auto</span> fusion_readers = readers_;</span><br><span class="line">  <span class="keyword">auto</span> start_time = Time::Now().ToSecond();</span><br><span class="line">  <span class="keyword">while</span> ((Time::Now().ToSecond() - start_time) &lt; conf_.wait_time_s() &amp;&amp;</span><br><span class="line">         fusion_readers.<span class="built_in">size</span>() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> itr = fusion_readers.<span class="built_in">begin</span>(); itr != fusion_readers.<span class="built_in">end</span>();) &#123;</span><br><span class="line">      (*itr)-&gt;Observe(); <span class="comment">//注意此处的reader并不通过回调函数读取数据，而是通过Observe()</span></span><br><span class="line">      <span class="keyword">if</span> (!(*itr)-&gt;Empty()) &#123;</span><br><span class="line">        <span class="keyword">auto</span> source = (*itr)-&gt;GetLatestObserved();</span><br><span class="line">        <span class="keyword">if</span> (conf_.drop_expired_data() &amp;&amp; IsExpired(target, source)) &#123;</span><br><span class="line">          ++itr;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          Fusion(target, source);</span><br><span class="line">          itr = fusion_readers.erase(itr);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        ++itr;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    usleep(USLEEP_INTERVAL);<span class="comment">//5000us</span></span><br><span class="line">  &#125;</span><br><span class="line">  fusion_writer_-&gt;Write(target);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>主通道接收到点云数据后，在0.02s内等待接收readers的消息。注意此处readers并不由回调函数调用，而是直接通过 <code>reader-&gt;Observe()</code>和<code>reader-&gt;GetLatestObserved()</code>获取数据。</p>
+<ul>
+<li><p><code>IsExpired(target,source)</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 判断通过Observe得到的两个Lidar数据是否过期</span></span><br><span class="line"><span class="comment">// @param: target 主通道接收到的点云数据(front center)</span></span><br><span class="line"><span class="comment">// @param: source 另外两个lidar通过observe获取得到的最新数据(rear left or rear right)</span></span><br><span class="line"><span class="comment">// 根据lidar数据保重measurement_time的相隔时间不大于50ms</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">PriSecFusionComponent::IsExpired</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PointCloud&gt;&amp; target,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PointCloud&gt;&amp; source)</span></span></span><br></pre></td></tr></table></figure></li>
+<li><p><code>Fusion(target, source)</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 没有source 相较于target没有过期的话，则对当前帧点云数据进行融合</span></span><br><span class="line"><span class="comment">// @param: target 主通道接收到的点云数据(front center)</span></span><br><span class="line"><span class="comment">// @param: source 另外两个lidar通过observe获取得到的最新数据(rear left or rear right)</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">PriSecFusionComponent::Fusion</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PointCloud&gt; target,</span></span></span><br><span class="line"><span class="function"><span class="params">                                   <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PointCloud&gt; source)</span></span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>QueryPoseAffine(target-&gt;header().frame_id(), source-&gt;header().frame_id(),&amp;pose</code>)`</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 通过transform::buffer查询source-&gt;target的坐标转换矩阵</span></span><br><span class="line"><span class="comment">// @param[in]: target_frame_id, source_frame_id</span></span><br><span class="line"><span class="comment">// @param[out]: pose 转换矩阵</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">PriSecFusionComponent::QueryPoseAffine</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; target_frame_id,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; source_frame_id,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            Eigen::Affine3d* pose)</span></span></span><br></pre></td></tr></table></figure></li>
+<li><p><code>AppendPointCloud(target, source, pose)</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @bried: 利用坐标转换将source lidar注册到 target lidar的位置中</span></span><br><span class="line"><span class="comment">// @param[in/out]: point_cloud 主雷达数据(基准)</span></span><br><span class="line"><span class="comment">// @param[in]: point_cloud_add 补充的雷达数据</span></span><br><span class="line"><span class="comment">// @param[in]: pose: 坐标变换矩阵</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">PriSecFusionComponent::AppendPointCloud</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PointCloud&gt; point_cloud,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PointCloud&gt; point_cloud_add, <span class="keyword">const</span> Eigen::Affine3d&amp; pose)</span></span></span><br></pre></td></tr></table></figure></li>
+</ul></li>
+<li><p><code>fusion_writer_-&gt;Write(target);</code>将融合后的front_center lidar数据通过通道 <code>/apollo/sensor/lidar16/fusion/PointCloud2</code>发布。</p></li>
+</ul></li>
+</ul>
+<hr>
+<h2 id="compensatorcomponent">CompensatorComponent()</h2>
+<p><strong>对之前融合的16线fusion/Pointcloud和front up lidar, lidar128这三个通道的雷达数据进行补偿</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 以velydone <span class="number">128</span>线激光雷达为例</span><br><span class="line">module_config &#123;</span><br><span class="line">    module_library : <span class="string">"/apollo/bazel-bin/modules/drivers/velodyne/compensator/libvelodyne_compensator_component.so"</span></span><br><span class="line"></span><br><span class="line">    components &#123;</span><br><span class="line">      class_name : <span class="string">"CompensatorComponent"</span></span><br><span class="line">      <span class="built_in">config</span> &#123;</span><br><span class="line">        name : <span class="string">"velodyne128_compensator"</span></span><br><span class="line">        config_file_path : <span class="string">"/apollo/modules/drivers/velodyne/conf/velodyne128_fusion_compensator.pb.txt"</span></span><br><span class="line">        readers &#123;channel: <span class="string">"/apollo/sensor/lidar128/PointCloud2"</span>&#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Component参数：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># modules/drivers/velodyne/conf/velodyne128_fusion_compensator.pb.txt</span><br><span class="line">world_frame_id: <span class="string">"world"</span></span><br><span class="line">transform_query_timeout: <span class="number">0.02</span></span><br><span class="line">output_channel: <span class="string">"/apollo/sensor/lidar128/compensator/PointCloud2"</span></span><br></pre></td></tr></table></figure>
+<p><strong>初始化Init()</strong></p>
+<ul>
+<li><p><strong>Init()</strong></p>
+<ul>
+<li><p>创建writer输出通道,发布补偿后的lidar点云数据：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">writer_ = node_-&gt;CreateWriter&lt;PointCloud&gt;(<span class="built_in">config</span>.output_channel());</span><br></pre></td></tr></table></figure></li>
+<li><p>根据配置文件参数创建该组件的功能实现类<code>&lt;Compensator&gt;</code> ,</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compensator_.reset(<span class="keyword">new</span> Compensator(<span class="built_in">config</span>));</span><br></pre></td></tr></table></figure></li>
+<li><p>并创建点云数据类型的对象池(大小为8)(<strong>貌似对点云数据直接处理的都会先创建对象池</strong>),并为创建的点云类型预先分配14000个点</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">compensator_pool_.reset(<span class="keyword">new</span> CCObjectPool&lt;PointCloud&gt;(pool_size_));</span><br><span class="line">compensator_pool_-&gt;ConstructAll();</span><br></pre></td></tr></table></figure></li>
+</ul></li>
+<li><p><strong>Proc()</strong> 从对象池中获取点云数据结构类型point_cloud_compensated</p>
+<ul>
+<li><p><code>Compensator::MotionCompensation(point_cloud, point_cloud_compensated)</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//@brief: 进行点云运动补偿的入口函数</span></span><br><span class="line"><span class="comment">//@param[in]: msg 接收到的原始点云数据</span></span><br><span class="line"><span class="comment">//@param[out]: msg_compensated 补偿后的点云数据</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Compensator::MotionCompensation</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">const</span> PointCloud&gt;&amp; msg,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PointCloud&gt; msg_compensated)</span></span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>GetTimestampInterval(msg, &amp;timestamp_min, &amp;timestamp_max)</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//@brief： 由接收到的点云数据计算时间间隔</span></span><br><span class="line"><span class="comment">//@param[out]: timestamp_min 该数据帧中点云中单个点的时间戳最小值</span></span><br><span class="line"><span class="comment">//@param[out]: timestamp_max ... 最大值</span></span><br><span class="line"><span class="comment">//@param[in]: 当前帧接收到的点云数据</span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">Compensator::GetTimestampInterval</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">const</span> PointCloud&gt;&amp; msg, <span class="keyword">uint64_t</span>* timestamp_min,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">uint64_t</span>* timestamp_max)</span></span>&#123;...&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>设置运动补偿点云point_cloud_compensated的时间戳信息</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">msg_compensated-&gt;mutable_header()-&gt;set_timestamp_sec(</span><br><span class="line">    cyber::Time::Now().ToSecond()); <span class="comment">//该时间戳为消息发布时刻</span></span><br><span class="line">msg_compensated-&gt;mutable_header()-&gt;set_frame_id(msg-&gt;header().frame_id());</span><br><span class="line">msg_compensated-&gt;mutable_header()-&gt;set_lidar_timestamp(</span><br><span class="line">    msg-&gt;header().lidar_timestamp()); <span class="comment">//该消息类型对应需要的lidar数据时刻</span></span><br><span class="line">msg_compensated-&gt;set_measurement_time(msg-&gt;measurement_time()); <span class="comment">//lidar数据获取时的时间</span></span><br><span class="line">msg_compensated-&gt;set_height(msg-&gt;<span class="built_in">height</span>());</span><br><span class="line">msg_compensated-&gt;set_is_dense(msg-&gt;is_dense());</span><br></pre></td></tr></table></figure></li>
+<li><p>补偿点云，移除nan的点：</p>
+<ul>
+<li><p><code>QueryPoseAffineFromTF2(timestamp_min, &amp;pose_min_time, frame_id)</code><br>
+注： pose_max_time同样</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//@brief: 通过tf buffer获取timestamp时刻原始点云数据到世界坐标系的转换矩阵</span></span><br><span class="line"><span class="comment">//@param[in]: timestamp:时间戳（对应之前得到的该帧点云中最早检测点和最晚检测点的时刻）</span></span><br><span class="line"><span class="comment">//@param[in]: child_frame_id: 接收到的点云数据对应的传感器id</span></span><br><span class="line"><span class="comment">//@param[in/out]: pose </span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Compensator::QueryPoseAffineFromTF2</span><span class="params">(<span class="keyword">const</span> <span class="keyword">uint64_t</span>&amp; timestamp, <span class="keyword">void</span>* pose,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; child_frame_id)</span></span></span><br></pre></td></tr></table></figure>
+<p>通过上述函数就获得了该帧头尾两个时刻到世界坐标系的转换矩阵。</p></li>
+<li><p><code>MotionCompensation(msg, msg_compensated, timestamp_min, timestamp_max,            pose_min_time, pose_max_time)</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//@brief: 主要处理函数，</span></span><br><span class="line"><span class="comment">//@param[in]: msg（原始接收到的lidar数据）,</span></span><br><span class="line"><span class="comment">//@param[in]: timestamp_min，timestamp_max 该帧数据头尾两个点的时刻</span></span><br><span class="line"><span class="comment">//@param[in]: pose_min_time,pose_max_time 对应头尾两个时刻到世界坐标系的转换矩阵</span></span><br><span class="line"><span class="comment">//@param[in/out]: msg_compensated 输出补偿后的点云数据</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Compensator::MotionCompensation</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">const</span> PointCloud&gt;&amp; msg,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PointCloud&gt; msg_compensated, <span class="keyword">const</span> <span class="keyword">uint64_t</span> timestamp_min,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="keyword">uint64_t</span> timestamp_max, <span class="keyword">const</span> Eigen::Affine3d&amp; pose_min_time,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> Eigen::Affine3d&amp; pose_max_time)</span></span></span><br></pre></td></tr></table></figure>
+<p>通过该帧头和尾时刻的世界坐标系的坐标可得到lidar在该帧的时间段内在世界坐标系下相对转动和平移，可以通过线性插值得到中间点近似的旋转和平移。由于lidar的测距精度为~2cm,当距离超过70m，此时角度应小于0.02/70=0.0003rad，认为此时的相对角度是有意义的。</p></li>
+</ul>
+<blockquote>
+<p>由于lidar各个激光束的依次发射需要时间，因此在这段时间里，可能车辆发生了位移，导致该真点云并不是严格在同一位置检测得到的，因此需要补偿该帧各个点的位置。</p>
+</blockquote></li>
+</ul></li>
+<li><p><code>writer_-&gt;Write(point_cloud_compensated);</code>通过通道<code>/apollo/sensor/lidar128/compensator/PointCloud2</code>发布补偿后的点云数据。</p></li>
+</ul></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag"># 感知</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/24/apollo-lidar_recognition/" rel="prev" title="apollo lidar算法--recognition component">
+      <i class="fa fa-chevron-left"></i> apollo lidar算法--recognition component
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#drivervelodyne_driver_component"><span class="nav-number">1.</span> <span class="nav-text">driver(velodyne_driver_component)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#程序"><span class="nav-number">1.1.</span> <span class="nav-text">程序：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化"><span class="nav-number">1.2.</span> <span class="nav-text">初始化：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理函数"><span class="nav-number">1.3.</span> <span class="nav-text">处理函数：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#prisecfusioncomponent"><span class="nav-number">2.</span> <span class="nav-text">PrisecFusionComponent()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compensatorcomponent"><span class="nav-number">3.</span> <span class="nav-text">CompensatorComponent()</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" rel="tag">lidar目标检测</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">lidar目标跟踪</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">240k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:41</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/04/24/apollo-lidar_driver/";
+    this.page.identifier = "2020/04/24/apollo-lidar_driver/";
+    this.page.title = "apollo lidar驱动组件";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
