@@ -56,7 +56,7 @@
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
 <meta property="og:description" content="该组件实现lidar的目标跟踪算法，该组件接收segment得到的检测物体信息，然后建立帧与帧之间的联系以实现帧间同一目标速度等动态信息的预测。 Init-&gt;Preprocess-&gt;MapManager-&gt;Segmentaion-&gt;ObjectBuilder-&gt;ObjectFilter-&gt;Classifier-&gt;Tracker">
 <meta property="article:published_time" content="2020-04-24T05:41:25.893Z">
-<meta property="article:modified_time" content="2020-04-24T05:41:25.893Z">
+<meta property="article:modified_time" content="2020-04-24T16:33:28.228Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="lidar目标跟踪">
 <meta name="twitter:card" content="summary">
@@ -235,6 +235,13 @@
 
               <time title="创建时间：2020-04-24 13:41:25" itemprop="dateCreated datePublished" datetime="2020-04-24T13:41:25+08:00">2020-04-24</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-25 00:33:28" itemprop="dateModified" datetime="2020-04-25T00:33:28+08:00">2020-04-25</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -274,14 +281,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4.1k</span>
+              <span>9.1k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>7 分钟</span>
+              <span>15 分钟</span>
             </span>
 
         </div>
@@ -758,16 +765,115 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: track segmented objects from multiple lidar sensors</span></span><br><span class="line"><span class="comment">// @params [in]: tracker options</span></span><br><span class="line"><span class="comment">// @params [in/out]: lidar frame</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">MlfEngine::Track</span><span class="params">(<span class="keyword">const</span> MultiTargetTrackerOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">           LidarFrame* frame)</span> <span class="keyword">override</span></span>;</span><br></pre></td></tr></table></figure>
 <ol type="1">
 <li><p>modify objects timestamp if necessary 将物体检测的时间戳修改为数据帧frame的时间戳，之前<code>object-&gt;latest_tracked_time</code>为物体点云所有点的平均时间</p></li>
-<li><p>add global offset to pose</p></li>
-<li><p>分割前景和背景的物体，并转换为被跟踪物体</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: split foreground/background objects and attach to tracked objects</span></span><br><span class="line"><span class="comment">// @params [in]: objects</span></span><br><span class="line"><span class="comment">// @params [in]: sensor info</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfEngine::SplitAndTransformToTrackedObjects</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::ObjectPtr&gt;&amp; objects,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> base::SensorInfo&amp; sensor_info)</span></span>;</span><br></pre></td></tr></table></figure>
+<li><p>add global offset to pose(only when no track exists)</p></li>
+<li><p>分离前景和背景的物体，并转换为被跟踪物体</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: split foreground/background objects and attach to tracked objects</span></span><br><span class="line"><span class="comment">// @params [in]: objects</span></span><br><span class="line"><span class="comment">// @params [in]: sensor info</span></span><br><span class="line"><span class="comment">// @output :background_objects_,foreground_objects_,shape_features,shape_features_full</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfEngine::SplitAndTransformToTrackedObjects</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::ObjectPtr&gt;&amp; objects,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> base::SensorInfo&amp; sensor_info)</span></span>;</span><br></pre></td></tr></table></figure>
 <ul>
 <li><p>向被跟踪列表中添加object：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tracked_objects[i]-&gt;AttachObject(objects[i], sensor_to_local_pose_,</span><br><span class="line">                                  global_to_local_offset_, sensor_info);</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; @brief: add object to tracked list</span><br><span class="line">&#x2F;&#x2F; @params[in]: objectptr,pose(world-&gt;lidar),sensor_info</span><br><span class="line"></span><br><span class="line">tracked_objects[i]-&gt;AttachObject(objects[i], sensor_to_local_pose_,</span><br><span class="line">                               global_to_local_offset_, sensor_info);</span><br></pre></td></tr></table></figure>
+<p>向<code>&lt;TrackedObject&gt;</code>数据类型中传递object的相关属性(朝向,大小,中心,)。 <strong>存疑：这个sensor_to_local_pose_的转换方向不明</strong></p></li>
 <li><p>如果object不是背景且采用直方图匹配方法,则计算物体的外观特征中的<code>histogram_distance</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tracked_objects[i]-&gt;ComputeShapeFeatures();</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tracked_objects[i]-&gt;ComputeShapeFeatures();</span><br></pre></td></tr></table></figure></li>
 </ul></li>
 </ol>
+<ul>
+<li><p>​</p>
+<ul>
+<li><p>计算物体的外观特征：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: compute object's shape feature</span></span><br><span class="line">  <span class="comment">// @params[in]: histogram_bin_size default:10</span></span><br><span class="line">  <span class="comment">// @params[out]: object's shape feature</span></span><br><span class="line">  FeatureDescriptor::ComputeHistogram(<span class="keyword">int</span> bin_size, <span class="keyword">float</span>* feature) &#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>根据object的点云计算特征向量的组成为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">...　</span><br><span class="line"> feature[<span class="number">0</span>] = center_pt_.x / <span class="number">10.0f</span>; <span class="comment">//x轴点云中心点</span></span><br><span class="line"> feature[<span class="number">1</span>] = center_pt_.y / <span class="number">10.0f</span>; <span class="comment">//y轴点云中心点</span></span><br><span class="line"> feature[<span class="number">2</span>] = center_pt_.z; <span class="comment">//z轴点云中心点 </span></span><br><span class="line"> feature[<span class="number">3</span>] = xsize; <span class="comment">//x轴点云长度</span></span><br><span class="line"> feature[<span class="number">4</span>] = ysize; <span class="comment">//y轴点云长度</span></span><br><span class="line"> feature[<span class="number">5</span>] = zsize; <span class="comment">//z轴点云长度</span></span><br><span class="line"> feature[<span class="number">6</span>] = <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(pt_num); <span class="comment">//点云中点数量</span></span><br><span class="line"> <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; stat_feat.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">   feature[i + <span class="number">7</span>] = <span class="comment">//直方图特征,每一个点对应stat_feat中的区间位置</span></span><br><span class="line">       <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(stat_feat[i]) / <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(pt_num);</span><br><span class="line"> &#125; <span class="comment">//总共37维</span></span><br></pre></td></tr></table></figure></li>
+</ul></li>
+</ul>
+<ol start="4" type="1">
+<li><p>assign tracked objects to tracks,匹配objects和tracks</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: match tracks and objects and object-track assignment</span></span><br><span class="line"><span class="comment">// @params [in]: match options  default:null</span></span><br><span class="line"><span class="comment">// @params [in]: objects for match :foreground and background separately</span></span><br><span class="line"><span class="comment">// @params [in]: name (foreground or background)</span></span><br><span class="line"><span class="comment">// @params [in/out]: tracks for match and assignment</span></span><br><span class="line"><span class="comment">// @note :分开单独处理前景和背景</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfEngine::TrackObjectMatchAndAssign</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> MlfTrackObjectMatcherOptions&amp; match_options,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;TrackedObjectPtr&gt;&amp; objects, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;MlfTrackDataPtr&gt;* tracks)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><strong>二分图</strong>匹配检测到的detected objects和tracks <code>matcher_-&gt;Match(match_options, objects, *tracks, &amp;assignments,                  &amp;unassigned_tracks, &amp;unassigned_objects);</code>　</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: match detected objects to tracks</span></span><br><span class="line"><span class="comment">// @params [in]: new detected objects for matching</span></span><br><span class="line"><span class="comment">// @params [in]: maintaining tracks for matching</span></span><br><span class="line"><span class="comment">// @params [out]: assignment pair of object &amp; track</span></span><br><span class="line"><span class="comment">// @params [out]: tracks without matched object</span></span><br><span class="line"><span class="comment">// @params [out]: objects without matched track</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTrackObjectMatcher::Match</span><span class="params">(<span class="keyword">const</span> MlfTrackObjectMatcherOptions &amp;options,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;TrackedObjectPtr&gt; &amp;objects,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;MlfTrackDataPtr&gt; &amp;tracks,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">size_t</span>, <span class="keyword">size_t</span>&gt; &gt; *assignments,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; *unassigned_tracks,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; *unassigned_objects)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>前景和背景分开处理,此处仅以前景为例,计算关联的代价矩阵:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: compute association matrix</span></span><br><span class="line"><span class="comment">// @params [in]: maintained tracks for matching</span></span><br><span class="line"><span class="comment">// @params [in]: new detected objects for matching</span></span><br><span class="line"><span class="comment">// @params [out]: matrix of association distance</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTrackObjectMatcher::ComputeAssociateMatrix</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;MlfTrackDataPtr&gt; &amp;tracks,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;TrackedObjectPtr&gt; &amp;new_objects,</span></span></span><br><span class="line"><span class="function"><span class="params">    common::SecureMat&lt;<span class="keyword">float</span>&gt; *association_mat)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>计算new detected object 与已存在的track两两之间的匹配程度(距离)<code>track_object_distance</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: compute object track distance</span></span><br><span class="line"><span class="comment">// @params [in]: object</span></span><br><span class="line"><span class="comment">// @params [in]: track data</span></span><br><span class="line"><span class="comment">// @return: distance</span></span><br><span class="line"><span class="function"><span class="keyword">float</span> <span class="title">MlfTrackObjectDistance::ComputeDistance</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> TrackedObjectConstPtr&amp; object,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> MlfTrackDataConstPtr&amp; track)</span> <span class="keyword">const</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>关联特征权重表：</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">关联特征</th>
+<th style="text-align: center;">一致性评估</th>
+<th style="text-align: center;">默认权重(前景,背景)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong>location_dist_weight</strong></td>
+<td style="text-align: center;">运动</td>
+<td style="text-align: center;"><strong>0.6</strong> , 0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">direction dist weight</td>
+<td style="text-align: center;">运动</td>
+<td style="text-align: center;">0.2 , 0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">bbox size dist weight</td>
+<td style="text-align: center;">外观</td>
+<td style="text-align: center;">0.1 , 0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">point num dist weight</td>
+<td style="text-align: center;">外观</td>
+<td style="text-align: center;">0.1 , 0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>histogram dist weight</strong></td>
+<td style="text-align: center;">外观</td>
+<td style="text-align: center;"><strong>0.5</strong> , 0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">centroid shift dist weight</td>
+<td style="text-align: center;">外观</td>
+<td style="text-align: center;">0.0 , 0.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">bbox iou dist weight</td>
+<td style="text-align: center;">外观</td>
+<td style="text-align: center;">0.0 , 0.8</td>
+</tr>
+</tbody>
+</table>
+<p>由上表可以看出，在计算关联距离时，重点考虑的是几何距离和两者的形状相似度。</p>
+<ul>
+<li><code>track-&gt;PredictState(current_time)</code>预测状态，包含了位置<code>latest_anchor_point</code>和速度信息<code>latest_velocity</code> 共6个状态。</li>
+</ul>
+<p>根据当前object和track预测的状态信息，分别计算上述7个特征,加权求和，函数实现位于 <code>distace_collection.h</code>中。</p>
+<p>LocationDistance : <span class="math inline">\(\sqrt{\Delta x^2+\Delta y^2+\Delta z^2}\)</span></p></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ol>
+<p>DirectionDistance: <span class="math inline">\(-cos(\theta)+1 \in (0,2)\)</span>　,<span class="math inline">\(\theta\)</span>为两个物体方向的夹角 BboxSizeDistance:<span class="math inline">\(min\{\frac{|oldsize\_x-newsize\_x|}{max\{oldsize\_x,newsize\_x\}},\frac{|oldsize\_y-newsize\_y|}{max\{oldsize\_y,newsize\_y\}}\} \in (0,1)\)</span></p>
+<p>PointNumDistance:<span class="math inline">\(\frac{|old\_point\_num-new\_point\_num|}{max(old\_point\_num,new\_point\_num)} \in (0,1)\)</span> HistogramDistance: <span class="math inline">\(d+=abs(old\_feature[i]-new\_feature[i]) \in(0,3)\)</span></p>
+<pre><code>CentroidShiftDistance: $\sqrt{\Delta x^2+\Delta y^2}$
+     BboxIouDistance:  $dist = (1-iou)*match\_threshold$  其中match_threshold = 4.0
+
+ - 然后进行关联,前景关联采用`&lt;MultiHmBipartiteGraphMatcher&gt;`
+
+   背景关联使用`&lt;GnnBipartiteGraphMatcher&gt;` ,同一继承自`&lt;BaseBipartiteGraphMatcher&gt;`接口类
+ 
+   <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: match interface</span></span><br><span class="line"><span class="comment">// @params [in]: match params</span></span><br><span class="line"><span class="comment">// @params [out]: matched pair of objects &amp; tracks</span></span><br><span class="line"><span class="comment">// @params [out]: unmatched rows</span></span><br><span class="line"><span class="comment">// @params [out]: unmatched cols</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Match</span><span class="params">(<span class="keyword">const</span> BipartiteGraphMatcherOptions &amp;options,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;NodeNodePair&gt; *assignments,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; *unassigned_rows,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; *unassigned_cols)</span></span>;</span><br></pre></td></tr></table></figure>
+
+   实际上调用的是根据计算得到的代价矩阵，根据门控匈牙利算法:`&lt;common::GatedHungarianMatcher&gt;` ,其中设置参数`max_match_distance=4`,`bound_value=100`
+
+ - 设置objects中对应object的association_score,</code></pre>
+<ul>
+<li><p>对于已关联的object和track,执行下列函数，将object添加到track的缓冲区<code>cached_objects</code>中。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   <span class="comment">// @brief: 将已经与track关联的object添加到缓冲区</span></span><br><span class="line">   <span class="comment">// @param[in]: obj与track关联的新检测物体</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTrackData::PushTrackedObjectToCache</span><span class="params">(TrackedObjectPtr obj)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>对于未被关联的objects，需要创建新的tracks,更新<code>MlfTrackData</code>中与跟踪相关的状态</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: initialize new track data and push new object to cache</span></span><br><span class="line"><span class="comment">// @params [in/out]: new track data</span></span><br><span class="line"><span class="comment">// @params [in/out]: new object</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTracker::InitializeTrack</span><span class="params">(MlfTrackDataPtr new_track_data,</span></span></span><br><span class="line"><span class="function"><span class="params">                              TrackedObjectPtr new_object)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
 <hr>
 <h3 id="classify">Classify</h3>
 
@@ -949,12 +1055,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">240k</span>
+    <span title="站点总字数">245k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">6:41</span>
+    <span title="站点阅读时长">6:49</span>
 </div>
 
 <span id="sitetime"></span>
