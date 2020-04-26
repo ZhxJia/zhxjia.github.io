@@ -56,7 +56,7 @@
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
 <meta property="og:description" content="该组件实现lidar的目标跟踪算法，该组件接收segment得到的检测物体信息，然后建立帧与帧之间的联系以实现帧间同一目标速度等动态信息的预测。 Init-&gt;Preprocess-&gt;MapManager-&gt;Segmentaion-&gt;ObjectBuilder-&gt;ObjectFilter-&gt;Classifier-&gt;Tracker">
 <meta property="article:published_time" content="2020-04-24T05:41:25.893Z">
-<meta property="article:modified_time" content="2020-04-26T12:26:03.926Z">
+<meta property="article:modified_time" content="2020-04-26T16:30:52.447Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="lidar目标跟踪">
 <meta name="twitter:card" content="summary">
@@ -240,7 +240,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-26 20:26:03" itemprop="dateModified" datetime="2020-04-26T20:26:03+08:00">2020-04-26</time>
+                <time title="修改时间：2020-04-27 00:30:52" itemprop="dateModified" datetime="2020-04-27T00:30:52+08:00">2020-04-27</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -281,14 +281,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>9.1k</span>
+              <span>14k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>15 分钟</span>
+              <span>24 分钟</span>
             </span>
 
         </div>
@@ -860,11 +860,76 @@
 <li><p>对于已关联的object和track,执行下列函数，将object添加到track的缓冲区<code>cached_objects</code>中。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// @brief: 将已经与track关联的object添加到缓冲区</span></span><br><span class="line"> <span class="comment">// @param[in]: obj与track关联的新检测物体</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTrackData::PushTrackedObjectToCache</span><span class="params">(TrackedObjectPtr obj)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure></li>
 <li><p>对于未被关联的objects，需要创建新的tracks,更新<code>MlfTrackData</code>中与跟踪相关的状态</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: initialize new track data and push new object to cache</span></span><br><span class="line"><span class="comment">// @params [in/out]: new track data</span></span><br><span class="line"><span class="comment">// @params [in/out]: new object</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTracker::InitializeTrack</span><span class="params">(MlfTrackDataPtr new_track_data,</span></span></span><br><span class="line"><span class="function"><span class="params">                              TrackedObjectPtr new_object)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: initialize new track data and push new object to cache</span></span><br><span class="line"><span class="comment">// @params [in/out]: new track data</span></span><br><span class="line"><span class="comment">// @params [in/out]: new object</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTracker::InitializeTrack</span><span class="params">(MlfTrackDataPtr new_track_data,</span></span></span><br><span class="line"><span class="function"><span class="params">                              TrackedObjectPtr new_object)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>创建新的track的过程：从<code>MlfTrackDataPool</code>对象池中创建<code>MlfTrackDataPtr</code>实例<code>track_data</code>,然后通过 <code>&lt;MlfTracker&gt;</code>类中的<code>InitializeTrack</code>对创建的<code>track_data</code>结合提供的<code>object</code>信息，进行相关跟踪属性的赋值，然后将得到的<code>track_data</code>加入到已存在的跟踪列表<code>std::vector&lt;MlfTrackDataPtr&gt;</code>中。</p></li>
 </ul></li>
+<li><p>state filter in tracker if is main sensor (default : Velodyne64)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: filter tracks</span></span><br><span class="line"><span class="comment">// @params [in]: tracks for filter</span></span><br><span class="line"><span class="comment">// @params [in]: frame timestamp</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfEngine::TrackStateFilter</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;MlfTrackDataPtr&gt;&amp; tracks,</span></span></span><br><span class="line"><span class="function"><span class="params">                                 <span class="keyword">double</span> frame_timestamp)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>输入是上一步得到的<code>std::vector&lt;MlfTrackDataPrt&gt;</code></p>
+<ul>
+<li><p>从CachedObjects(latest_tracked_time和object的pair)获取持续时间超过阈值的,同时删除小于时间阈值的object.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: get/clean track objects from cached based trackdata</span></span><br><span class="line"><span class="comment">// @param[in/out]: objects</span></span><br><span class="line"><span class="comment">// @note :每一个跟踪物体都有一个对应的trackdata</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTrackData::GetAndCleanCachedObjectsInTimeInterval</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;TrackedObjectPtr&gt;* objects)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>这里有两个时间<code>latest_visible_time_</code>(最近一次可见的时间)及<code>latest_cached_time_</code>(上一次被加入到缓冲区的时间)。 <code>catched_object-&gt;timestamp&lt;=latest_visible_time_</code>则删除， <code>catched_object-&gt;timestamp&lt;=latest_cached_time_</code>则将该cached_object添加到objects中</p></li>
+<li><p>根据从<code>catched_objects</code>中获得的objects,更新TrackData</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: update track data with object</span></span><br><span class="line"><span class="comment">// @params [in/out]: history track data</span></span><br><span class="line"><span class="comment">// @params [in/out]: new object</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTracker::UpdateTrackDataWithObject</span><span class="params">(MlfTrackDataPtr track_data,</span></span></span><br><span class="line"><span class="function"><span class="params">                                           TrackedObjectPtr new_object)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<ol type="1">
+<li><p>state fitler and store belief in new_object ,(filters contain <code>MlfShapeFilter</code> <code>MlfMotionFilter</code>)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: updating shape filter with object</span></span><br><span class="line"><span class="comment">// @params [in]: options for updating</span></span><br><span class="line"><span class="comment">// @params [in]: track data, not include new object</span></span><br><span class="line"><span class="comment">// @params [in/out]: new object for updating</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfShapeFilter::UpdateWithObject</span><span class="params">(<span class="keyword">const</span> MlfFilterOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">                                      <span class="keyword">const</span> MlfTrackDataConstPtr&amp; track_data,</span></span></span><br><span class="line"><span class="function"><span class="params">                                      TrackedObjectPtr new_object)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>此处未详细看，基本处理包括计算object polygon;方向的滑动平均过滤;更新new object的<code>ouput_center</code>, <code>output_direction</code>,<code>output_size</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: updating motion filter with object</span></span><br><span class="line"><span class="comment">// @params [in]: options for updating</span></span><br><span class="line"><span class="comment">// @params [in]: track data, not include new object</span></span><br><span class="line"><span class="comment">// @params [in/out]: new object for updating</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfMotionFilter::UpdateWithObject</span><span class="params">(<span class="keyword">const</span> MlfFilterOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">                                       <span class="keyword">const</span> MlfTrackDataConstPtr&amp; track_data,</span></span></span><br><span class="line"><span class="function"><span class="params">                                       TrackedObjectPtr new_object)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>此处亦未详细看，过滤方法采用KalmanFilter,此处的基本处理过程包括了: 若object的track_data-&gt;age为0,则初始化状态，若该object为背景则不进行处理，否则 　首先计算相关的测量速度值(anchor_point_velocity,bbox_center_velocity,bbox_corner_velocity),根据运动一致性选取速度<code>selected_measured_velocity</code> 同时根据object点的数量差异和关联分数评估测量的质量 <code>update_quality</code>，代码如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> motion_measurer_-&gt;ComputeMotionMeasurment(track_data, new_object);</span><br></pre></td></tr></table></figure>
+<p>　然后使用自适应鲁棒卡尔曼滤波对track的状态估计，并剔除异常数据的影响，相较于传统的卡尔曼滤波，此处的修改包括：</p>
+<blockquote>
+<ul>
+<li><p>在一系列的重复观测中选择速度测量，即滤波算法的输入包括了锚点以为，边界框中心偏移，边界框角点偏移等。卡尔曼滤波更新的观测值为速度，每次观测三个速度值:锚点移位速度，边界框中心偏移速度，边界框角点位移速度，从这三个速度中，根据运动一致性约束，选取和之前观测速度偏差最小的速度作为最终的观测值，并根据最近３次的速度观测值，计算加速度的观测值。</p></li>
+<li>在过滤中使用故障阈值<code>breakdown_threshold_</code>，当更新的增益过大时，用于克服增益的过度估计，其中速度的故障阈值是动态计算的，与速度误差协方差矩阵有关，而加速度的故障阈值是一个定值，默认为２.</li>
+<li><p>更新关联质量，原始的卡尔曼滤波在更新状态时不区分测量的质量，此处使用两种策略来计算更新关联质量，关联分数和前后两个object的点云数量变化,之后取得分小的结果控制滤波器噪声。</p></li>
+</ul>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2.</span> KalmanFilterUpdateWithPartialObservation(track_data, latest_object,</span><br><span class="line">                                           new_object);</span><br></pre></td></tr></table></figure>
+<p>　然后进行convergence估计</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">3.</span> ConvergenceEstimationAndBoostUp(track_data, latest_object, new_object);</span><br></pre></td></tr></table></figure>
+<p>​ 然后object中的belirf属性复制到output属性</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">4.</span> BeliefToOutput(new_object);</span><br></pre></td></tr></table></figure>
+<p>​ 然后进行后处理：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">5.</span> motion_refiner_-&gt;Refine(track_data, new_object)</span><br></pre></td></tr></table></figure>
+<p>​ 最后进行在线协方差估计:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">6.</span> OnlineCovarianceEstimation(track_data, new_object);</span><br></pre></td></tr></table></figure></li>
+<li><p>push new_object to track_data 更新object成为新的track:</p></li>
 </ol>
+<p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTrackData::PushTrackedObjectToTrack</span><span class="params">(TrackedObjectPtr obj)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure></p></li>
+</ul></li>
+<li><p>track to object if is main sensor ,因为objects可能来自于多个不同的Lidar传感器，此处是在主传感器上进行汇总。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: collect track results and store in frame tracked objects</span></span><br><span class="line"><span class="comment">// @params [in/out]: lidar frame</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfEngine::CollectTrackedResult</span><span class="params">(LidarFrame* frame)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>综合前面得到的<code>foreground_track_data_</code>以及<code>background_track_data_</code>通过函数<code>MlfTrackData::ToObject</code>填充<code>&lt;LidarFrame&gt;</code>数据结构</p></li>
+<li><p>remove stale data 删除过期数据(latest_visible_time+reserved_invisible_time &gt;= timestamp)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: remove stale track data for memory management</span></span><br><span class="line"><span class="comment">// @params: name</span></span><br><span class="line"><span class="comment">// @params: timestamp</span></span><br><span class="line"><span class="comment">// @params [in/out]: tracks to be cleaned</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfEngine::RemoveStaleTrackData</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; name, <span class="keyword">double</span> timestamp,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;MlfTrackDataPtr&gt;* tracks)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>跟踪主要流程总结如下：</p>
+<ul>
+<li>构造跟踪对象并将其转换为世界坐标</li>
+<li>预测现有跟踪列表的状态，并进行匹配</li>
+<li>在更新后的跟踪列表中更新运动窗台，并收集跟踪结果</li>
+</ul>
 <hr>
 <h3 id="classify">Classify</h3>
+<p>主入口函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: classify object list, and fill type in object.</span></span><br><span class="line"><span class="comment">// @param [in]: options</span></span><br><span class="line"><span class="comment">// @param [in/out]: object list</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">FusedClassifier::Classify</span><span class="params">(<span class="keyword">const</span> ClassifierOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">                               LidarFrame* frame)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>首先将objects加入到序列<code>&lt;ObjectSequence&gt;</code>中,序列是track_id与对应object的map</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: add tracked objects to sequence,and remove stale tracks</span></span><br><span class="line"><span class="comment">// @param [in]: objectptr ,timestamp</span></span><br><span class="line"><span class="comment">// @return: true or false</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ObjectSequence::AddTrackedFrameObjects</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;ObjectPtr&gt;&amp; objects, TimeStampKey timestamp)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>物体通用类型包括：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// @brief general object type</span></span><br><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">ObjectType</span> &#123;</span></span><br><span class="line">  UNKNOWN = <span class="number">0</span>,</span><br><span class="line">  UNKNOWN_MOVABLE = <span class="number">1</span>,</span><br><span class="line">  UNKNOWN_UNMOVABLE = <span class="number">2</span>,</span><br><span class="line">  PEDESTRIAN = <span class="number">3</span>,</span><br><span class="line">  BICYCLE = <span class="number">4</span>,</span><br><span class="line">  VEHICLE = <span class="number">5</span>,</span><br><span class="line">  MAX_OBJECT_TYPE = <span class="number">6</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如果object是背景，则将物体类型置为<code>ObjectType::UNKNOWN_UNMOVABLE</code></p>
+<p>否则，首先获取特定track_id在特定时间段内对应的object列表</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 获取特定track_id在到当前时刻的往前window_time时间序列中对应的object组成的列表</span></span><br><span class="line"><span class="comment">// @param[in]: track_id , window_time</span></span><br><span class="line"><span class="comment">// @param[in/out]: track (在window_time时间段内的track_id的object)</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ObjectSequence::GetTrackInTemporalWindow</span><span class="params">(TrackIdKey track_id,</span></span></span><br><span class="line"><span class="function"><span class="params">                                              TrackedObjects* track,</span></span></span><br><span class="line"><span class="function"><span class="params">                                              TimeStampKey window_time)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>然后进行类型融合：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">CCRFSequenceTypeFusion::TypeFusion</span><span class="params">(<span class="keyword">const</span> TypeFusionOption&amp; option,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        TrackedObjects* tracked_objects)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="dt">bool</span> CCRFSequenceTypeFusion::FuseWithConditionalProbabilityInference(</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">    TrackedObjects* tracked_objects) {}</a></code></pre></div></li>
+<li></li>
+</ul>
 
     </div>
 
@@ -1044,12 +1109,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">245k</span>
+    <span title="站点总字数">251k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">6:49</span>
+    <span title="站点阅读时长">6:58</span>
 </div>
 
 <span id="sitetime"></span>
