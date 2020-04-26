@@ -56,7 +56,7 @@
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
 <meta property="og:description" content="该组件实现lidar的目标跟踪算法，该组件接收segment得到的检测物体信息，然后建立帧与帧之间的联系以实现帧间同一目标速度等动态信息的预测。 Init-&gt;Preprocess-&gt;MapManager-&gt;Segmentaion-&gt;ObjectBuilder-&gt;ObjectFilter-&gt;Classifier-&gt;Tracker">
 <meta property="article:published_time" content="2020-04-24T05:41:25.893Z">
-<meta property="article:modified_time" content="2020-04-24T16:33:28.228Z">
+<meta property="article:modified_time" content="2020-04-26T12:26:03.926Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="lidar目标跟踪">
 <meta name="twitter:card" content="summary">
@@ -240,7 +240,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-25 00:33:28" itemprop="dateModified" datetime="2020-04-25T00:33:28+08:00">2020-04-25</time>
+                <time title="修改时间：2020-04-26 20:26:03" itemprop="dateModified" datetime="2020-04-26T20:26:03+08:00">2020-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -849,31 +849,20 @@
 <li><code>track-&gt;PredictState(current_time)</code>预测状态，包含了位置<code>latest_anchor_point</code>和速度信息<code>latest_velocity</code> 共6个状态。</li>
 </ul>
 <p>根据当前object和track预测的状态信息，分别计算上述7个特征,加权求和，函数实现位于 <code>distace_collection.h</code>中。</p>
-<p>LocationDistance : <span class="math inline">\(\sqrt{\Delta x^2+\Delta y^2+\Delta z^2}\)</span></p></li>
+<p>LocationDistance : <span class="math inline">\(\sqrt{\Delta x^2+\Delta y^2+\Delta z^2}\)</span></p>
+<p>DirectionDistance: <span class="math inline">\(-cos(\theta)+1 \in (0,2)\)</span>　,<span class="math inline">\(\theta\)</span>为两个物体方向的夹角 BboxSizeDistance:<span class="math inline">\(min\{\frac{|oldsize\_x-newsize\_x|}{max\{oldsize\_x,newsize\_x\}},\frac{|oldsize\_y-newsize\_y|}{max\{oldsize\_y,newsize\_y\}}\} \in (0,1)\)</span> PointNumDistance:<span class="math inline">\(\frac{|old\_point\_num-new\_point\_num|}{max(old\_point\_num,new\_point\_num)} \in (0,1)\)</span> HistogramDistance: <span class="math inline">\(d+=abs(old\_feature[i]-new\_feature[i]) \in(0,3)\)</span> CentroidShiftDistance: <span class="math inline">\(\sqrt{\Delta x^2+\Delta y^2}\)</span> BboxIouDistance: <span class="math inline">\(dist = (1-iou)*match\_threshold\)</span> 其中match_threshold = 4.0</p></li>
 </ul></li>
+<li><p>然后进行关联,前景关联采用<code>&lt;MultiHmBipartiteGraphMatcher&gt;</code></p>
+<p>背景关联使用<code>&lt;GnnBipartiteGraphMatcher&gt;</code> ,同一继承自<code>&lt;BaseBipartiteGraphMatcher&gt;</code>接口类</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: match interface</span></span><br><span class="line"><span class="comment">// @params [in]: match params</span></span><br><span class="line"><span class="comment">// @params [out]: matched pair of objects &amp; tracks</span></span><br><span class="line"><span class="comment">// @params [out]: unmatched rows</span></span><br><span class="line"><span class="comment">// @params [out]: unmatched cols</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Match</span><span class="params">(<span class="keyword">const</span> BipartiteGraphMatcherOptions &amp;options,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;NodeNodePair&gt; *assignments,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; *unassigned_rows,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; *unassigned_cols)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>实际上调用的是根据计算得到的代价矩阵，根据门控匈牙利算法:<code>&lt;common::GatedHungarianMatcher&gt;</code> ,其中设置参数<code>max_match_distance=4</code>,<code>bound_value=100</code></p></li>
 </ul></li>
-</ul></li>
-</ol>
-<p>DirectionDistance: <span class="math inline">\(-cos(\theta)+1 \in (0,2)\)</span>　,<span class="math inline">\(\theta\)</span>为两个物体方向的夹角 BboxSizeDistance:<span class="math inline">\(min\{\frac{|oldsize\_x-newsize\_x|}{max\{oldsize\_x,newsize\_x\}},\frac{|oldsize\_y-newsize\_y|}{max\{oldsize\_y,newsize\_y\}}\} \in (0,1)\)</span></p>
-<p>PointNumDistance:<span class="math inline">\(\frac{|old\_point\_num-new\_point\_num|}{max(old\_point\_num,new\_point\_num)} \in (0,1)\)</span> HistogramDistance: <span class="math inline">\(d+=abs(old\_feature[i]-new\_feature[i]) \in(0,3)\)</span></p>
-<pre><code>CentroidShiftDistance: $\sqrt{\Delta x^2+\Delta y^2}$
-     BboxIouDistance:  $dist = (1-iou)*match\_threshold$  其中match_threshold = 4.0
-
- - 然后进行关联,前景关联采用`&lt;MultiHmBipartiteGraphMatcher&gt;`
-
-   背景关联使用`&lt;GnnBipartiteGraphMatcher&gt;` ,同一继承自`&lt;BaseBipartiteGraphMatcher&gt;`接口类
- 
-   <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: match interface</span></span><br><span class="line"><span class="comment">// @params [in]: match params</span></span><br><span class="line"><span class="comment">// @params [out]: matched pair of objects &amp; tracks</span></span><br><span class="line"><span class="comment">// @params [out]: unmatched rows</span></span><br><span class="line"><span class="comment">// @params [out]: unmatched cols</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Match</span><span class="params">(<span class="keyword">const</span> BipartiteGraphMatcherOptions &amp;options,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;NodeNodePair&gt; *assignments,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; *unassigned_rows,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; *unassigned_cols)</span></span>;</span><br></pre></td></tr></table></figure>
-
-   实际上调用的是根据计算得到的代价矩阵，根据门控匈牙利算法:`&lt;common::GatedHungarianMatcher&gt;` ,其中设置参数`max_match_distance=4`,`bound_value=100`
-
- - 设置objects中对应object的association_score,</code></pre>
-<ul>
 <li><p>对于已关联的object和track,执行下列函数，将object添加到track的缓冲区<code>cached_objects</code>中。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">   <span class="comment">// @brief: 将已经与track关联的object添加到缓冲区</span></span><br><span class="line">   <span class="comment">// @param[in]: obj与track关联的新检测物体</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTrackData::PushTrackedObjectToCache</span><span class="params">(TrackedObjectPtr obj)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// @brief: 将已经与track关联的object添加到缓冲区</span></span><br><span class="line"> <span class="comment">// @param[in]: obj与track关联的新检测物体</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTrackData::PushTrackedObjectToCache</span><span class="params">(TrackedObjectPtr obj)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure></li>
 <li><p>对于未被关联的objects，需要创建新的tracks,更新<code>MlfTrackData</code>中与跟踪相关的状态</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: initialize new track data and push new object to cache</span></span><br><span class="line"><span class="comment">// @params [in/out]: new track data</span></span><br><span class="line"><span class="comment">// @params [in/out]: new object</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MlfTracker::InitializeTrack</span><span class="params">(MlfTrackDataPtr new_track_data,</span></span></span><br><span class="line"><span class="function"><span class="params">                              TrackedObjectPtr new_object)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
+</ul></li>
+</ol>
 <hr>
 <h3 id="classify">Classify</h3>
 
