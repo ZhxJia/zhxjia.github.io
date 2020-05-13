@@ -52,16 +52,16 @@
   <meta name="description" content="该组件实现lidar的目标跟踪算法，该组件接收segment得到的检测物体信息，然后建立帧与帧之间的联系以实现帧间同一目标速度等动态信息的预测。 Init-&gt;Preprocess-&gt;MapManager-&gt;Segmentaion-&gt;ObjectBuilder-&gt;ObjectFilter-&gt;Classifier-&gt;Tracker">
 <meta property="og:type" content="article">
 <meta property="og:title" content="apollo lidar算法--recognition component（一）">
-<meta property="og:url" content="https://zhxjia.github.io/2020/04/24/apollo-lidar_tracker/index.html">
+<meta property="og:url" content="https://zhxjia.github.io/2020/05/13/apollo-lidar_tracker/index.html">
 <meta property="og:site_name" content="ZhxJia&#39;s Blog">
 <meta property="og:description" content="该组件实现lidar的目标跟踪算法，该组件接收segment得到的检测物体信息，然后建立帧与帧之间的联系以实现帧间同一目标速度等动态信息的预测。 Init-&gt;Preprocess-&gt;MapManager-&gt;Segmentaion-&gt;ObjectBuilder-&gt;ObjectFilter-&gt;Classifier-&gt;Tracker">
-<meta property="article:published_time" content="2020-04-24T05:41:25.893Z">
-<meta property="article:modified_time" content="2020-04-26T16:30:52.447Z">
+<meta property="article:published_time" content="2020-05-13T03:23:08.670Z">
+<meta property="article:modified_time" content="2020-05-13T03:23:08.670Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="lidar目标跟踪">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://zhxjia.github.io/2020/04/24/apollo-lidar_tracker/">
+<link rel="canonical" href="https://zhxjia.github.io/2020/05/13/apollo-lidar_tracker/">
 
 
 <script id="page-configurations">
@@ -210,7 +210,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/04/24/apollo-lidar_tracker/">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/05/13/apollo-lidar_tracker/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/jd.png">
@@ -233,15 +233,8 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-04-24 13:41:25" itemprop="dateCreated datePublished" datetime="2020-04-24T13:41:25+08:00">2020-04-24</time>
+              <time title="创建时间：2020-05-13 11:23:08" itemprop="dateCreated datePublished" datetime="2020-05-13T11:23:08+08:00">2020-05-13</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-27 00:30:52" itemprop="dateModified" datetime="2020-04-27T00:30:52+08:00">2020-04-27</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -270,8 +263,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2020/04/24/apollo-lidar_tracker/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/24/apollo-lidar_tracker/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2020/05/13/apollo-lidar_tracker/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/05/13/apollo-lidar_tracker/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -281,14 +274,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>14k</span>
+              <span>18k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>24 分钟</span>
+              <span>29 分钟</span>
             </span>
 
         </div>
@@ -921,15 +914,42 @@
 <p>物体通用类型包括：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// @brief general object type</span></span><br><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">ObjectType</span> &#123;</span></span><br><span class="line">  UNKNOWN = <span class="number">0</span>,</span><br><span class="line">  UNKNOWN_MOVABLE = <span class="number">1</span>,</span><br><span class="line">  UNKNOWN_UNMOVABLE = <span class="number">2</span>,</span><br><span class="line">  PEDESTRIAN = <span class="number">3</span>,</span><br><span class="line">  BICYCLE = <span class="number">4</span>,</span><br><span class="line">  VEHICLE = <span class="number">5</span>,</span><br><span class="line">  MAX_OBJECT_TYPE = <span class="number">6</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>如果object是背景，则将物体类型置为<code>ObjectType::UNKNOWN_UNMOVABLE</code></p>
-<p>否则，首先获取特定track_id在特定时间段内对应的object列表</p>
+<p>否则，首先获取特定track_id在特定时间段内对应的object列表，即获取一个被跟踪物体的序列：</p>
+<blockquote>
+<p>(Time_1,TrackedObject_1), (Time_1,TrackedObject_2), .... (Time_n,TrackedObject_n),</p>
+</blockquote>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 获取特定track_id在到当前时刻的往前window_time时间序列中对应的object组成的列表</span></span><br><span class="line"><span class="comment">// @param[in]: track_id , window_time</span></span><br><span class="line"><span class="comment">// @param[in/out]: track (在window_time时间段内的track_id的object)</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ObjectSequence::GetTrackInTemporalWindow</span><span class="params">(TrackIdKey track_id,</span></span></span><br><span class="line"><span class="function"><span class="params">                                              TrackedObjects* track,</span></span></span><br><span class="line"><span class="function"><span class="params">                                              TimeStampKey window_time)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
 <p>然后进行类型融合：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">CCRFSequenceTypeFusion::TypeFusion</span><span class="params">(<span class="keyword">const</span> TypeFusionOption&amp; option,</span></span></span><br><span class="line"><span class="function"><span class="params">                                        TrackedObjects* tracked_objects)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li><div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="dt">bool</span> CCRFSequenceTypeFusion::FuseWithConditionalProbabilityInference(</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">    TrackedObjects* tracked_objects) {}</a></code></pre></div></li>
-<li></li>
+<li><p>```c++ // <span class="citation" data-cites="brief">@brief</span>: Enter fuse with conditional probability inference // <span class="citation" data-cites="param">@param [in]</span>: TrackedObject with timestamp bool CCRFSequenceTypeFusion::FuseWithConditionalProbabilityInference( TrackedObjects* tracked_objects) {...} <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 对于跟踪序列中的每一个物体，执行&#96;one_shot_fuser_.FuseOneShotTypeProbs&#96;</span><br><span class="line"></span><br><span class="line">  &gt; 整个过程共分两步：</span><br><span class="line">  &gt;</span><br><span class="line">  &gt; - 状态平滑</span><br><span class="line">  &gt; - Viterbi算法推断状态</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">  &#96;&#96;&#96;c++</span><br><span class="line">  &#x2F;&#x2F; @brief: fuse on shot prons in sequence</span><br><span class="line">  &#x2F;&#x2F; @param[in]: ObjectPtr(the object in sequence)</span><br><span class="line">  &#x2F;&#x2F; @param[out]: log prob(fused oneshot probs type:a vector [valid_type_num,1])</span><br><span class="line">  </span><br><span class="line">  bool CCRFOneShotTypeFusion::FuseOneShotTypeProbs(const ObjectPtr&amp; object,</span><br><span class="line">                                                   Vectord* log_prob) &#123;...&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>smooth_matrices_:</code></p>
+<p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">DecisionForestClassifier</span><br><span class="line"><span class="number">0.7751</span> <span class="number">0.0298</span> <span class="number">0.0639</span> <span class="number">0.1312</span> <span class="comment">// -&gt; sum = 1.0</span></span><br><span class="line"><span class="number">0.2510</span> <span class="number">0.6802</span> <span class="number">0.0615</span> <span class="number">0.0073</span></span><br><span class="line"><span class="number">0.1904</span> <span class="number">0.0628</span> <span class="number">0.6314</span> <span class="number">0.1155</span></span><br><span class="line"><span class="number">0.1054</span> <span class="number">0.0003</span> <span class="number">0.0038</span> <span class="number">0.8905</span></span><br><span class="line"></span><br><span class="line">CNNSegmentation</span><br><span class="line"><span class="number">0.9095</span> <span class="number">0.0238</span> <span class="number">0.0190</span> <span class="number">0.0476</span></span><br><span class="line"><span class="number">0.3673</span> <span class="number">0.5672</span> <span class="number">0.0642</span> <span class="number">0.0014</span></span><br><span class="line"><span class="number">0.1314</span> <span class="number">0.0078</span> <span class="number">0.7627</span> <span class="number">0.0980</span></span><br><span class="line"><span class="number">0.3383</span> <span class="number">0.0017</span> <span class="number">0.0091</span> <span class="number">0.6508</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//对应四种有效类型：UNKNOWN,PEDESTRIAN,BICYCLE,VEHICLE</span></span><br></pre></td></tr></table></figure></p>
+<p><code>confidence_smooth_matrix_:</code></p>
+<p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Confidence</span><br><span class="line"><span class="number">1.00</span> <span class="number">0.00</span> <span class="number">0.00</span> <span class="number">0.00</span></span><br><span class="line"><span class="number">0.40</span> <span class="number">0.60</span> <span class="number">0.00</span> <span class="number">0.00</span></span><br><span class="line"><span class="number">0.40</span> <span class="number">0.00</span> <span class="number">0.60</span> <span class="number">0.00</span></span><br><span class="line"><span class="number">0.50</span> <span class="number">0.00</span> <span class="number">0.00</span> <span class="number">0.50</span></span><br></pre></td></tr></table></figure></p>
+<p>计算不考虑整个序列的单独各个object的概率single_prob: <span class="math display">\[
+  p(c|x) = p(c|x,o)p(o|x)+p(c|x,\widetilde{o})p(\widetilde{o}|x)
+  \]</span> 程序表示为, 输入为x条件下类别的概率 = 前景的概率 * 类别概率+（背景的概率）* 类别的置信度平滑矩阵 * 类别概率</p>
+<p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">single_prob = conf * single_prob +</span><br><span class="line">                (<span class="number">1.0</span> - conf) * confidence_smooth_matrix_ * single_prob;</span><br></pre></td></tr></table></figure></p>
+<p>转换为对数概率 <span class="math inline">\(log\_prob=log(single\_prob)\)</span> ,获得该object属于各个类别的对数概率。由此可得到该 TrackedObjects对应序列的每一个object的4种有效类型概率。</p>
+<ul>
+<li><p>通过维特比(Viterbi)算法推断状态：</p>
+<blockquote>
+<p>维特比算法前提是状态链是马尔可夫链，<strong>下一时刻的状态仅仅取决于当前时刻的状态</strong> 假设隐状态数量为m,观测状态的数量为n,隐状态分别为<span class="math inline">\(s_1,s_2,...,s_m\)</span>,可观测状态分别为 <code>o_1,o_2,...,o_n</code>,则有： 状态转移矩阵<span class="math inline">\(P(m\times m):P[i,j]\)</span> 代表状态i到状态j转移的概率,<span class="math inline">\(\sum_{j=0}^mP[i,j]=1\)</span> ,发射概率矩阵 <span class="math inline">\(R(m\times n):R[i,j]\)</span>代表隐状态i能被观测到为j的概率:<span class="math inline">\(\sum_{j=0}^nP[i,j]=1\)</span></p>
+</blockquote>
+<p>添加先验知识用于抑制突然出现的物体类型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//UNKNOWN,PEDESTRIAN,BICYCLE,VEHICLE</span></span><br><span class="line">    <span class="number">0.34</span>     <span class="number">0.22</span>     <span class="number">0.33</span>    <span class="number">0.11</span> <span class="comment">//UNKNOWN</span></span><br><span class="line">    <span class="number">0.03</span>     <span class="number">0.90</span>     <span class="number">0.05</span>    <span class="number">0.02</span> <span class="comment">//PEDESTRIAN   </span></span><br><span class="line">    <span class="number">0.03</span>     <span class="number">0.05</span>     <span class="number">0.90</span>    <span class="number">0.02</span> <span class="comment">//BICYCLE</span></span><br><span class="line">    <span class="number">0.06</span>     <span class="number">0.01</span>     <span class="number">0.03</span>    <span class="number">0.90</span> <span class="comment">//VEHICLE</span></span><br><span class="line"><span class="comment">//对应四种有效物体类型的先验知识 转移概率矩阵</span></span><br><span class="line">transition_matrix_alpha:<span class="number">1.8</span></span><br></pre></td></tr></table></figure>
+<p>下面程序是根据转移概率矩阵(left-&gt;right)推断当前时刻最大概率的过程： 认为fused_sequence_probs为隐状态，根据上一时刻的隐状态fused_sequence_probs[i-1]和状态转移矩阵求解联合状态矩阵，其中矩阵元素<span class="math inline">\(fused\_sequence\_probs\_[i][j]\)</span>的求解方式为：下列代码中，fused_oneshot_probs_是每个时刻独立的4类概率，经过平滑和log(·)处理。transition_matrix_是状态转移矩阵P，维度为4x4，经过log(·)处理，fused_sequence_probs_为Viterbi算法推理后的修正状态(也就是真实的隐状态)。 <span class="math display">\[
+p(s_{i,j}, s_{i-1,k}) = p_{prv\_state=s_{i-1,k}} * P(s_j|s_k)
+\]</span></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="built_in">std</span>::<span class="keyword">size_t</span> i = <span class="number">1</span>; i &lt; length; ++i) &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="built_in">std</span>::<span class="keyword">size_t</span> right = <span class="number">0</span>; right &lt; VALID_OBJECT_TYPE; ++right) &#123;</span><br><span class="line">    <span class="keyword">double</span> prob = <span class="number">0.0</span>;</span><br><span class="line">    <span class="keyword">double</span> max_prob = -DBL_MAX;</span><br><span class="line">    <span class="built_in">std</span>::<span class="keyword">size_t</span> id = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">std</span>::<span class="keyword">size_t</span> left = <span class="number">0</span>; left &lt; VALID_OBJECT_TYPE; ++left) &#123;</span><br><span class="line">      prob = fused_sequence_probs_[i - <span class="number">1</span>](left) +</span><br><span class="line">             transition_matrix_(left, right) * s_alpha_ +</span><br><span class="line">             fused_oneshot_probs_[i](right);</span><br><span class="line">      <span class="keyword">if</span> (prob &gt; max_prob) &#123;</span><br><span class="line">        max_prob = prob; <span class="comment">//根据转移概率推断得到当前的object (right值)最大概率</span></span><br><span class="line">        id = left;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    fused_sequence_probs_[i](right) = max_prob;</span><br><span class="line">    state_back_trace_[i](right) = <span class="keyword">static_cast</span>&lt;<span class="keyword">int</span>&gt;(id);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>获取类别概率后：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RecoverFromLogProbability(&amp;fused_sequence_probs_.back(), &amp;object-&gt;type_probs,</span><br><span class="line">                          &amp;object-&gt;type); <span class="comment">//将Eigen转换回std::vector得到物体类别</span></span><br></pre></td></tr></table></figure></li>
+</ul></li>
 </ul>
+<h3 id="参考">参考：</h3>
+<p>类型融合：https://blog.csdn.net/qq_41204464/article/details/102987228</p>
+<p>跟踪：https://mp.weixin.qq.com/s?__biz=MzI1NjkxOTMyNQ==&amp;mid=2247485879&amp;idx=1&amp;sn=d921ab976ebc72c502eb5df1ef7ff548&amp;chksm=ea1e1bc5dd6992d3220bd47c5cd951f38648c060d4f9dc9bfbe5eac1a3076f920fa3e360c038&amp;scene=21#wechat_redirect</p>
 
     </div>
 
@@ -948,13 +968,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/04/24/pr_MV3D/" rel="prev" title="Multi-View 3D Object Detection Network for Autonomous Driving">
-      <i class="fa fa-chevron-left"></i> Multi-View 3D Object Detection Network for Autonomous Driving
+    <a href="/2020/05/13/apollo-lidar_segmentor/" rel="prev" title="apollo lidar算法--segmentaion component（二）">
+      <i class="fa fa-chevron-left"></i> apollo lidar算法--segmentaion component（二）
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/04/24/apollo-lidar_recognition/" rel="next" title="apollo lidar算法--recognition component">
-      apollo lidar算法--recognition component <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -1021,7 +1038,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-组件初始化和配置"><span class="nav-number">1.</span> <span class="nav-text">一、 组件初始化和配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#外部参数配置"><span class="nav-number">1.1.</span> <span class="nav-text">1. 外部参数配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化"><span class="nav-number">1.2.</span> <span class="nav-text">2. 初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二算法处理流程proc"><span class="nav-number">2.</span> <span class="nav-text">二、算法处理流程Proc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#track"><span class="nav-number">2.1.</span> <span class="nav-text">Track</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#classify"><span class="nav-number">2.2.</span> <span class="nav-text">Classify</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-组件初始化和配置"><span class="nav-number">1.</span> <span class="nav-text">一、 组件初始化和配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#外部参数配置"><span class="nav-number">1.1.</span> <span class="nav-text">1. 外部参数配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化"><span class="nav-number">1.2.</span> <span class="nav-text">2. 初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二算法处理流程proc"><span class="nav-number">2.</span> <span class="nav-text">二、算法处理流程Proc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#track"><span class="nav-number">2.1.</span> <span class="nav-text">Track</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#classify"><span class="nav-number">2.2.</span> <span class="nav-text">Classify</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">2.3.</span> <span class="nav-text">参考：</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -1037,20 +1054,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1079,7 +1096,7 @@
           <h3 class="widget-title">Tag Cloud</h3>
           <div id="myCanvasContainer" class="widget tagcloud">
               <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" rel="tag">lidar目标检测</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">lidar目标跟踪</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" rel="tag">lidar目标检测</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">lidar目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E4%BC%A0%E6%84%9F%E5%99%A8%E8%9E%8D%E5%90%88/" rel="tag">多传感器融合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
         </canvas>
        </div>
      </div>
@@ -1109,12 +1126,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">251k</span>
+    <span title="站点总字数">278k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">6:58</span>
+    <span title="站点阅读时长">7:44</span>
 </div>
 
 <span id="sitetime"></span>
@@ -1310,8 +1327,8 @@
 </script>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://zhxjia.github.io/2020/04/24/apollo-lidar_tracker/";
-    this.page.identifier = "2020/04/24/apollo-lidar_tracker/";
+    this.page.url = "https://zhxjia.github.io/2020/05/13/apollo-lidar_tracker/";
+    this.page.identifier = "2020/05/13/apollo-lidar_tracker/";
     this.page.title = "apollo lidar算法--recognition component（一）";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {

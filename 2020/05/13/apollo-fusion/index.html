@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="多传感器融合将各种传感器进行多层次，多空间的信息互补和优化组合处理，最终产生对观测环境的一致性解释。在自动驾驶平台中稳定可靠的感知算法仍然是有待解决的问题，多个传感器信息融合无疑成为提升自动驾驶安全性的趋势。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="apollo 融合算法--fusion component">
+<meta property="og:url" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="多传感器融合将各种传感器进行多层次，多空间的信息互补和优化组合处理，最终产生对观测环境的一致性解释。在自动驾驶平台中稳定可靠的感知算法仍然是有待解决的问题，多个传感器信息融合无疑成为提升自动驾驶安全性的趋势。">
+<meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/sensorfusion.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/image-20200429223959318.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/image-20200429224301475.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/chi_squared.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/image-20200508214807548.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/image-20200508222547038.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/image-20200512151919053.png">
+<meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/image-20200510203006092.png">
+<meta property="article:published_time" content="2020-05-13T03:23:08.654Z">
+<meta property="article:modified_time" content="2020-05-13T05:13:08.553Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="多传感器融合">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/sensorfusion.png">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/05/13/apollo-fusion/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>apollo 融合算法--fusion component | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/05/13/apollo-fusion/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          apollo 融合算法--fusion component
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-13 11:23:08 / 修改时间：13:13:08" itemprop="dateCreated datePublished" datetime="2020-05-13T11:23:08+08:00">2020-05-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/fusion/" itemprop="url" rel="index">
+                    <span itemprop="name">fusion</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/05/13/apollo-fusion/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/05/13/apollo-fusion/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>24k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>40 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>多传感器融合将各种传感器进行多层次，多空间的信息互补和优化组合处理，最终产生对观测环境的一致性解释。在自动驾驶平台中稳定可靠的感知算法仍然是有待解决的问题，多个传感器信息融合无疑成为提升自动驾驶安全性的趋势。</p>
+<p><img src="/2020/05/13/apollo-fusion/sensorfusion.png" alt="sensorfusion" style="zoom: 33%;"></p>
+<a id="more"></a>
+<h2 id="一组件初始化和相关配置">一、组件初始化和相关配置</h2>
+<h3 id="外部配置文件">1. 外部配置文件</h3>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">components &#123;</span><br><span class="line">  class_name: <span class="string">"FusionComponent"</span></span><br><span class="line">  config &#123;</span><br><span class="line">    name: <span class="string">"SensorFusion"</span></span><br><span class="line">    config_file_path: <span class="string">"/apollo/modules/perception/production/conf/perception/fusion/fusion_component_conf.pb.txt"</span></span><br><span class="line">    readers &#123;</span><br><span class="line">        channel: <span class="string">"/perception/inner/PrefusedObjects"</span></span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>组件的配置文件：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#../productrion/conf/preception/fusion/fusion_component_conf.pb.txt</span><br><span class="line">fusion_method: <span class="string">"ProbabilisticFusion"</span></span><br><span class="line">fusion_main_sensor: <span class="string">"velodyne128"</span></span><br><span class="line">object_in_roi_check: <span class="literal">true</span></span><br><span class="line">radius_for_roi_object_check: <span class="number">120</span></span><br><span class="line">output_obstacles_channel_name: <span class="string">"/apollo/perception/obstacles"</span></span><br><span class="line">output_viz_fused_content_channel_name: <span class="string">"/perception/inner/visualization/FusedObjects"</span></span><br></pre></td></tr></table></figure>
+<p>接收来自<code>fusion_camera_detection_component</code> ,<code>recognition_component</code>,<code>radar_detection_component</code>三个相关组件输出的<code>/percepiton/inner/PrefusedObjects</code>通道信息，信息格式位于<code>inner_component_messages.h</code>的<code>&lt;SensorFrameMessage&gt;</code></p>
+<p>该组件的输出通道为<code>&quot;/apollo/perception/obstacles&quot;</code> 信息格式为<code>&lt;PerceptionObstacles&gt;</code>位于 <code>modules/perception/proto/preception_obstacle.proto</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">message PerceptionObstacles &#123;</span><br><span class="line">  repeated PerceptionObstacle perception_obstacle = <span class="number">1</span>;  <span class="comment">// An array of obstacles</span></span><br><span class="line">  optional common.Header header = <span class="number">2</span>;                    <span class="comment">// Header</span></span><br><span class="line">  optional common.ErrorCode error_code = <span class="number">3</span> [<span class="keyword">default</span> = OK];</span><br><span class="line">  optional LaneMarkers lane_marker = <span class="number">4</span>;</span><br><span class="line">  optional CIPVInfo cipv_info = <span class="number">5</span>;  <span class="comment">// Closest In Path Vehicle (CIPV)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="功能初始化">2. 功能初始化</h3>
+<p>功能类<code>&lt;fusion::ObstacleMultiSensorFusion&gt;</code>初始化: 根据配置文件中的<code>fusion_method</code>创建接口类<code>BaseFusionSystem</code>的实例化对象指针并初始化<code>fusion_-&gt;Init()</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ProbabilisticFusion::Init</span><span class="params">(<span class="keyword">const</span> FusionInitOptions&amp; init_options)</span> <span class="keyword">override</span></span>;</span><br></pre></td></tr></table></figure>
+<p>由<code>ConfigManager</code>管理的该功能类的相关参数为：</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">参数名称</th>
+<th style="text-align: center;">默认值</th>
+<th style="text-align: center;">参数说明</th>
+<th style="text-align: center;">参数类型</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">use_lidar</td>
+<td style="text-align: center;">true</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">use_radar</td>
+<td style="text-align: center;">true</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">use_camera</td>
+<td style="text-align: center;">true</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">tracked_method</td>
+<td style="text-align: center;">PbfTracker</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">data_association_method</td>
+<td style="text-align: center;">HMAssociation</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">gate_keeper_method</td>
+<td style="text-align: center;">PbfGatekeeper</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">prohibition_sensors</td>
+<td style="text-align: center;">radar_front</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">max_lidar_invisible_period</td>
+<td style="text-align: center;">0.25</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">max_radar_invisible_period</td>
+<td style="text-align: center;">0.50</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">max_camera_invisible_period</td>
+<td style="text-align: center;">0.75</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">max_cached_frame_num</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p><strong>创建初始化<code>scenes_</code>,<code>matcher_</code>,<code>gate_keeper_</code>分别对应<code>&lt;Scene&gt;</code>,<code>&lt;HMtrakersObjectsAssociation&gt;</code>,<code>&lt;PbfGatekeeper&gt;</code></strong></p>
+<ul>
+<li><p><code>matcher_-&gt;Init()</code></p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">参数名称</th>
+<th style="text-align: center;">默认值</th>
+<th style="text-align: center;">参数说明</th>
+<th style="text-align: center;">参数类型</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">s_match_distance_thresh_</td>
+<td style="text-align: center;">4.0</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">s_match_distance_bound_</td>
+<td style="text-align: center;">100.0</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">s_association_center_dist_threshold_</td>
+<td style="text-align: center;">30.0</td>
+<td style="text-align: center;">单位：米</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>s_association_center_dist_threshold_</code> 参数说明： 对于相机与(lidar/radar)的关联，考虑到2d-to-3d的平均误差为7%,30m是200m的15%,是两倍的平均误差。</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">HMTrackersObjectsAssociation::Init</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    track_object_distance_.set_distance_thresh(</span><br><span class="line">        <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(s_match_distance_thresh_));</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>gate_keeper_-&gt;Init()</code></p>
+<p>ConfigManager管理的参数：</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">参数名称</th>
+<th style="text-align: center;">默认值</th>
+<th style="text-align: center;">参数说明</th>
+<th style="text-align: center;">参数类型</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">publish_if_has_lidar</td>
+<td style="text-align: center;">true</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">bool</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">publish_if_has_radar</td>
+<td style="text-align: center;">true</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">bool</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">publish_if_has_camera</td>
+<td style="text-align: center;">true</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">bool</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">use_camera_3d</td>
+<td style="text-align: center;">true</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">bool</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">min_radar_confident_distance</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">max_radar_confident_angle</td>
+<td style="text-align: center;">20</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">min_camera_publish_distance</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">invisible_period_threshold</td>
+<td style="text-align: center;">0.001</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">toic_threshold</td>
+<td style="text-align: center;">0.8</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">use_track_time_pub_strategy</td>
+<td style="text-align: center;">true</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">pub_track_time_thresh</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">existance_threshold</td>
+<td style="text-align: center;">0.7</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">radar_existance_threshold</td>
+<td style="text-align: center;">0.9</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table></li>
+</ul>
+<p><strong>最后进行数据融合的初始化，包括了三个方面：</strong></p>
+<blockquote>
+<ul>
+<li>TypeFusion</li>
+<li>ExistanceFusion</li>
+<li>PbfTracker</li>
+</ul>
+</blockquote>
+<ol type="1">
+<li><code>TypeFusion::Init()</code></li>
+</ol>
+<p>ConfigManager管理的参数，对应各lidar和camera的检测结果的可信度。</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#注这里是.pt文件 实际通过GetProtoFromFile加载</span><br><span class="line">camera_params &#123;</span><br><span class="line">  name: <span class="string">"front_6mm"</span></span><br><span class="line">  valid_dist: <span class="number">110</span></span><br><span class="line">  reliability: <span class="number">0.95</span></span><br><span class="line">  reliability_for_unknown: <span class="number">0.2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">camera_params &#123;</span><br><span class="line">  name: <span class="string">"front_12mm"</span></span><br><span class="line">  valid_dist: <span class="number">150</span></span><br><span class="line">  reliability: <span class="number">0.5</span></span><br><span class="line">  reliability_for_unknown: <span class="number">0.2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">lidar_params &#123;</span><br><span class="line">  name: <span class="string">"velodyne64"</span></span><br><span class="line">  reliability: <span class="number">0.5</span></span><br><span class="line">  reliability_for_unknown: <span class="number">0.5</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对应修改<code>&lt;DstTypeFusionOpitons&gt;</code>配置参数,默认如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">DstTypeFusionOptions</span> &#123;</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">double</span>&gt; camera_max_valid_dist_ = &#123;</span><br><span class="line">      &#123;<span class="string">"camera_smartereye"</span>, <span class="number">110</span>&#125;,</span><br><span class="line">      &#123;<span class="string">"camera_front_obstacle"</span>, <span class="number">110</span>&#125;,</span><br><span class="line">      &#123;<span class="string">"front_6mm"</span>, <span class="number">110</span>&#125;,</span><br><span class="line">      &#123;<span class="string">"camera_front_narrow"</span>, <span class="number">150</span>&#125;,</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">double</span>&gt; sensor_reliability_ = &#123;</span><br><span class="line">      &#123;<span class="string">"velodyne64"</span>, <span class="number">0.5</span>&#125;,          &#123;<span class="string">"velodyne_64"</span>, <span class="number">0.5</span>&#125;,</span><br><span class="line">      &#123;<span class="string">"velodyne128"</span>, <span class="number">0.5</span>&#125;,         &#123;<span class="string">"camera_smartereye"</span>, <span class="number">0.95</span>&#125;,</span><br><span class="line">      &#123;<span class="string">"front_6mm"</span>, <span class="number">0.95</span>&#125;,          &#123;<span class="string">"camera_front_obstacle"</span>, <span class="number">0.95</span>&#125;,</span><br><span class="line">      &#123;<span class="string">"camera_front_narrow"</span>, <span class="number">0.5</span>&#125;,</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">double</span>&gt; sensor_reliability_for_unknown_ = &#123;</span><br><span class="line">      &#123;<span class="string">"velodyne64"</span>, <span class="number">0.5</span>&#125;,          &#123;<span class="string">"velodyne_64"</span>, <span class="number">0.5</span>&#125;,</span><br><span class="line">      &#123;<span class="string">"velodyne128"</span>, <span class="number">0.5</span>&#125;,         &#123;<span class="string">"camera_smartereye"</span>, <span class="number">0.2</span>&#125;,</span><br><span class="line">      &#123;<span class="string">"front_6mm"</span>, <span class="number">0.2</span>&#125;,           &#123;<span class="string">"camera_front_obstacle"</span>, <span class="number">0.2</span>&#125;,</span><br><span class="line">      &#123;<span class="string">"camera_front_narrow"</span>, <span class="number">0.2</span>&#125;,</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>在TypeFusion初始化的最后一步通过一个单例类<code>&lt;DstManager&gt;</code>管理各个子节点和它们之间的相互关系</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// brief: app initialization</span></span><br><span class="line"><span class="comment">// param [in]: app_name (now it is TypeFusion)</span></span><br><span class="line"><span class="comment">// param [in]: fod_subsets, hypotheses sets</span></span><br><span class="line"><span class="comment">// param [in]: fod_subset_names</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">DstManager::AddApp</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;app_name,</span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; &amp;fod_subsets,</span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; &amp;fod_subset_names)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>其中fod_subsets为<code>&lt;DstTypeFusion::DstMaps&gt;</code>中的：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_ = &#123;</span><br><span class="line">    PEDESTRIAN=<span class="number">1</span>,     BICYCLE=<span class="number">2</span>, VEHICLE=<span class="number">4</span>, OTHERS_MOVABLE=<span class="number">8</span>,</span><br><span class="line">    OTHERS_UNMOVABLE=<span class="number">16</span>, OTHERS=<span class="number">24</span>,  UNKNOWN=<span class="number">31</span>&#125;;</span><br></pre></td></tr></table></figure>
+<p>对应的fod_subset_names为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; subset_names_ = &#123;</span><br><span class="line">    <span class="string">"PEDESTRIAN"</span>,       <span class="string">"BICYCLE"</span>, <span class="string">"VEHICLE"</span>, <span class="string">"OTHERS_MOVABLE"</span>,</span><br><span class="line">    <span class="string">"OTHERS_UNMOVABLE"</span>, <span class="string">"OTHERS"</span>,  <span class="string">"UNKNOWN"</span>&#125;;</span><br></pre></td></tr></table></figure>
+<p>用二进制每一位表示一个类型，若是多个类型的复合则将对应位置为1</p>
+</blockquote>
+<p><code>&lt;DstManager&gt;</code>类主要管理的数据结构为：<code>&lt;DstCommonData&gt;</code> 将其与各个<code>app_name</code>作为一个map</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">DstCommonData</span> &#123;</span></span><br><span class="line">  <span class="comment">// ensure initialize DSTEvidence once</span></span><br><span class="line">  <span class="keyword">bool</span> init_ = <span class="literal">false</span>;</span><br><span class="line">  <span class="comment">// fods</span></span><br><span class="line">  <span class="keyword">size_t</span> fod_loc_ = <span class="number">0</span>; <span class="comment">//the indice of fod</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_;</span><br><span class="line">  <span class="comment">// for transforming to probability effectively</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; fod_subset_cardinalities_; <span class="comment">//对应fod_subset中各个值对应二进制1的个数</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; fod_subset_names_;</span><br><span class="line">  <span class="comment">// for combining two bbas effectively. 对应inter_relation的subsets两两之间索引值</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">size_t</span>, <span class="keyword">size_t</span>&gt;&gt;&gt; combination_relations_;<span class="comment">//</span></span><br><span class="line">  <span class="comment">// for computing support vector effectively</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt;&gt; subset_relations_; <span class="comment">//对应subsets含有包含关系的subset索引</span></span><br><span class="line">  <span class="comment">// for computing plausibility vector effectively</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt;&gt; inter_relations_; <span class="comment">//对应subsets含有相同值的各subset索引</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="keyword">uint64_t</span>, <span class="keyword">size_t</span>&gt; subsets_ind_map_; <span class="comment">// pair(subset,indice )</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>上述各值通过<code>&lt;DstManager::AddMap&gt;</code>进行初值的填充，此处不展开。 inter_relations: <img src="/2020/05/13/apollo-fusion/image-20200429223959318.png" alt="image-20200429223959318">subset_relations:<img src="/2020/05/13/apollo-fusion/image-20200429224301475.png"></p>
+<ol start="2" type="1">
+<li><code>DstExistanceFusion::Init()</code></li>
+</ol>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">track_object_max_match_distance: <span class="number">4.0</span></span><br><span class="line"></span><br><span class="line">camera_valid_dist &#123;</span><br><span class="line">  camera_name: <span class="string">"camera_front_obstacle"</span></span><br><span class="line">  valid_dist: <span class="number">110</span></span><br><span class="line">&#125;</span><br><span class="line">camera_valid_dist &#123;</span><br><span class="line">  camera_name: <span class="string">"camera_front_narrow"</span></span><br><span class="line">  valid_dist: <span class="number">150</span></span><br><span class="line">&#125;</span><br><span class="line">camera_valid_dist &#123;</span><br><span class="line">  camera_name: <span class="string">"front_6mm"</span></span><br><span class="line">  valid_dist: <span class="number">110</span></span><br><span class="line">&#125;</span><br><span class="line">camera_valid_dist &#123;</span><br><span class="line">  camera_name: <span class="string">"front_12mm"</span></span><br><span class="line">  valid_dist: <span class="number">150</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同样最后根据以下maps添加APP</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ToicDstMaps</span> &#123;</span></span><br><span class="line">  <span class="comment">// for (N)TOIC: (not)target of interest in camera judgement</span></span><br><span class="line">  <span class="keyword">enum</span> &#123; TOIC = (<span class="number">1</span> &lt;&lt; <span class="number">0</span>), NTOIC = (<span class="number">1</span> &lt;&lt; <span class="number">1</span>), TOICUNKOWN = (TOIC | NTOIC) &#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_ = &#123;TOIC, NTOIC, TOICUNKOWN&#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; subset_names_ = &#123;<span class="string">"TOIC"</span>, <span class="string">"NTOIC"</span>, <span class="string">"TOICUNKOWN"</span>&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ExistanceDstMaps</span> &#123;</span></span><br><span class="line">  <span class="keyword">enum</span> &#123; EXIST = (<span class="number">1</span> &lt;&lt; <span class="number">0</span>), NEXIST = (<span class="number">1</span> &lt;&lt; <span class="number">1</span>), EXISTUNKOWN = (EXIST | NEXIST) &#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_ = &#123;EXIST, NEXIST, EXISTUNKOWN&#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; subset_names_ = &#123;<span class="string">"EXIST"</span>, <span class="string">"NEXIST"</span>, <span class="string">"EXISTUNKOWN"</span>&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>此处通过<code>DstManager::Instance()-&gt;AddApp</code>添加两个名称为<code>DstExistanceFusion</code> 和<code>DstToicFusion</code>的App</p>
+<blockquote>
+<p><strong>toic</strong> means :target of interest in camera judgement</p>
+</blockquote>
+<ol start="3" type="1">
+<li><code>PbfTracker::InitParams()</code></li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">参数名称</th>
+<th style="text-align: center;">默认值</th>
+<th style="text-align: center;">参数说明</th>
+<th style="text-align: center;">参数类型</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">type_fusion_method</td>
+<td style="text-align: center;">DstTypeFusion</td>
+<td style="text-align: center;">融合方法类名称</td>
+<td style="text-align: center;">string</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">motion_fusion_method</td>
+<td style="text-align: center;">KalmanMotionFusion</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">string</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">shape_fusion_method</td>
+<td style="text-align: center;">PbfShapeFusion</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">string</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">existance_fusion_method</td>
+<td style="text-align: center;">DstExistanceFusion</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">string</td>
+</tr>
+</tbody>
+</table>
+<h2 id="二算法处理">二、算法处理</h2>
+<p>多个传感器发布的<code>&lt;SensorFrameMessage&gt;</code>传递到Proc处理函数中，调用内部处理函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: multi sensor fusion entry function</span></span><br><span class="line"><span class="comment">// @param[in]: in_menssage (the received message)</span></span><br><span class="line"><span class="comment">// @param[out]: out_message (the ouyput message)</span></span><br><span class="line"><span class="comment">// @param[out]: viz_message (for visualizing)</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">FusionComponent::InternalProc</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;SensorFrameMessage <span class="keyword">const</span>&gt;&amp; in_message,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;PerceptionObstacles&gt; out_message,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;SensorFrameMessage&gt; viz_message)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="消息序列化">2.1 消息序列化</h3>
+<p><code>Msgserializer::SerializeMsg</code></p>
+<h3 id="融合处理process">2.2融合处理Process( )</h3>
+<p><code>fusion_-&gt;Process(frame, &amp;fused_objects)</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: Process MultiSensorFusion</span></span><br><span class="line"><span class="comment">// @param[in]: frame (SensorFrameMessage-&gt;frame_)</span></span><br><span class="line"><span class="comment">// @param[out]: objects (To obtain the fused objects)</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ObstacleMultiSensorFusion::Process</span><span class="params">(<span class="keyword">const</span> base::FrameConstPtr&amp; frame,</span></span></span><br><span class="line"><span class="function"><span class="params">              <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::ObjectPtr&gt;* objects)</span></span>;</span><br></pre></td></tr></table></figure>
+<p><code>fusion_-&gt;Fuse(options, frame, objects)</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: func inteface</span></span><br><span class="line"><span class="comment">// @param[in]: options (FusionOptions ,default null) </span></span><br><span class="line"><span class="comment">// @param[in]: sensor_frame (SensorFrameMessage-&gt;frame_)</span></span><br><span class="line"><span class="comment">// @param[out]: objects (To obtain the fused objects)</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">ProbabilisticFusion::Fuse</span><span class="params">(<span class="keyword">const</span> FusionOptions&amp; options,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">const</span> base::FrameConstPtr&amp; sensor_frame,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::ObjectPtr&gt;* fused_objects)</span> <span class="keyword">override</span></span>;</span><br></pre></td></tr></table></figure>
+<ol type="1">
+<li><p><strong>Save frame data</strong> 这里用到了单例类<code>&lt;SensorDataManager&gt;</code>用于管理各个传感器帧数据，首先判断传感器是否是<code>publish_sensor</code>，即是否是主传感器（用于最用发布融合信息的基准,apollo默认是velodyne128）,从第一次接收主传感器数据开始，添加各传感器测量信息：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: add sensor frame message to &lt;Sensor&gt; datastructure</span></span><br><span class="line"><span class="comment">// @param[in]: frame_ptr (sensor frame)</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SensorDataManager::AddSensorMeasurements</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> base::FrameConstPtr&amp; frame_ptr)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>通过调用<code>Sensor::AddFrame(const base::FrameConstPtr&amp; frame_ptr)</code>将传感器数据存储到<code>&lt;SensorFrame&gt;</code>数据结构中 这里主要分两步：</p>
+<ul>
+<li>找到传感器(对应<code>&lt;Sensor&gt;</code>数据结构)，如果没有就创建</li>
+<li>然后向对应传感器中添加数据帧frame，存储到<code>&lt;Sensor&gt;</code>的<code>frames_</code>中(对应的数据存储结构为<code>&lt;SensorFrame&gt;</code>) 这里暗含将原<code>&lt;frame&gt;</code>数据结构转换为<code>&lt;SensorFrame&gt;</code>数据结构</li>
+</ul></li>
+<li><p><strong>query related sensor_frames for fusion</strong> 数据融合的前期数据准备阶段：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: get latest frame of each sensor</span></span><br><span class="line"><span class="comment">// @param[in]: timestamp(the timestamp of frame)</span></span><br><span class="line"><span class="comment">// @param[out]: frames (the realted frames)</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SensorDataManager::GetLatestFrames</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">double</span> timestamp, <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;SensorFramePtr&gt;* frames)</span> <span class="keyword">const</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>以timestamp为依据，遍历当前的所有传感器<code>&lt;Sensor&gt;</code>,查询数据帧<code>&lt;SensorFrame&gt;</code> 范围 (_lastest_fused_time_stamp,time_stamp) 即上一次查询(融合)的时间到当前查询的时间范围内最新帧，并按照时间顺序由早到晚排序。</p></li>
+<li><p><strong>preform fusion on realted frames</strong> 对于related frames中的每一帧，执行：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: perform fusion</span></span><br><span class="line"><span class="comment">// @param[in]: frame (each frame of the realted frames)</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ProbabilisticFusion::FuseFrame</span><span class="params">(<span class="keyword">const</span> SensorFramePtr&amp; frame)</span> </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>融合过程有三个步骤，每一个步骤又分为关联，更新，创建新的Track，注意下方函数均是对单一数据帧中的objects和tracks而言：</p>
+<ul>
+<li><p>ProbabilisticFusion::FusedForegroundTrack 前景融合</p>
+<ul>
+<li><p>HMTrackersObjectsAssociation::Associate (<code>sensor_objects &lt;----&gt; fusion_tracks</code>) 得到 <code>association_result</code></p>
+<ul>
+<li><p>HMTrackersObjectsAssociation::IdAssign() 得到assignments,unassigned_tracks,unassigned_measurements ； sensor_objects与相同传感器的tracks进行匹配，匹配依据是base_object-&gt;track_id</p></li>
+<li><p>HMTrackersObjectsAssociation::ComputeAssociationDistanceMat() 得到association_mat 关联距离矩阵(unassigned_tracks,unassigned_measurements)</p>
+<ul>
+<li><p>TrackObjectDistance::Compute() 计算fused track 和 sensor object之间的距离，结合阈值判断当前检测sensor_object与各传感器对应的fused track中的object的距离(polygon distance)度量，然后其中的最小值作为最终的度量添加到关联矩阵中。 <strong>1</strong> 当新检测的sensor_object是<strong>Lidar</strong>时，计算与fused_track各个传感器的最新object的距离度量：</p>
+<ul>
+<li><p>TrackObjectDistance::ComputeLidarLidar(）</p>
+<p>sensor_object(lidar检测)与fused_object(lidar检测)之间距离小于10m，计算Polygon中心之间的欧氏距离，否则返回<code>std::numeric_limits&lt;float&gt;::max</code>，即不进行匹配</p></li>
+<li><p>TrackObjectDistance::ComputeLidarRadar(）</p>
+<p>sensor_object(lidar检测)与fused_object(radar检测)之间距离小于10m,计算Polygon中心之间的欧式距离，否则返回<code>std::numeric_limits&lt;float&gt;::max</code> 即不进行匹配</p></li>
+<li><p>TrackObjectDistance::ComputeLidarCamera(） lidar与camera的匹配距离计算则稍显复杂，首先先判断是否lidar自身传感器的跟踪连续，若不连续则判断sensor_object(lidar检测)与fused_object(camera检测)是否大于<strong>动态阈值</strong>，若是则直接返回<code>distance_thresh_=4.0</code>,否则，计算sensor_object(lidar)点云在相机图像平面的投影object与fused_object(camera检测)的相似性：</p>
+<ul>
+<li><p>ComputePtsBoxSimilarity()</p>
+<p>计算点云的2d投影box和相机的2d投影box之间的相似性,取值范围[0,1]，方式是通过计算位置的相似性和形状的相似性，然后进行将这两个相似性融合。</p>
+<ul>
+<li><p>ComputePtsBoxLocationSimilarity()</p>
+<p>计算点云和相机box的位置相似性，首先计算IOU(此处将box扩大一定尺寸再计算 IOU)，若没有交集则返回最小相似性1e-6，然后按照如下步骤：</p>
+<ol type="1">
+<li>计算lidar投影的2d点位于camera box之外的各个点与camera box边界的平均距离</li>
+<li>根据camera box的大小归一化这个距离，然后假设归一化后的距离服从高斯分布</li>
+<li>假设归一化后的x,y方向像素差值服从正态分布，则它们转化为标准正太分布后的平方和服从卡方分布，通过卡方分布，得到相似性： <img src="/2020/05/13/apollo-fusion/chi_squared.png" alt="img"></li>
+</ol></li>
+<li><p>ComputePtsBoxShapeSimilarity() 计算点云和相机box的形状的相似性[0,1]:</p>
+<ol type="1">
+<li>首先计算box尺寸的差异，针对点云只检测到一个点的，此处限制sensor_object(点云检测)的尺寸不能低于camera box的十分之一</li>
+<li>将随机变量标准化(根据先验的标准差)，使其服从标准正态分布</li>
+<li>同样根据卡方分布得到相似度</li>
+</ol></li>
+<li><p>FuseTwoProbabilities()</p>
+<p>将上述两个概率融合(即相似度),当两概率之和大于1，融合概率大于0.5，否则小于0.5，得到的相似性[0,1]乘以距离阈值<code>distance_thresh_=4.0</code>即可得到最终的距离度量 <span class="math display">\[
+tmp=\frac{p1}{1-p1}*\frac{p2}{1-p2}\\
+prob = \frac{tmp}{tmp+1}
+\]</span></p></li>
+</ul></li>
+<li><p>QueryProjectedVeloCtOnCamera()</p>
+<p>如果lidar检测目标的cloud为空(<strong>此处疑问：为啥有检测目标还会为空</strong>)，则将lidar检测的物体中心投影到相机图像坐标系中，计算中心点之间的距离(单位为像素)。</p></li>
+</ul>
+<p><strong>综上，通过计算lidar camera物体的相似性或者中心的距离得到lidar检测目标和camera目标之间的距离度量(此处最大值由distance_thresh_=4.0限定范围)</strong></p></li>
+</ul>
+<p><strong>2</strong> 当新检测到的sensor_object是radar时，基本与lidar时同样的操作，计算lidar 与radar之间的距离度量(与上面的相似)和camera与radar之间的距离度量：</p>
+<ul>
+<li>TrackObjectDistance::ComputeRadarCamera(） 与lidar和camera的距离度量相似，首先计算camera可用的信息：包括camera检测的2d box，物体的中心点以及box的宽和高；radar可用的信息：radar的检测物体的3d中心点以及8个顶点，将8个顶点的高度修改为相机检测物体的高度，然后都投影到2d图像平面。 紧接着计算相似性，若radar检测的物体在相机的视场内，相似性度量方式如下：
+<ul>
+<li>ComputeRadarCameraXSimilarity() 计算中心点在x方向上的差异，并进行通过camera box size_x进行归一化 通过<code>WelshVarLossFun</code>计算相似性，然后限制最大概率(相似度)为(0.9)(进行缩放)，下图为 welshvarlossfun示意图，以0.5为阈值分为两段,横轴为距离，纵轴为概率。 <img src="/2020/05/13/apollo-fusion/image-20200508214807548.png" alt="image-20200508214807548" style="zoom:30%;"></li>
+<li>ComputeRadarCameraYSimilarity() 计算2dbox中心点在y方向上的差异(单位为像素)，然后根据给定的标准差进行normalize,同样通过卡方分布获取相似性，最后根据给定的范围缩放概率到区间(0.5,0.6)</li>
+<li>ComputeRadarCameraLocSimilarity() 计算物体3D center的位置差异(单位为米)，通过<code>WelshVarLossFun</code>获取相似性，然后进行缩放概率区间为(0,0.7) <img src="/2020/05/13/apollo-fusion/image-20200508222547038.png" alt="image-20200508222547038" style="zoom:30%;"></li>
+<li>ComputeRadarCameraVelocitySimilarity() 当camera或者radar的速度大于2.0时，计算速度差值，并通过卡方分布得到相似性分数，然后限制缩放(&gt;0.5，即positive)的概率为最大0.9</li>
+<li>FuseMultipleProbabilities() 最后将这多个概率融合，作为最终的相似度距离度量，融合过程概率先取对数，将乘法变为加法，然后再取指数。</li>
+</ul></li>
+<li>TrackObjectDistance::BuildProjectionCacheObject() 由于一般Lidar是360度视角，而相机视角有限，在进行距离计算时，需要判断lidar的点是否位于相机的视锥体(Frustum)中，此处采用的方式是将lidar点云投影到相机坐标系的图像平面中2d点中并判断是否超出了图像边界，将在相机视场内时，将lidar点的图像平面投影点保存到数据结构 <code>&lt;ProjectCache&gt;</code>中，该数据结构存储各数据帧各个物体lidar 2d图像投影点(注：前提是这些点的原3d点位于相机视场内)<code>&lt;ProjectionCacheObject&gt;</code> 为各个物体的基本存储单位，保存该物体的投影点的索引和2d边界框。</li>
+</ul>
+<p><strong>3</strong> 当新检测到的sensor_object是camera时，只计算与跟踪列表中lidar的检测目标的相似性，关于相机和相机本身的已经在相机检测组件中进行了融合。</p></li>
+</ul></li>
+<li><p>HMTrackersObjectsAssociation::MinimizeAssignment() 根据上一步得到的距离矩阵通过匈牙利算法<code>common::GatedHungarianMatcher&lt;float&gt; optimizer_</code>进行二分图最优匹配，距离阈值4.0(用于判断连接是否有效),距离bound为100，得到<code>assignments</code>,<code>unassigned</code> <code>_tracks,unassigned_measurements</code></p></li>
+<li><p>HMTrackersObjectsAssociation::PostIdAssign() 进行Id的后分配，得到<code>post_assignments</code>,相机检测得到的<code>unassigned_sensor_objects</code>在此处进行id分配，得到<code>post_assignment</code>,并添加到前面得到的<code>assignments</code>中</p></li>
+<li><p>HMTrackersObjectsAssociation::GenerateUnassignedData(） 剔除<code>assignments</code>从而获取未被分配的unassigned_tracks和unassigned_measurements</p></li>
+<li><p>HMTrackersObjectsAssociation::ComputeDistance() 填充<code>&lt;AssociationReult&gt;</code>数据结构中的<code>track2measurements_dist</code>和<code>measurement2track_dist</code></p></li>
+</ul></li>
+<li><p>ProbabilisticFusion::UpdateAssignedTracks 对于每个track根据当前匹配的新的测量object更新track的状态：</p>
+<ul>
+<li><p>PbfTracker::UpdateWithMeasurement() 更新包括4个融合方法：类型融合<code>DstTypeFusion</code>,运动状态融合<code>KalmanMotionFusion</code>,存在性融合 <code>DstExistanceFuison</code>以及形状外观融合<code>PbfShapeFusion</code></p>
+<ul>
+<li><p>DstExistanceFusion::UpdateWithMeasurement(） 基于证据的方法更新track存在的可能性</p></li>
+<li><p>DstExistanceFusion::GetExistReliability() 根据测量物体的类型(是否是UNKNOWN)以及测量传感器的类型判断获取存在因子(这里对于lidar,camera,radar的权重依次为0.9,0.8,0.6,radar可信度较低)</p></li>
+<li><p>DstExistanceFusion::ComputeDistDecay(） 将检测物体的中心坐标由世界坐标系转换到传感器坐标系下，并计算距离，若距离大于60m，则设置衰减率为0.8,否则1.0</p></li>
+<li><p>Dst::SetBba(） 设置bba_vec_,根据存在的可信度</p></li>
+<li><p>DstExistanceFusion::GetExistanceProbability() 通过初始化时预先设置的<code>combination_relations</code>和上步设置的<code>bba_vec_</code>计算 <code>probability_vec_</code>,然后返回<code>EXIST</code>对应的概率，计算详细过程见附录。</p></li>
+<li><p><code>fused_existance_ =   fused_existance_ + existance_evidence * exist_fused_w * association_prob;</code> 通过重构的加法和乘法运算符融合更新<code>bba_vec_</code></p></li>
+<li><p>DstExistanceFusion::UpdateToicWithCameraMeasurement(） 针对测量传感器是相机的情况，基本方法同Existance，先设置<code>bba_vec_</code></p>
+<ul>
+<li><p>ObjectInCameraView() 获取物体在相机视野中的可视率in_view_ratio，用于融合更新<code>bba_vec_</code> ,三种方法： 根据与该相机检测物体相匹配的track中的最近检测到的lidar或radar物体点云中的点出现在相机视野中的比例；当没有点云信息时，则根据物体3d边界框的顶点投影到相机图像平面的二维边界框在相机视野中所占的比例确定可视率；若边界框也无效的话，则根据物体三维中心点投影到相机图像平面的二维中心点，判断中心点是否位于相机的视野中，是则可视率直接设为1，否则为0。 由于相机检测物体随着距离的增加准确率会降低，因此根据下图所示的类sigmoid函数得到检测距离对应的权重(图中所示以150作为相机最大有效检测距离，0.25表示曲线的斜率),距离越远对应的值越小，用该值乘以上面得到的可视率作为最终的结果。</p>
+<p><img src="/2020/05/13/apollo-fusion/image-20200512151919053.png" alt="image-20200512151919053" style="zoom:30%;"></p></li>
+</ul></li>
+<li><p>DstExistanceFusion::UpdateExistanceState() 根据各自更新的<code>bba_vec_</code>，分别得到对应的概率值<code>GetToicProbability</code>和 <code>GetExistanceProbability</code>，并赋值到<code>track</code>的相关属性中。 更新<code>track-&gt;toic_prob_</code>和<code>track-&gt;existance_prob_</code></p></li>
+<li><p>KalmanMotionFusion::UpdateWithMeasurement(） 基于Kalman Filter更新track的运动信息:</p></li>
+<li><p>KalmanMotionFusion::InitFilter() 初始化滤波器的相关状态和不确定性矩阵，全局状态有 $[center(2),velocity(2),acceleration(2)]$6个。</p></li>
+</ul>
+<pre><code>-  KalmanMotionFusion::UpdateSensorHistory(）
+  `std::deque&lt;base::SensorType&gt; history_sensor_type_`中存储了过去物体测量值对应的传感器类型，存储容量为20，`history_velocity_`,`history_timestamp_`同理，分别存储过去测量值的速度和检测时间戳，用途是计算加速度和pseudo measurement，注意radar和lidar各自的最长追溯值为3个。
+- KalmanFilter::Init()
+  初始化状态矩阵，观测矩阵，状态转移矩阵，状态不确定性，观测不确定性，
+  gain_break,value_break,kalman_gain
+-  KalmanFilter::SetGainBreakdownThresh()
+  `gain_break_down={0,0,0,0,1,1}  gain_break_down_threshold = 2.0f`
+  用于校正不合理的加速度增益
+- KalmanFilter::SetValueBreakdownThresh()
+  `value_break_down={0,0,1,1,0,0} value_break_down_threshold = 0.05f`
+  用于校正不合理的速度</code></pre>
+<ul>
+<li><p>KalmanMotionFusion::MotionFusionWithMeasurement()</p>
+<ul>
+<li><p>KalmanFilter::Predict(） 预测状态X(k+1|k)和协方差阵P <code>global_state,global_uncertainty</code></p></li>
+<li><p>KalmanMotionFusion::ComputeAccelerationMeasurement() 计算加速度，当measurement传感器类型为camera时利用kalman滤波当前推断的加速度状态，当measurement传感器类型为lidar或radar利用<code>history_velocity</code></p></li>
+<li><p>根据measurement object的中心位置和速度的不确定性更新测量协方差矩阵R</p></li>
+<li><p>KalmanMotionFusion::ComputePseudoMeasurement() 计算伪测量值，根据lidar和radar，camera的原始测量值,以lidar为例，如果给定lidar的测量值能够在短时间内较好的估计radar的测量值，则将radar的测量值投影到给定的lidar测量值，具体如下：</p>
+<ul>
+<li><p>KalmanMotionFusion::ComputePseudoLidarMeasurement() 以lidar为例,首先追溯radar的测量历史<code>history_velocity_</code> ,试图通过找到好的radar测量值用于获得更加精确的lidar测量值(radar传感器本身速度测量较准)，如何算好的radar历史测量值？给出如下标准：</p>
+<ol type="1">
+<li>radar速度的长度(标量)应与lidar速度的长度差值小于阈值5</li>
+<li>radar测量速度矢量与lidar测量速度矢量的夹角(认为时角速度)小于阈值pi/20</li>
+<li>radar速度矢量在lidar速度方向上的投影向量与lidar速度向量的差值矢量与加速度矢量的夹角(认为是角加速度)小于阈值</li>
+<li>上述投影差值矢量也应小于一定阈值</li>
+</ol>
+<p>满足条件，则将radar速度矢量的在lidar方向的投影值作为pseudo_measurement</p></li>
+</ul></li>
+<li><p>KalmanMotionFusion::RewardRMatrix() 根据传感器类型和速度是否收敛(object-&gt;velocity_converged)调整测量协方差阵R，</p></li>
+<li><p>KalmanFilter::DeCorrelation() 去相关</p></li>
+<li><p>KalmanFilter::Correct(）根据测量值和测量的不确定性矩阵R校正</p></li>
+<li><p>KalmanFilter::CorrectionBreakdown() 判断加速度和速度状态的变化是否小于一定阈值，否则速度设为0，加速度的根据阈值进行设置。</p></li>
+</ul></li>
+<li><p>卡尔曼滤波更新之后进行形状和位置的融合，如果测量传感器是lidar：使用lidar的anchor point和fused velocity。如果测量传感器是radar，同时没有历史的lidar跟踪目标，使用fused anchor point 和fused velocity。如果测量传感器是camera,同时有历史的lidar跟踪目标，使用fused position和fused velocity(滤波器估计值)；测量传感器是camera，同时没有历史lidar跟踪目标但是有radar跟踪目标，位置采用radar的anchor_point,速度采用滤波器的结果fused_velocity()；既没有lidar有没有radar，直接使用测量值作为fused_velocity和fused_anchor_point_。 加速度的更新因为没有传感器测量直接采用卡尔曼滤波器的状态输出结果。</p></li>
+<li><p>KalmanMotionFusion::UpdateMotionState() 更新<code>track-&gt;fused_object</code>的运动状态，包括<code>velocity,acceleration,center_uncertainty</code> ,<code>velocity_uncertainty,acceleration_uncertainty</code>,不确定性目前是直接根据measurement赋值</p></li>
+<li><p>PbfShapeFusion::UpdateWithMeasurement(）</p>
+<ul>
+<li>PbfShapeFusion::UpdateState(）
+<ul>
+<li>PbfShapeFusion::UpdateShape(） 更新<code>track-&gt;fused_object</code>的形状信息,包括<code>size,direction,theta,polygon</code></li>
+<li>PbfShapeFusion::UpdateCenter(） 更新<code>track-&gt;fused_object</code>的中心坐标，包括<code>center,anchor_point</code>,均直接根据测量值更新，没有中间处理</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>ProbabilisticFusion::UpdateUnassignedTracks</p></li>
+<li><p>ProbabilisticFusion::CreateNewTracks</p></li>
+</ul></li>
+<li><p>FusedbackgroundTrack 背景融合</p></li>
+<li><p>RemoveLostTrack 移除跟丢的Track</p></li>
+</ul></li>
+</ol>
+<h3 id="参考链接">参考链接</h3>
+<p>https://developer.baidu.com/topic/show/290445</p>
+<p>https://blog.csdn.net/u012423865/article/details/80386444</p>
+<p>https://zhuanlan.zhihu.com/p/116901401</p>
+<p>https://blog.csdn.net/zhanghm1995/article/details/104910923</p>
+<p>视锥体，判断Lidar 3D点是否位于相机视野内： https://blog.csdn.net/qq_29797957/article/details/96914792</p>
+<h3 id="补充">补充</h3>
+<h4 id="卡方分布">1.卡方分布：</h4>
+<p>由n个相互独立的随机变量，均服从标准正态分布(独立同分布于标准正太分布)，则这n个服从标准正态分布的随机变量的平方和构成新的随机变量，其分布规律称为卡方分布，卡方分布位于第一象限，均值为自由度v，方差为2v。</p>
+<h4 id="apollo中gatehungrianmatcher的匹配流程">2. apollo中<code>GateHungrianMatcher</code>的匹配流程：</h4>
+<ol type="1">
+<li><p>创建优化器实例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">common::GatedHungarianMatcher&lt;<span class="keyword">float</span>&gt; optimizer_;</span><br></pre></td></tr></table></figure>
+<p>通过实现已经获取的度量矩阵设置<code>global_costs</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">common::SecureMat&lt;<span class="keyword">float</span>&gt;* global_costs = optimizer_.mutable_global_costs();</span><br></pre></td></tr></table></figure></li>
+<li><p>运行主接口函数：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">optimizer_.Match(<span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(s_match_distance_thresh_), <span class="comment">// thresh 4.0</span></span><br><span class="line">                   <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(s_match_distance_bound_), opt_flag, <span class="comment">//bound 100.0</span></span><br><span class="line">                   &amp;local_assignments, &amp;local_unassigned_tracks, <span class="comment">//row -&gt; tracks</span></span><br><span class="line">                   &amp;local_unassigned_measurements); <span class="comment">///column -&gt; measurements</span></span><br></pre></td></tr></table></figure>
+<p><strong>2.1</strong> <code>MatchInit()</code> 获取行数和列数(即跟踪目标数量rows和测量目标cols的数量)，并根据opt_flag，确定比较函数,此处包含的选项有<code>OptimizeFlag::OPTMAX</code>和<code>OptimizeFlag::OPTMIN</code>分别对应与<code>thresh</code>的比较方式,例如当<code>opt_flag=OPTMIN</code>时，当<code>global_cost(i,j)&lt;s_match_distance_thresh_</code>时返回ture。 <strong>2.2</strong> <code>ComputeConnectedComponents(&amp;row_components, &amp;col_components)</code> 为了加速匹配的速度，将原始的cost_graph分割为几个小的子二分图,根据阈值<code>s_match_distance_thresh_</code>判断连接是否有效，将有效的相互连接组成一个 <code>Component</code> 以此将原始图进行分割为独立的子图，下图所示为关联矩阵以2.1为阈值，并进行图分割为2个component的例子，0<sub>6为对应的节点id，其中0</sub>2对应行,3~6对应列(id=row_num+col_id),最终函数返回： <code>row_components[0]={0,1},row_components[1]={2}；col_components[0]={3,4},col_components[1]={5,6}</code></p>
+<p><img src="/2020/05/13/apollo-fusion/image-20200510203006092.png" alt="image-20200510203006092" style="zoom:30%;"></p>
+<p><strong>2.3</strong> <code>OptimizeConnectedComponent</code> 对每个component进行优化，进行分配。 <strong>2.4</strong> <code>GenerateUnassiganedData</code> 生成未分配的节点的集合</p></li>
+</ol>
+<h4 id="pbftracker的更新融合方法">3. PbfTracker的更新融合方法</h4>
+<h5 id="dstexistancefusion">3.1 DstExistanceFusion</h5>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ExistanceDstMaps</span> &#123;</span></span><br><span class="line">  <span class="keyword">enum</span> &#123; EXIST = (<span class="number">1</span> &lt;&lt; <span class="number">0</span>), NEXIST = (<span class="number">1</span> &lt;&lt; <span class="number">1</span>), EXISTUNKOWN = (EXIST | NEXIST) &#125;; <span class="comment">//1,2,3</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_ = &#123;EXIST, NEXIST, EXISTUNKOWN&#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; subset_names_ = &#123;<span class="string">"EXIST"</span>, <span class="string">"NEXIST"</span>, <span class="string">"EXISTUNKOWN"</span>&#125;;</span><br><span class="line">  <span class="comment">//EXISTUNKOWN从二进制角度来说包含了EXIST,NEXIST</span></span><br><span class="line">  <span class="comment">//subsets的索引ind是指从0开始各个subset的编号，此处 0 1 2 </span></span><br><span class="line">  <span class="comment">//它们的实际值为 01  10  11</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>基于<code>&lt;Dst&gt;</code>数据结构，重构了加法和乘法运算符，对应成员变量：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> app_name_; <span class="comment">//唯一的标识符</span></span><br><span class="line"><span class="keyword">mutable</span> DstCommonDataPtr dst_data_ptr_ = <span class="literal">nullptr</span>; <span class="comment">//由DstManager管理的DstCommonData</span></span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; bba_vec_; <span class="comment">//大小为subset的大小，内容为各个subset的mass(可理解为概率)取值0~1</span></span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; support_vec_;</span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; plausibility_vec_; <span class="comment">//合理性</span></span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; uncertainty_vec_; <span class="comment">//不确定性</span></span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; probability_vec_; <span class="comment">//大小为bba_vec的大小</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">DstCommonData</span> &#123;</span></span><br><span class="line">  <span class="comment">// ensure initialize DSTEvidence once</span></span><br><span class="line">  <span class="keyword">bool</span> init_ = <span class="literal">false</span>;</span><br><span class="line">  <span class="comment">// fods</span></span><br><span class="line">  <span class="keyword">size_t</span> fod_loc_ = <span class="number">0</span>; <span class="comment">//指向subsets的最后一个元素对应的编号值</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_;</span><br><span class="line">  <span class="comment">// for transforming to probability effectively 存储各subset的二进制中1的位数</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; fod_subset_cardinalities_;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; fod_subset_names_;</span><br><span class="line">  <span class="comment">// for combining two bbas effectively. 用于计算probability_vec_,第一维表示两个fod_subset交集(大小为</span></span><br><span class="line">  <span class="comment">// fod_sets大小)对应的subset的索引编号，第二维为对应该交集的所有两个fod_subset的索引编号pair</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">size_t</span>, <span class="keyword">size_t</span>&gt;&gt;&gt; combination_relations_; </span><br><span class="line">  <span class="comment">// for computing support vector effectively,第一维大小为fod_subsets大小，第二维存储各fod_subset二进制</span></span><br><span class="line">  <span class="comment">//包含（存在包含关系）的subset所对应的索引编号</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt;&gt; subset_relations_;</span><br><span class="line">  <span class="comment">// for computing plausibility vector effectively，第一维大小为fod_subsets大小，第二位存储各fod_subset二</span></span><br><span class="line">  <span class="comment">// 进制具有相同二进制位(存在交集)的subset对应的索引编号</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt;&gt; inter_relations_; <span class="comment">//intersection</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="keyword">uint64_t</span>, <span class="keyword">size_t</span>&gt; subsets_ind_map_;  <span class="comment">//pair(subset,ind)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>概率计算举例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ExistanceDstMaps</span> &#123;</span></span><br><span class="line">    <span class="keyword">enum</span> &#123; EXIST = (<span class="number">1</span> &lt;&lt; <span class="number">0</span>), NEXIST = (<span class="number">1</span> &lt;&lt; <span class="number">1</span>), EXISTUNKOWN = (EXIST | NEXIST) &#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_ = &#123;EXIST, NEXIST, EXISTUNKOWN&#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; subset_names_ = &#123;<span class="string">"EXIST"</span>, <span class="string">"NEXIST"</span>, <span class="string">"EXISTUNKOWN"</span>&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; probability_vec_;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; bba_vec_=&#123;<span class="number">0.7</span>,<span class="number">0</span>,<span class="number">0.3</span>&#125;;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">size_t</span> ,<span class="keyword">size_t</span> &gt;&gt;&gt; combination_relations_;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; fod_subset_cardinalities_=&#123;<span class="number">1</span>,<span class="number">1</span>,<span class="number">2</span>&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ComputeProbability</span><span class="params">()</span>  </span>&#123;</span><br><span class="line">    combination_relations_.resize(bba_vec_.<span class="built_in">size</span>());</span><br><span class="line"></span><br><span class="line">    combination_relations_[<span class="number">0</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">0</span>,<span class="number">0</span>));</span><br><span class="line">    combination_relations_[<span class="number">0</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">0</span>,<span class="number">2</span>));</span><br><span class="line">    combination_relations_[<span class="number">0</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">2</span>,<span class="number">0</span>));</span><br><span class="line">    combination_relations_[<span class="number">1</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">1</span>,<span class="number">1</span>));</span><br><span class="line">    combination_relations_[<span class="number">1</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">1</span>,<span class="number">2</span>));</span><br><span class="line">    combination_relations_[<span class="number">1</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">2</span>,<span class="number">1</span>));</span><br><span class="line">    combination_relations_[<span class="number">2</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">2</span>,<span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">    probability_vec_.<span class="built_in">clear</span>();</span><br><span class="line">    probability_vec_.resize(bba_vec_.<span class="built_in">size</span>(), <span class="number">0.0</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;combination_relations = combination_relations_; <span class="comment">//存储两个subset的交集索引编号和该两个subset的编号</span></span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; &amp;fod_subset_cardinalities =</span><br><span class="line">            fod_subset_cardinalities_; <span class="comment">//存储各个subset对应的二进制值中1的个数</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; combination_relations.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">auto</span> &amp;combination_pairs = combination_relations[i];<span class="comment">//交集为各个subset的pair</span></span><br><span class="line">        <span class="keyword">double</span> intersection_card = <span class="keyword">static_cast</span>&lt;<span class="keyword">double</span>&gt;(fod_subset_cardinalities[i]); <span class="comment">//该subset对应的位数</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> combination_pair : combination_pairs) &#123;</span><br><span class="line">            <span class="keyword">size_t</span> a_ind = combination_pair.first;</span><br><span class="line">            <span class="keyword">size_t</span> b_ind = combination_pair.second;</span><br><span class="line">            probability_vec_[a_ind] +=</span><br><span class="line">                    intersection_card /</span><br><span class="line">                    <span class="keyword">static_cast</span>&lt;<span class="keyword">double</span>&gt;(fod_subset_cardinalities[b_ind]) *</span><br><span class="line">                    bba_vec_[b_ind];<span class="comment">//根据交集的位数占后者的位数的比例确定所占概率比例的大小</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//@ result：</span></span><br><span class="line">probability_vev_=&#123;<span class="number">0.85</span>,<span class="number">0.15</span>,<span class="number">1</span>&#125;</span><br><span class="line"><span class="comment">//@ note: bba_vec_=&#123;0.7,0,0.3&#125;</span></span><br><span class="line"><span class="comment">//@ 理解为此处的EXIST，NEXIST均与EXISTUNKOWN有交集，因此根据bba_vec按照交集位数的比例比如NEXIST与EXISTUNKOWN的二进制位数为1的比例为 1/2=0.5，因此其概率为0.3*0.5=0.15,而EXIST为0.7(自身概率)+0.3*0.5=0.85</span></span><br></pre></td></tr></table></figure>
+<p>更新概率： 通过重构运算符加法和乘法，进行概率融合，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Dst <span class="keyword">operator</span>*(<span class="keyword">const</span> Dst &amp;dst, <span class="keyword">double</span> w) &#123;</span><br><span class="line">  dst.SelfCheck();</span><br><span class="line">  <span class="function">Dst <span class="title">res</span><span class="params">(dst.app_name_)</span></span>;</span><br><span class="line">  <span class="comment">// check w</span></span><br><span class="line">  <span class="keyword">if</span> (w &lt; <span class="number">0.0</span> || w &gt; <span class="number">1.0</span>) &#123;</span><br><span class="line">    AERROR &lt;&lt; boost::format(</span><br><span class="line">                  <span class="string">"the weight of bba %lf is not valid, return default bba"</span>) %</span><br><span class="line">                  w;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">size_t</span> fod_loc = dst.dst_data_ptr_-&gt;fod_loc_;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; &amp;resbba_vec_ = res.bba_vec_;</span><br><span class="line">  <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; &amp;bba_vec = dst.bba_vec_;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; resbba_vec_.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">    <span class="keyword">if</span> (i == fod_loc) &#123;</span><br><span class="line">      resbba_vec_[i] = <span class="number">1.0</span> - w + w * bba_vec[i]; <span class="comment">//???</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      resbba_vec_[i] = w * bba_vec[i];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="dsttypefusion">3.2 DstTypeFusion</h5>
+<h5 id="kalmanmoitonfusion">3.3 KalmanMoitonFusion</h5>
+<h5 id="pbfshapefusion">3.4 PbfShapeFusion</h5>
+<h4 id="自适应卡尔曼滤波">4. 自适应卡尔曼滤波</h4>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%9A%E4%BC%A0%E6%84%9F%E5%99%A8%E8%9E%8D%E5%90%88/" rel="tag"># 多传感器融合</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/24/apollo-lidar_driver/" rel="prev" title="apollo lidar驱动组件">
+      <i class="fa fa-chevron-left"></i> apollo lidar驱动组件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/13/apollo-KM_Hungarian/" rel="next" title="apollo Hungarian算法">
+      apollo Hungarian算法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一组件初始化和相关配置"><span class="nav-number">1.</span> <span class="nav-text">一、组件初始化和相关配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#外部配置文件"><span class="nav-number">1.1.</span> <span class="nav-text">1. 外部配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#功能初始化"><span class="nav-number">1.2.</span> <span class="nav-text">2. 功能初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二算法处理"><span class="nav-number">2.</span> <span class="nav-text">二、算法处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#消息序列化"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 消息序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#融合处理process"><span class="nav-number">2.2.</span> <span class="nav-text">2.2融合处理Process( )</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考链接"><span class="nav-number">2.3.</span> <span class="nav-text">参考链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#补充"><span class="nav-number">2.4.</span> <span class="nav-text">补充</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#卡方分布"><span class="nav-number">2.4.1.</span> <span class="nav-text">1.卡方分布：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#apollo中gatehungrianmatcher的匹配流程"><span class="nav-number">2.4.2.</span> <span class="nav-text">2. apollo中GateHungrianMatcher的匹配流程：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pbftracker的更新融合方法"><span class="nav-number">2.4.3.</span> <span class="nav-text">3. PbfTracker的更新融合方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#dstexistancefusion"><span class="nav-number">2.4.3.1.</span> <span class="nav-text">3.1 DstExistanceFusion</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#dsttypefusion"><span class="nav-number">2.4.3.2.</span> <span class="nav-text">3.2 DstTypeFusion</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#kalmanmoitonfusion"><span class="nav-number">2.4.3.3.</span> <span class="nav-text">3.3 KalmanMoitonFusion</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pbfshapefusion"><span class="nav-number">2.4.3.4.</span> <span class="nav-text">3.4 PbfShapeFusion</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自适应卡尔曼滤波"><span class="nav-number">2.4.4.</span> <span class="nav-text">4. 自适应卡尔曼滤波</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" rel="tag">lidar目标检测</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">lidar目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E4%BC%A0%E6%84%9F%E5%99%A8%E8%9E%8D%E5%90%88/" rel="tag">多传感器融合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">278k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">7:44</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/05/13/apollo-fusion/";
+    this.page.identifier = "2020/05/13/apollo-fusion/";
+    this.page.title = "apollo 融合算法--fusion component";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
