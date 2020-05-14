@@ -64,7 +64,7 @@
 <meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/image-20200512151919053.png">
 <meta property="og:image" content="https://zhxjia.github.io/2020/05/13/apollo-fusion/image-20200510203006092.png">
 <meta property="article:published_time" content="2020-05-13T03:23:08.654Z">
-<meta property="article:modified_time" content="2020-05-13T05:13:08.553Z">
+<meta property="article:modified_time" content="2020-05-14T17:07:01.714Z">
 <meta property="article:author" content="ZhxJia">
 <meta property="article:tag" content="多传感器融合">
 <meta name="twitter:card" content="summary">
@@ -241,10 +241,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-13 11:23:08 / 修改时间：13:13:08" itemprop="dateCreated datePublished" datetime="2020-05-13T11:23:08+08:00">2020-05-13</time>
+              <time title="创建时间：2020-05-13 11:23:08" itemprop="dateCreated datePublished" datetime="2020-05-13T11:23:08+08:00">2020-05-13</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-15 01:07:01" itemprop="dateModified" datetime="2020-05-15T01:07:01+08:00">2020-05-15</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -284,14 +290,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>24k</span>
+              <span>34k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>40 分钟</span>
+              <span>57 分钟</span>
             </span>
 
         </div>
@@ -688,7 +694,7 @@ prob = \frac{tmp}{tmp+1}
 <li><p>HMTrackersObjectsAssociation::GenerateUnassignedData(） 剔除<code>assignments</code>从而获取未被分配的unassigned_tracks和unassigned_measurements</p></li>
 <li><p>HMTrackersObjectsAssociation::ComputeDistance() 填充<code>&lt;AssociationReult&gt;</code>数据结构中的<code>track2measurements_dist</code>和<code>measurement2track_dist</code></p></li>
 </ul></li>
-<li><p>ProbabilisticFusion::UpdateAssignedTracks 对于每个track根据当前匹配的新的测量object更新track的状态：</p>
+<li><p>ProbabilisticFusion::UpdateAssignedTracks 对于每个track根据当前已匹配的新的测量object更新track的状态，此处有一个参数<code>match_distance</code>用于在<code>ExistanceFusion</code>中计算<code>toic score</code>,由于此处track 和 object已经匹配，直接设置为0与实际的 match_distance差距不大，因此此处设为0</p>
 <ul>
 <li><p>PbfTracker::UpdateWithMeasurement() 更新包括4个融合方法：类型融合<code>DstTypeFusion</code>,运动状态融合<code>KalmanMotionFusion</code>,存在性融合 <code>DstExistanceFuison</code>以及形状外观融合<code>PbfShapeFusion</code></p>
 <ul>
@@ -700,65 +706,203 @@ prob = \frac{tmp}{tmp+1}
 <li><p><code>fused_existance_ =   fused_existance_ + existance_evidence * exist_fused_w * association_prob;</code> 通过重构的加法和乘法运算符融合更新<code>bba_vec_</code></p></li>
 <li><p>DstExistanceFusion::UpdateToicWithCameraMeasurement(） 针对测量传感器是相机的情况，基本方法同Existance，先设置<code>bba_vec_</code></p>
 <ul>
-<li><p>ObjectInCameraView() 获取物体在相机视野中的可视率in_view_ratio，用于融合更新<code>bba_vec_</code> ,三种方法： 根据与该相机检测物体相匹配的track中的最近检测到的lidar或radar物体点云中的点出现在相机视野中的比例；当没有点云信息时，则根据物体3d边界框的顶点投影到相机图像平面的二维边界框在相机视野中所占的比例确定可视率；若边界框也无效的话，则根据物体三维中心点投影到相机图像平面的二维中心点，判断中心点是否位于相机的视野中，是则可视率直接设为1，否则为0。 由于相机检测物体随着距离的增加准确率会降低，因此根据下图所示的类sigmoid函数得到检测距离对应的权重(图中所示以150作为相机最大有效检测距离，0.25表示曲线的斜率),距离越远对应的值越小，用该值乘以上面得到的可视率作为最终的结果。</p>
-<p><img src="/2020/05/13/apollo-fusion/image-20200512151919053.png" alt="image-20200512151919053" style="zoom:30%;"></p></li>
+<li>ObjectInCameraView() 获取物体在相机视野中的可视率in_view_ratio，用于融合更新<code>bba_vec_</code> ,三种方法： 根据与该相机检测物体相匹配的track中的最近检测到的lidar或radar物体点云中的点出现在相机视野中的比例；当没有点云信息时，则根据物体3d边界框的顶点投影到相机图像平面的二维边界框在相机视野中所占的比例确定可视率；若边界框也无效的话，则根据物体三维中心点投影到相机图像平面的二维中心点，判断中心点是否位于相机的视野中，是则可视率直接设为1，否则为0。 由于相机检测物体随着距离的增加准确率会降低，因此根据下图所示的类sigmoid函数得到检测距离对应的权重(图中所示以150作为相机最大有效检测距离，0.25表示曲线的斜率),距离越远对应的值越小，用该值乘以上面得到的可视率作为最终的结果。 <img src="/2020/05/13/apollo-fusion/image-20200512151919053.png" alt="image-20200512151919053" style="zoom:30%;"></li>
 </ul></li>
-<li><p>DstExistanceFusion::UpdateExistanceState() 根据各自更新的<code>bba_vec_</code>，分别得到对应的概率值<code>GetToicProbability</code>和 <code>GetExistanceProbability</code>，并赋值到<code>track</code>的相关属性中。 更新<code>track-&gt;toic_prob_</code>和<code>track-&gt;existance_prob_</code></p></li>
+<li><p>DstExistanceFusion::UpdateExistanceState() 根据各自更新的<code>bba_vec_</code>，分别得到对应的概率值<code>GetToicProbability</code>和 <code>GetExistanceProbability</code>，并赋值到<code>track</code>的相关属性中。</p>
+<p>更新<code>track-&gt;toic_prob_</code>和<code>track-&gt;existance_prob_</code></p></li>
 <li><p>KalmanMotionFusion::UpdateWithMeasurement(） 基于Kalman Filter更新track的运动信息:</p></li>
-<li><p>KalmanMotionFusion::InitFilter() 初始化滤波器的相关状态和不确定性矩阵，全局状态有 $[center(2),velocity(2),acceleration(2)]$6个。</p></li>
-</ul>
-<pre><code>-  KalmanMotionFusion::UpdateSensorHistory(）
-  `std::deque&lt;base::SensorType&gt; history_sensor_type_`中存储了过去物体测量值对应的传感器类型，存储容量为20，`history_velocity_`,`history_timestamp_`同理，分别存储过去测量值的速度和检测时间戳，用途是计算加速度和pseudo measurement，注意radar和lidar各自的最长追溯值为3个。
-- KalmanFilter::Init()
-  初始化状态矩阵，观测矩阵，状态转移矩阵，状态不确定性，观测不确定性，
-  gain_break,value_break,kalman_gain
--  KalmanFilter::SetGainBreakdownThresh()
-  `gain_break_down={0,0,0,0,1,1}  gain_break_down_threshold = 2.0f`
-  用于校正不合理的加速度增益
-- KalmanFilter::SetValueBreakdownThresh()
-  `value_break_down={0,0,1,1,0,0} value_break_down_threshold = 0.05f`
-  用于校正不合理的速度</code></pre>
+<li><p>KalmanMotionFusion::InitFilter() 初始化滤波器的相关状态和不确定性矩阵，全局状态有 $[center(2),velocity(2),acceleration(2)]$6个。</p>
 <ul>
+<li>KalmanMotionFusion::UpdateSensorHistory(） <code>std::deque&lt;base::SensorType&gt; history_sensor_type_</code>中存储了过去物体测量值对应的传感器类型，存储容量为20，<code>history_velocity_</code>,<code>history_timestamp_</code>同理，分别存储过去测量值的速度和检测时间戳，用途是计算加速度和pseudo measurement，注意radar和lidar各自的最长追溯值为3个。</li>
+<li>KalmanFilter::Init() 初始化状态矩阵，观测矩阵，状态转移矩阵，状态不确定性，观测不确定性， gain_break,value_break,kalman_gain</li>
+<li>KalmanFilter::SetGainBreakdownThresh() <code>gain_break_down={0,0,0,0,1,1}  gain_break_down_threshold = 2.0f</code> 用于校正不合理的加速度增益</li>
+<li>KalmanFilter::SetValueBreakdownThresh() <code>value_break_down={0,0,1,1,0,0} value_break_down_threshold = 0.05f</code> 用于校正不合理的速度</li>
+</ul></li>
 <li><p>KalmanMotionFusion::MotionFusionWithMeasurement()</p>
 <ul>
 <li><p>KalmanFilter::Predict(） 预测状态X(k+1|k)和协方差阵P <code>global_state,global_uncertainty</code></p></li>
 <li><p>KalmanMotionFusion::ComputeAccelerationMeasurement() 计算加速度，当measurement传感器类型为camera时利用kalman滤波当前推断的加速度状态，当measurement传感器类型为lidar或radar利用<code>history_velocity</code></p></li>
 <li><p>根据measurement object的中心位置和速度的不确定性更新测量协方差矩阵R</p></li>
-<li><p>KalmanMotionFusion::ComputePseudoMeasurement() 计算伪测量值，根据lidar和radar，camera的原始测量值,以lidar为例，如果给定lidar的测量值能够在短时间内较好的估计radar的测量值，则将radar的测量值投影到给定的lidar测量值，具体如下：</p>
+<li><p>KalmanMotionFusion::ComputePseudoMeasurement()</p>
+<p>计算伪测量值，根据lidar和radar，camera的原始测量值,以lidar为例，如果给定lidar的测量值能够在短时间内较好的估计radar的测量值，则将radar的测量值投影到给定的lidar测量值，具体如下：</p>
 <ul>
-<li><p>KalmanMotionFusion::ComputePseudoLidarMeasurement() 以lidar为例,首先追溯radar的测量历史<code>history_velocity_</code> ,试图通过找到好的radar测量值用于获得更加精确的lidar测量值(radar传感器本身速度测量较准)，如何算好的radar历史测量值？给出如下标准：</p>
-<ol type="1">
-<li>radar速度的长度(标量)应与lidar速度的长度差值小于阈值5</li>
-<li>radar测量速度矢量与lidar测量速度矢量的夹角(认为时角速度)小于阈值pi/20</li>
-<li>radar速度矢量在lidar速度方向上的投影向量与lidar速度向量的差值矢量与加速度矢量的夹角(认为是角加速度)小于阈值</li>
-<li>上述投影差值矢量也应小于一定阈值</li>
-</ol>
+<li><p>KalmanMotionFusion::ComputePseudoLidarMeasurement()</p>
+<p>以lidar为例,首先追溯radar的测量历史<code>history_velocity_</code> ,试图通过找到好的radar测量值用于获得更加精确的lidar测量值(radar传感器本身速度测量较准)，如何算好的radar历史测量值？给出如下标准：</p>
+<p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> radar速度的长度(标量)应与lidar速度的长度差值小于阈值<span class="number">5</span></span><br><span class="line"><span class="number">2.</span> radar测量速度矢量与lidar测量速度矢量的夹角(认为时角速度)小于阈值pi/<span class="number">20</span></span><br><span class="line"><span class="number">3.</span> radar速度矢量在lidar速度方向上的投影向量与lidar速度向量的差值矢量与加速度矢量的夹角(认为是角加速度)小于阈值</span><br><span class="line"><span class="number">4.</span> 上述投影差值矢量也应小于一定阈值</span><br></pre></td></tr></table></figure></p>
 <p>满足条件，则将radar速度矢量的在lidar方向的投影值作为pseudo_measurement</p></li>
 </ul></li>
-<li><p>KalmanMotionFusion::RewardRMatrix() 根据传感器类型和速度是否收敛(object-&gt;velocity_converged)调整测量协方差阵R，</p></li>
+<li><p>KalmanMotionFusion::RewardRMatrix()</p>
+<p>根据传感器类型和速度是否收敛(object-&gt;velocity_converged)调整测量协方差阵R，</p></li>
 <li><p>KalmanFilter::DeCorrelation() 去相关</p></li>
 <li><p>KalmanFilter::Correct(）根据测量值和测量的不确定性矩阵R校正</p></li>
-<li><p>KalmanFilter::CorrectionBreakdown() 判断加速度和速度状态的变化是否小于一定阈值，否则速度设为0，加速度的根据阈值进行设置。</p></li>
-</ul></li>
+<li><p>KalmanFilter::CorrectionBreakdown()</p>
+<p>判断加速度和速度状态的变化是否小于一定阈值，否则速度设为0，加速度的根据阈值进行设置。</p></li>
 <li><p>卡尔曼滤波更新之后进行形状和位置的融合，如果测量传感器是lidar：使用lidar的anchor point和fused velocity。如果测量传感器是radar，同时没有历史的lidar跟踪目标，使用fused anchor point 和fused velocity。如果测量传感器是camera,同时有历史的lidar跟踪目标，使用fused position和fused velocity(滤波器估计值)；测量传感器是camera，同时没有历史lidar跟踪目标但是有radar跟踪目标，位置采用radar的anchor_point,速度采用滤波器的结果fused_velocity()；既没有lidar有没有radar，直接使用测量值作为fused_velocity和fused_anchor_point_。 加速度的更新因为没有传感器测量直接采用卡尔曼滤波器的状态输出结果。</p></li>
-<li><p>KalmanMotionFusion::UpdateMotionState() 更新<code>track-&gt;fused_object</code>的运动状态，包括<code>velocity,acceleration,center_uncertainty</code> ,<code>velocity_uncertainty,acceleration_uncertainty</code>,不确定性目前是直接根据measurement赋值</p></li>
+<li><p>KalmanMotionFusion::UpdateMotionState() 更新<code>track-&gt;fused_object</code>的运动状态，包括<code>velocity,acceleration,center_uncertainty,velocity_uncertainty,</code> ,acceleration_uncertainty`,不确定性目前是直接根据measurement赋值</p></li>
+</ul></li>
 <li><p>PbfShapeFusion::UpdateWithMeasurement(）</p>
 <ul>
 <li>PbfShapeFusion::UpdateState(）
 <ul>
-<li>PbfShapeFusion::UpdateShape(） 更新<code>track-&gt;fused_object</code>的形状信息,包括<code>size,direction,theta,polygon</code></li>
+<li>PbfShapeFusion::UpdateShape(） 更新<code>track-&gt;fused_object</code>的DstTypeFusion::UpdateWithMeasurement(形状信息,包括<code>size,direction,theta,polygon</code></li>
 <li>PbfShapeFusion::UpdateCenter(） 更新<code>track-&gt;fused_object</code>的中心坐标，包括<code>center,anchor_point</code>,均直接根据测量值更新，没有中间处理</li>
 </ul></li>
 </ul></li>
+<li><p>DstTypeFusion::UpdateWithMeasurement() 创建测量值对应的<code>Dst</code></p>
+<ul>
+<li><p>DstTypeFusion::TypeProbsToDst() 将物体<code>object-&gt;type_probs</code>转换为Dst。</p>
+<ul>
+<li><p>DstTypeFusion::TypToHyp() 将物体原检测类型转换为<code>Dst hypothesis types</code>,映射关系为:</p>
+<table>
+<thead>
+<tr class="header">
+<th>origin object type</th>
+<th>value</th>
+<th>dst hypothesis types</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>UNKNOWN</td>
+<td>0</td>
+<td>OTHERS</td>
+<td>0001 1000 (24)</td>
+</tr>
+<tr class="even">
+<td>UNKNOWN_MOVABLE</td>
+<td>1</td>
+<td>OTHERS_MOVABLE</td>
+<td>0000 1000 (8)</td>
+</tr>
+<tr class="odd">
+<td>UNKNOWN_UNMOVABLE</td>
+<td>2</td>
+<td>OTHERS_UNMOVABLE</td>
+<td>0001 0000 (16)</td>
+</tr>
+<tr class="even">
+<td>PEDESTRIAN</td>
+<td>3</td>
+<td>PEDESTRIAN</td>
+<td>0000 0001 (1)</td>
+</tr>
+<tr class="odd">
+<td>BICYCLE</td>
+<td>4</td>
+<td>BICYCLE</td>
+<td>0000 0010 (2)</td>
+</tr>
+<tr class="even">
+<td>VEHICLE</td>
+<td>5</td>
+<td>VEHICLE</td>
+<td>0000 0100 (4)</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>UNKNOWN</td>
+<td>0001 1111 (31)</td>
+</tr>
+</tbody>
+</table>
+<p>将<code>origin object type</code>的检测概率值分别赋值到对应的<code>dst type</code>中构成<code>res_bba_map</code></p></li>
+<li><p>Dst::SetBba() 设置<code>bba_vec_</code>根据当前检测类别概率值构造的<code>res_bba_map</code>,<code>fod_subsets_</code>包括: <code>{PEDESTRIAN, BICYCLE, VEHICLE, OTHERS_MOVABLE, OTHERS_UNMOVABLE, OTHERS,  UNKNOWN}</code></p></li>
+</ul></li>
+<li><p>根据 当前测量值设置<code>bba_vec_</code> 的<code>measurement_dst</code>对之前存在的<code>fused_dst_</code>进行更新。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fused_dst_ =</span><br><span class="line">      fused_dst_ + measurement_dst * GetReliability(measurement-&gt;GetSensorId());</span><br></pre></td></tr></table></figure></li>
+<li><p>DstTypeFusion::GetReliability() 获取当前检测传感器对于物体类别的可靠程度： <code>velodyne64:0.5,front_6mm:0.95,front_12mm:0.5,....</code>等等,相机的类别检测的置信度较高</p></li>
+<li><p>如果当前测量值对应的传感器是相机，则将测量值对应的<code>object-&gt;sub_type</code>赋值到 <code>fused_object-&gt;sub_type</code></p></li>
+<li><p>DstTypeFusion::UpdateTypeState() 根据融合后的<code>bba_vec_</code>更新<code>fused_object</code>的类型概率。</p>
+<ul>
+<li><p>DstTypeFusion::HypToTyp() 将<code>hypothesis type</code>映射回原物体类型，这里将最大概率(bba_vec_中最大值索引)的<code>hypothesis</code>映射回<code>origin object type</code>并设置为<code>fused_object-&gt;type</code></p></li>
+<li><p>修正<code>fused_object-&gt;subtype</code> 之前<code>fused_object-&gt;sub_type</code>由测量的物体的<code>sub_type</code>直接赋值，此处在更新了<code>type</code>之后，需要判断该子类型对应的<code>type</code>是否和更新的<code>type</code>相等，不相等将<code>fused-&gt;subtype</code>设置为<code>base::ObjectSubType::UNKNOWN</code></p></li>
+<li><p>更新<code>fused_object-&gt;type_probs</code></p>
+<p>根据<code>fused_subset</code>与原<code>type</code>的映射，将<code>bba_vec_</code>中的值复制到<code>type_probs</code>中</p></li>
 </ul></li>
 </ul></li>
-<li><p>ProbabilisticFusion::UpdateUnassignedTracks</p></li>
-<li><p>ProbabilisticFusion::CreateNewTracks</p></li>
+<li><p>Track::UpdateWithSensorObject() 更新track对应的<code>SensorObject</code>,添加带有传感器id标记的object到对应的<code>lidar_objects_</code>,<code>radar_objects_</code>或<code>camera_objects_</code>的map中进行覆盖。然后将map中超时未被测量值匹配的object删除。同时需要更新最近一次被跟踪的时间戳为当前测量值的时间戳，更新对应传感器类型的补充属性，设置<code>is_alive_=True</code>，表明该track为活跃的。</p>
+<ul>
+<li>Track::UpdateSensorObject() 更新测量值对应传感器类型的objects中对应sensor_id(用于区分同一类传感器)的object,注意此处为直接覆盖。</li>
+<li>Track::UpdateSensorObjectWithMeasurement() 根据传感器最大容忍的invisible时间间隔(lidar 0.25s radar 0.5s camera 0.75s),超出该时间间隔(即在这段时间内没有新的测量值进行匹配)则从objects中将对应的object删除 对track中的<code>lidar_objects</code>,<code>radar_objects</code>,<code>camera_objects</code>分别执行上述过程。</li>
+<li>更新<code>fused_object_-&gt;latest_tracked_time</code>为当前测量物体的时间戳。</li>
+<li>Track::UpdateSupplementState() 将测量值<code>object</code>的补充属性直接赋值到<code>fused_object</code>的补充属性中。同时对于track中 <code>lidar_objects_</code>,<code>radar_objects_</code>或<code>camera_objects_</code>谁为空(目前该传感器还没有匹配的测量值)就将谁对应的<code>fused_object</code>中对应的<code>lidar_supplement</code>,<code>camera_supplement</code>或 <code>camera_supplement</code>重置</li>
+<li>Track::UpdateUnfusedState() 更新未融合的<code>fused_object</code>剩下的相关状态，对于lidar更新<code>fused_object-&gt;confidence</code>和<code>fused_object-&gt;velocity_converged</code>,对于radar没有啥还需要更新的，对于camera需要更新<code>fused_object-&gt;confidence</code></li>
 </ul></li>
-<li><p>FusedbackgroundTrack 背景融合</p></li>
-<li><p>RemoveLostTrack 移除跟丢的Track</p></li>
+</ul></li>
+</ul></li>
+<li><p>ProbabilisticFusion::UpdateUnassignedTracks() 更新未被当前帧测量值匹配的track的状态,与函数<code>UpdateAssignedTracks()</code>类似，此处有一个参数<code>match_distance</code>用于在<code>ExistanceFusion</code>中计算<code>toic score</code>,由于此处track没有对应的测量值进行匹配，由于没有用到，临时设置match_dsitance为0。</p>
+<ul>
+<li><p>PbfTracker::UpdateWithoutMeasurement() 更新track的状态同样也包含四类融合：类型融合<code>DstTypeFusion</code>,运动状态融合<code>KalmanMotionFusion</code>,存在性融合<code>DstExistanceFuison</code>以及形状外观融合<code>PbfShapeFusion</code>,基本方法同有测量值的更新，此处简述：</p>
+<ul>
+<li><p>DstExistanceFusion::UpdateWithoutMeasurement() 输入:包括sensor_id,测量时间戳(当前检测数据帧的时间戳),<code>min_match_dist</code>(输入时的临时值为0) 输出:<code>track-&gt;toic_prob</code>,<code>track-&gt;existance_prob</code></p>
+<ul>
+<li>DstExistanceFusion::UpdateToicWithoutCameraMeasurement() 虽然当前帧没有匹配的测量值,但是利用历史track最近匹配lidar或radar检测物体进行可视程度的判断,用于更新<code>toic_</code></li>
+</ul></li>
+<li><p>KalmanMotionFusion::UpdateWithoutMeasurement() 就是根据时间差异进行一个简单的预测，由于没有测量因此也就没有校正阶段,但预测的前提是要求该track已经的kalman_filter已经初始化过同时有过匹配的测量值,更新fused_object的相关属性如下： <code>track-&gt;fused_object-&gt;velocity</code>,<code>acceleration</code>,<code>center_uncertainty</code>, <code>velocity_uncertainty</code>,<code>acceleration_uncertainty</code></p></li>
+<li><p>PbfShapeFusion::UpdateWithoutMeasurement() do nothing!</p></li>
+<li><p>DstTypeFusion::UpdateWithoutMeasurement() 仅对当前帧的测量传感器是相机的情况进行处理,比较特殊的是相机在计算不可信度时，采用了时间信息，根据当前测量的时间戳转换到小时，判断是否是晚上以此获得更新的权重比例。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">double</span>&gt; sensor_reliability_for_unknown_ = &#123;</span><br><span class="line">  &#123;<span class="string">"velodyne64"</span>, <span class="number">0.5</span>&#125;,          &#123;<span class="string">"velodyne_64"</span>, <span class="number">0.5</span>&#125;,</span><br><span class="line">  &#123;<span class="string">"velodyne128"</span>, <span class="number">0.5</span>&#125;,         &#123;<span class="string">"camera_smartereye"</span>, <span class="number">0.2</span>&#125;,</span><br><span class="line">  &#123;<span class="string">"front_6mm"</span>, <span class="number">0.2</span>&#125;,           &#123;<span class="string">"camera_front_obstacle"</span>, <span class="number">0.2</span>&#125;,</span><br><span class="line">  &#123;<span class="string">"camera_front_narrow"</span>, <span class="number">0.2</span>&#125;,</span><br></pre></td></tr></table></figure>
+<p>更新track的相关属性如下: <code>track-&gt;fused_object-&gt;type_probs</code></p></li>
+<li><p>Track::UpdateWithoutSensorObject()</p>
+<ul>
+<li>Track::UpdateSensorObjectWithoutMeasurement() 根据当前测量时刻的时间戳对track目前存在的历史<code>lidar_objects</code>,<code>radar_objects</code> ,<code>camera_objects</code>的<code>invisible_period</code>进行更新。对于<code>invisible_period</code>大于阈值的 objects进行清除。 根据track当前的<code>lidar_objects,radar_objects</code>,<code>camera_objects</code>是否全部为空来判断track是否是alive。</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p>ProbabilisticFusion::CreateNewTracks</p>
+<p>根据未进行匹配当前帧测量物体,创建新的跟踪序列。</p>
+<ul>
+<li>Track::Initialize() 从并发对象池中获取track实例，并进行初始化，初始化过程主要由以下几步：
+<ol type="1">
+<li>重置<code>lidar_objects_,radar_objects_,camera_objects_</code>, 将fused_object设置为当前测量值并分配新的全局track_id。</li>
+<li>Track::UpdateWithSensorObject()根据测量值对应的sensor_id将相应值添加到<code>lidar_objects_</code>或 <code>radar_objects</code>或<code>camera_objects</code>中</li>
+</ol></li>
+<li>Scene::AddForegroundTrack(TrackPtr track) 将该<code>track_</code>添加到<code>foreground_tracks_</code>列表中。</li>
+<li>PbfTracker::Init(TrackPtr track, SensorObjectPtr measurement) 创建<code>&lt;PbfTracker&gt;</code>实例<code>tracker</code>，并通过<code>track_</code>和测量值进行初始化,首先通过<code>InitMethods</code>初始化跟踪融合的相关方法<code>type_fuison,shape_fusion,existance_fusion,motion_fusion</code>,创建他们的方法类实例。</li>
+<li>将创建的<code>tracker</code>添加到<code>ProbabilisticFusion::trackers_</code>列表中</li>
+</ul></li>
+</ul></li>
+<li>ProbabilisticFusion::FusebackgroundTrack(const SensorFramePtr&amp; frame) 背景物体跟踪,注意只有lidar传感器检测背景类物体。
+<ul>
+<li>首先进行background_tracks和background_objects的关联，关联依据是track-&gt;fused_object-&gt;track_id(即该track目前对应的object的局部track_id)与当前检测物体的局部<code>track_id</code>相等，则进行关联</li>
+<li>然后对已经匹配的track和object进行状态更新: Track::UpdateWithSensorObject(const SensorObjectPtr&amp; obj) 更新<code>track</code>中的sensor_objects (此处应该为<code>lidar_objects</code>)
+<ul>
+<li>Track::UpdateWithSensorObjectForBackground() 根据测量值的BaseObject更新<code>fused_object_</code>的BaseObject,但是保留原<code>fused_object_</code>的track_id</li>
+</ul></li>
+<li>然后对未匹配的track进行状态更新: Track::UpdateWithoutSensorObject()</li>
+<li>对未匹配的object创建新的跟踪序列: 从对象池中获取<code>track</code>实例，进行初始化<code>track-&gt;Initialize(...);</code>分配新的track_id。
+<ul>
+<li>Scene::AddBackgroundTrack() 将新创建的track加入到背景跟踪列表<code>background_tracks_</code>中。</li>
+</ul></li>
+</ul></li>
+<li><p>ProbabilisticFusion::RemoveLostTrack() 对应前景类，移除<code>track</code>和track对应的处理类<code>tracker</code>(仅前景类foreground存在该tracker处理) 查看<code>track-&gt;is_alive_</code>是否为true(本质上为track的lidar_objects_,radar_objects,camera_objects是否全为空), 对于背景类，仅需要移除<code>track</code></p></li>
+</ul></li>
+<li><p><strong>collect fused objects</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @brief: 收集融合的检测目标</span></span><br><span class="line"><span class="comment">// @params[in]: timestamp 当前传感器帧的时间戳</span></span><br><span class="line"><span class="comment">// @params[out]: fused_objects 融合的objects</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ProbabilisticFusion::CollectFusedObjects</span><span class="params">(<span class="keyword">double</span> timestamp,</span></span></span><br><span class="line"><span class="function"><span class="params">                          <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;base::ObjectPtr&gt;* fused_objects)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>PbfGatekeeper::AbleToPublish(const TrackPtr &amp;track) 对于前景物体跟踪的各个track查询各个类别传感器对应的<code>invisible_period_</code>,下列三个函数返回各类传感器是否是Visible</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">track-&gt;IsLidarVisible() <span class="comment">//(note:lidar类别传感器有不同的id,例如64线,32线等等)</span></span><br><span class="line">track-&gt;IsRadarVisible() <span class="comment">//相机和radar同理</span></span><br><span class="line">track-&gt;IsCameraVisible()</span><br></pre></td></tr></table></figure>
+<p>判断<code>invisible_period&lt; 1.0e-6</code>(要求一类传感器中的所有object) 即判断该传感器是否存在跟踪的中断。 下面三个函数分别判断传感器数据能否发布,若三种传感器都不能发布则返回False。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//要求lidar is visible 同时参数params_.publish_if_has_lidar为true时返回True</span></span><br><span class="line">PbfGatekeeper::LidarAbleToPublish()</span><br><span class="line"><span class="comment">//要求radar is visible 同时参数params_.publish_if_has_radar为true时,若track-&gt;radar_object</span></span><br><span class="line"><span class="comment">// 为"radar_front" ,返回false;若为"radar_rear",则满足：</span></span><br><span class="line"><span class="comment">// track-&gt;radar_object.range &gt; 40; track-&gt;radar_object.velocity&gt;4.0,</span></span><br><span class="line"><span class="comment">// track-&gt;existance_prob_&gt;0.9 时返回true.</span></span><br><span class="line">PbfGatekeeper::RadarAbleToPublish()</span><br><span class="line"><span class="comment">//　要求camera is visible 同时params_.publish_if_has_camera为true,is_night=False(白天)。</span></span><br><span class="line"><span class="comment">//  当subtype=TRAFFICCONE无视range大小及进行发布；若subtype=UNKNOWN_UNMOVABLE则还要求物体的</span></span><br><span class="line"><span class="comment">//  距离相机的距离&gt;50</span></span><br><span class="line"><span class="comment">//　track-&gt;existance_prob_&gt;0.7</span></span><br><span class="line">PbfGatekeeper::CameraAbleToPublish()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>AddTrackedTimes() ++tracked_times_　增加该track被跟踪次数。 前提是上述条件满足。</li>
+<li>GetTrackedTimes() 紧接着查询正常跟踪的次数，如果大于预设参数<code>params_.pub_track_time_thresh=3</code>表明该track已经超过3次被正常跟踪，可以进行发布了。</li>
+</ul></li>
+<li><p>ProbabilisticFusion::CollectObjectsByTrack() 从跟踪tracks中收集objects的相关属性,引入数据类型<code>&lt;SensorObjectMeasurement&gt;</code>位于object-&gt;fusion_supplement中:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> sensor_id = <span class="string">"unknown_sensor"</span>;</span><br><span class="line"><span class="keyword">double</span> timestamp = <span class="number">0.0</span>;</span><br><span class="line"><span class="keyword">int</span> track_id = <span class="number">-1</span>;</span><br><span class="line">Eigen::Vector3d center = Eigen::Vector3d(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">float</span> theta = <span class="number">0.0f</span>;</span><br><span class="line">Eigen::Vector3f <span class="built_in">size</span> = Eigen::Vector3f(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">Eigen::Vector3f velocity = Eigen::Vector3f(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">ObjectType type = ObjectType::UNKNOWN;</span><br><span class="line"><span class="comment">// @brief only for camera measurement</span></span><br><span class="line">BBox2D&lt;<span class="keyword">float</span>&gt; box;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>ProbabilisticFusion::CollectSensorMeasurementFromObject(...)</p>
+<p>首先对于基础属性，直接将track-&gt;fused_object-&gt;baseobject赋值到该obj中; 对于补充属性(fusion_supplement),从track-&gt;lidar_objects,track-&gt;radar_objects,track-&gt;camera_objects中分别得到上述<code>&lt;SensorObjectMeasurement&gt;</code>中的参数值，保存到<code>obj-&gt;fusion_supplement.measurements</code>中，其中<code>measurements</code>为一个向量数组，大小为下所示，分别保存了对应该track的所有测量值。 <code>lidar_objects_.size() + camera_objects_.size() + radar_objects_.size()</code> 除了上述数据类型中的值外,设置该obj的track_id,latest_tracked_time(上一次被跟踪的时间),tracking_time(跟踪时长)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">obj-&gt;track_id = track-&gt;GetTrackId();</span><br><span class="line">obj-&gt;latest_tracked_time = timestamp;</span><br><span class="line">obj-&gt;tracking_time = track-&gt;GetTrackingPeriod();</span><br></pre></td></tr></table></figure>
+<p>对每一个track执行上述操作后，得到的obj添加到<code>fused_objects</code>列表中。</p></li>
+</ul></li>
+<li><p>对于背景物体的跟踪的相关处理方法同上，此处不赘述。</p></li>
 </ul></li>
 </ol>
+<p>至此，<code>fusion_-&gt;Fuse(options, frame, objects)</code>完成,返回到<code>fusion_component</code>组件中。</p>
+<hr>
 <h3 id="参考链接">参考链接</h3>
 <p>https://developer.baidu.com/topic/show/290445</p>
 <p>https://blog.csdn.net/u012423865/article/details/80386444</p>
@@ -785,12 +929,13 @@ prob = \frac{tmp}{tmp+1}
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ExistanceDstMaps</span> &#123;</span></span><br><span class="line">  <span class="keyword">enum</span> &#123; EXIST = (<span class="number">1</span> &lt;&lt; <span class="number">0</span>), NEXIST = (<span class="number">1</span> &lt;&lt; <span class="number">1</span>), EXISTUNKOWN = (EXIST | NEXIST) &#125;; <span class="comment">//1,2,3</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_ = &#123;EXIST, NEXIST, EXISTUNKOWN&#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; subset_names_ = &#123;<span class="string">"EXIST"</span>, <span class="string">"NEXIST"</span>, <span class="string">"EXISTUNKOWN"</span>&#125;;</span><br><span class="line">  <span class="comment">//EXISTUNKOWN从二进制角度来说包含了EXIST,NEXIST</span></span><br><span class="line">  <span class="comment">//subsets的索引ind是指从0开始各个subset的编号，此处 0 1 2 </span></span><br><span class="line">  <span class="comment">//它们的实际值为 01  10  11</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>基于<code>&lt;Dst&gt;</code>数据结构，重构了加法和乘法运算符，对应成员变量：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> app_name_; <span class="comment">//唯一的标识符</span></span><br><span class="line"><span class="keyword">mutable</span> DstCommonDataPtr dst_data_ptr_ = <span class="literal">nullptr</span>; <span class="comment">//由DstManager管理的DstCommonData</span></span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; bba_vec_; <span class="comment">//大小为subset的大小，内容为各个subset的mass(可理解为概率)取值0~1</span></span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; support_vec_;</span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; plausibility_vec_; <span class="comment">//合理性</span></span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; uncertainty_vec_; <span class="comment">//不确定性</span></span><br><span class="line"><span class="keyword">mutable</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; probability_vec_; <span class="comment">//大小为bba_vec的大小</span></span><br></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">DstCommonData</span> &#123;</span></span><br><span class="line">  <span class="comment">// ensure initialize DSTEvidence once</span></span><br><span class="line">  <span class="keyword">bool</span> init_ = <span class="literal">false</span>;</span><br><span class="line">  <span class="comment">// fods</span></span><br><span class="line">  <span class="keyword">size_t</span> fod_loc_ = <span class="number">0</span>; <span class="comment">//指向subsets的最后一个元素对应的编号值</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_;</span><br><span class="line">  <span class="comment">// for transforming to probability effectively 存储各subset的二进制中1的位数</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; fod_subset_cardinalities_;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; fod_subset_names_;</span><br><span class="line">  <span class="comment">// for combining two bbas effectively. 用于计算probability_vec_,第一维表示两个fod_subset交集(大小为</span></span><br><span class="line">  <span class="comment">// fod_sets大小)对应的subset的索引编号，第二维为对应该交集的所有两个fod_subset的索引编号pair</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">size_t</span>, <span class="keyword">size_t</span>&gt;&gt;&gt; combination_relations_; </span><br><span class="line">  <span class="comment">// for computing support vector effectively,第一维大小为fod_subsets大小，第二维存储各fod_subset二进制</span></span><br><span class="line">  <span class="comment">//包含（存在包含关系）的subset所对应的索引编号</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt;&gt; subset_relations_;</span><br><span class="line">  <span class="comment">// for computing plausibility vector effectively，第一维大小为fod_subsets大小，第二位存储各fod_subset二</span></span><br><span class="line">  <span class="comment">// 进制具有相同二进制位(存在交集)的subset对应的索引编号</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt;&gt; inter_relations_; <span class="comment">//intersection</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="keyword">uint64_t</span>, <span class="keyword">size_t</span>&gt; subsets_ind_map_;  <span class="comment">//pair(subset,ind)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">DstCommonData</span> &#123;</span></span><br><span class="line">  <span class="comment">// ensure initialize DSTEvidence once</span></span><br><span class="line">  <span class="keyword">bool</span> init_ = <span class="literal">false</span>;</span><br><span class="line">  <span class="comment">// fods</span></span><br><span class="line">  <span class="keyword">size_t</span> fod_loc_ = <span class="number">0</span>; <span class="comment">//指向subsets的最后一个元素对应的编号值</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_;</span><br><span class="line">  <span class="comment">// for transforming to probability effectively 存储各subset的二进制中1的位数</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; fod_subset_cardinalities_;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; fod_subset_names_;</span><br><span class="line">  <span class="comment">// for combining two bbas effectively. 用于计算probability_vec_,</span></span><br><span class="line">  <span class="comment">//  第一维表示两个fod_subset交集(大小为fod_sets大小)对应的subset的索引编号</span></span><br><span class="line">  <span class="comment">//  第二维为对应该交集的所有两个fod_subset的索引编号pair</span></span><br><span class="line">  <span class="comment">//　用于结合两个bbas</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">size_t</span>, <span class="keyword">size_t</span>&gt;&gt;&gt; combination_relations_; </span><br><span class="line">  <span class="comment">// for computing support vector effectively,第一维大小为fod_subsets大小，第二维存储各fod_subset二进制</span></span><br><span class="line">  <span class="comment">//包含（存在包含关系）的subset所对应的索引编号</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt;&gt; subset_relations_;</span><br><span class="line">  <span class="comment">// for computing plausibility vector effectively，第一维大小为fod_subsets大小，第二位存储各fod_subset二</span></span><br><span class="line">  <span class="comment">// 进制具有相同二进制位(存在交集)的subset对应的索引编号</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt;&gt; inter_relations_; <span class="comment">//intersection</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="keyword">uint64_t</span>, <span class="keyword">size_t</span>&gt; subsets_ind_map_;  <span class="comment">//pair(subset,ind)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>概率计算举例：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ExistanceDstMaps</span> &#123;</span></span><br><span class="line">    <span class="keyword">enum</span> &#123; EXIST = (<span class="number">1</span> &lt;&lt; <span class="number">0</span>), NEXIST = (<span class="number">1</span> &lt;&lt; <span class="number">1</span>), EXISTUNKOWN = (EXIST | NEXIST) &#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_ = &#123;EXIST, NEXIST, EXISTUNKOWN&#125;;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; subset_names_ = &#123;<span class="string">"EXIST"</span>, <span class="string">"NEXIST"</span>, <span class="string">"EXISTUNKOWN"</span>&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; probability_vec_;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; bba_vec_=&#123;<span class="number">0.7</span>,<span class="number">0</span>,<span class="number">0.3</span>&#125;;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">size_t</span> ,<span class="keyword">size_t</span> &gt;&gt;&gt; combination_relations_;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; fod_subset_cardinalities_=&#123;<span class="number">1</span>,<span class="number">1</span>,<span class="number">2</span>&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ComputeProbability</span><span class="params">()</span>  </span>&#123;</span><br><span class="line">    combination_relations_.resize(bba_vec_.<span class="built_in">size</span>());</span><br><span class="line"></span><br><span class="line">    combination_relations_[<span class="number">0</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">0</span>,<span class="number">0</span>));</span><br><span class="line">    combination_relations_[<span class="number">0</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">0</span>,<span class="number">2</span>));</span><br><span class="line">    combination_relations_[<span class="number">0</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">2</span>,<span class="number">0</span>));</span><br><span class="line">    combination_relations_[<span class="number">1</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">1</span>,<span class="number">1</span>));</span><br><span class="line">    combination_relations_[<span class="number">1</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">1</span>,<span class="number">2</span>));</span><br><span class="line">    combination_relations_[<span class="number">1</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">2</span>,<span class="number">1</span>));</span><br><span class="line">    combination_relations_[<span class="number">2</span>].push_back(<span class="built_in">std</span>::make_pair(<span class="number">2</span>,<span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">    probability_vec_.<span class="built_in">clear</span>();</span><br><span class="line">    probability_vec_.resize(bba_vec_.<span class="built_in">size</span>(), <span class="number">0.0</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;combination_relations = combination_relations_; <span class="comment">//存储两个subset的交集索引编号和该两个subset的编号</span></span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; &amp;fod_subset_cardinalities =</span><br><span class="line">            fod_subset_cardinalities_; <span class="comment">//存储各个subset对应的二进制值中1的个数</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; combination_relations.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">auto</span> &amp;combination_pairs = combination_relations[i];<span class="comment">//交集为各个subset的pair</span></span><br><span class="line">        <span class="keyword">double</span> intersection_card = <span class="keyword">static_cast</span>&lt;<span class="keyword">double</span>&gt;(fod_subset_cardinalities[i]); <span class="comment">//该subset对应的位数</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> combination_pair : combination_pairs) &#123;</span><br><span class="line">            <span class="keyword">size_t</span> a_ind = combination_pair.first;</span><br><span class="line">            <span class="keyword">size_t</span> b_ind = combination_pair.second;</span><br><span class="line">            probability_vec_[a_ind] +=</span><br><span class="line">                    intersection_card /</span><br><span class="line">                    <span class="keyword">static_cast</span>&lt;<span class="keyword">double</span>&gt;(fod_subset_cardinalities[b_ind]) *</span><br><span class="line">                    bba_vec_[b_ind];<span class="comment">//根据交集的位数占后者的位数的比例确定所占概率比例的大小</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//@ result：</span></span><br><span class="line">probability_vev_=&#123;<span class="number">0.85</span>,<span class="number">0.15</span>,<span class="number">1</span>&#125;</span><br><span class="line"><span class="comment">//@ note: bba_vec_=&#123;0.7,0,0.3&#125;</span></span><br><span class="line"><span class="comment">//@ 理解为此处的EXIST，NEXIST均与EXISTUNKOWN有交集，因此根据bba_vec按照交集位数的比例比如NEXIST与EXISTUNKOWN的二进制位数为1的比例为 1/2=0.5，因此其概率为0.3*0.5=0.15,而EXIST为0.7(自身概率)+0.3*0.5=0.85</span></span><br></pre></td></tr></table></figure>
 <p>更新概率： 通过重构运算符加法和乘法，进行概率融合，</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Dst <span class="keyword">operator</span>*(<span class="keyword">const</span> Dst &amp;dst, <span class="keyword">double</span> w) &#123;</span><br><span class="line">  dst.SelfCheck();</span><br><span class="line">  <span class="function">Dst <span class="title">res</span><span class="params">(dst.app_name_)</span></span>;</span><br><span class="line">  <span class="comment">// check w</span></span><br><span class="line">  <span class="keyword">if</span> (w &lt; <span class="number">0.0</span> || w &gt; <span class="number">1.0</span>) &#123;</span><br><span class="line">    AERROR &lt;&lt; boost::format(</span><br><span class="line">                  <span class="string">"the weight of bba %lf is not valid, return default bba"</span>) %</span><br><span class="line">                  w;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">size_t</span> fod_loc = dst.dst_data_ptr_-&gt;fod_loc_;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; &amp;resbba_vec_ = res.bba_vec_;</span><br><span class="line">  <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; &amp;bba_vec = dst.bba_vec_;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; resbba_vec_.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">    <span class="keyword">if</span> (i == fod_loc) &#123;</span><br><span class="line">      resbba_vec_[i] = <span class="number">1.0</span> - w + w * bba_vec[i]; <span class="comment">//???</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      resbba_vec_[i] = w * bba_vec[i];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h5 id="dsttypefusion">3.2 DstTypeFusion</h5>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">DstMaps</span> &#123;</span></span><br><span class="line">  <span class="comment">// dst hypothesis types</span></span><br><span class="line">  <span class="keyword">enum</span> &#123;</span><br><span class="line">    PEDESTRIAN = (<span class="number">1</span> &lt;&lt; <span class="number">0</span>), <span class="comment">//1      0000 0001</span></span><br><span class="line">    BICYCLE = (<span class="number">1</span> &lt;&lt; <span class="number">1</span>), <span class="comment">//2         0000 0010</span></span><br><span class="line">    VEHICLE = (<span class="number">1</span> &lt;&lt; <span class="number">2</span>), <span class="comment">//4         0000 0100</span></span><br><span class="line">    OTHERS_MOVABLE = (<span class="number">1</span> &lt;&lt; <span class="number">3</span>), <span class="comment">//8  0000 1000</span></span><br><span class="line">    OTHERS_UNMOVABLE = (<span class="number">1</span> &lt;&lt; <span class="number">4</span>)<span class="comment">//16 0001 0000   </span></span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="keyword">enum</span> &#123;</span><br><span class="line">    OTHERS = (OTHERS_MOVABLE | OTHERS_UNMOVABLE), <span class="comment">//24 0001 1000</span></span><br><span class="line">    UNKNOWN = (PEDESTRIAN | BICYCLE | VEHICLE | OTHERS) <span class="comment">//31 0001 1111</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">uint64_t</span>&gt; fod_subsets_ = &#123;</span><br><span class="line">      PEDESTRIAN,       BICYCLE, VEHICLE, OTHERS_MOVABLE,</span><br><span class="line">      OTHERS_UNMOVABLE, OTHERS,  UNKNOWN&#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; subset_names_ = &#123;</span><br><span class="line">      <span class="string">"PEDESTRIAN"</span>,       <span class="string">"BICYCLE"</span>, <span class="string">"VEHICLE"</span>, <span class="string">"OTHERS_MOVABLE"</span>,</span><br><span class="line">      <span class="string">"OTHERS_UNMOVABLE"</span>, <span class="string">"OTHERS"</span>,  <span class="string">"UNKNOWN"</span>&#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="keyword">size_t</span>, <span class="keyword">uint64_t</span>&gt; typ_to_hyp_map_ = &#123;</span><br><span class="line">      &#123;<span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::PEDESTRIAN), PEDESTRIAN&#125;,</span><br><span class="line">      &#123;<span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::BICYCLE), BICYCLE&#125;,</span><br><span class="line">      &#123;<span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::VEHICLE), VEHICLE&#125;,</span><br><span class="line">      &#123;<span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::UNKNOWN_MOVABLE), OTHERS_MOVABLE&#125;,</span><br><span class="line">      &#123;<span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::UNKNOWN_UNMOVABLE),</span><br><span class="line">       OTHERS_UNMOVABLE&#125;,</span><br><span class="line">      &#123;<span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::UNKNOWN), OTHERS&#125;,</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="keyword">uint64_t</span>, <span class="keyword">size_t</span>&gt; hyp_to_typ_map_ = &#123;</span><br><span class="line">      &#123;PEDESTRIAN, <span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::PEDESTRIAN)&#125;,</span><br><span class="line">      &#123;BICYCLE, <span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::BICYCLE)&#125;,</span><br><span class="line">      &#123;VEHICLE, <span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::VEHICLE)&#125;,</span><br><span class="line">      &#123;OTHERS_MOVABLE, <span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::UNKNOWN_MOVABLE)&#125;,</span><br><span class="line">      &#123;OTHERS_UNMOVABLE,</span><br><span class="line">       <span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::UNKNOWN_UNMOVABLE)&#125;,</span><br><span class="line">      &#123;OTHERS, <span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::UNKNOWN)&#125;,</span><br><span class="line">      &#123;UNKNOWN, <span class="keyword">static_cast</span>&lt;<span class="keyword">size_t</span>&gt;(base::ObjectType::UNKNOWN)&#125;&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h5 id="kalmanmoitonfusion">3.3 KalmanMoitonFusion</h5>
 <h5 id="pbfshapefusion">3.4 PbfShapeFusion</h5>
 <h4 id="自适应卡尔曼滤波">4. 自适应卡尔曼滤波</h4>
@@ -973,12 +1118,12 @@ prob = \frac{tmp}{tmp+1}
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">278k</span>
+    <span title="站点总字数">289k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">7:44</span>
+    <span title="站点阅读时长">8:01</span>
 </div>
 
 <span id="sitetime"></span>
