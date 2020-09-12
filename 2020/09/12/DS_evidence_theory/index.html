@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/bitbug_favicon32x32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/bitbug_favicon16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://zhxjia.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: 'JFFLKNTBOH',
+      apiKey: '12c519466e9111e97c1a9fa4f29a7156',
+      indexName: 'zhxjia',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="70年代初，Dempster和Shafer建立的一套数学理论，称为D-S证据理论，是贝叶斯推理方法的推广，广泛应用于多源信息融合，不确定性推理。 贝叶斯理论通过已知的三个概率推断第四个概率，即在某些已知条件下，推断某事件发生的概率， \[ P(A|B)&#x3D;\frac{P(B|A)P(A)}{P(B)}\\ \] P(A|B)为已知B发生情况下A的后验概率 P(A)时A的先验概率(边缘概率) P(B|">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DS(Dempster-Shafer)多元信息融合证据理论">
+<meta property="og:url" content="https://zhxjia.github.io/2020/09/12/DS_evidence_theory/index.html">
+<meta property="og:site_name" content="ZhxJia&#39;s Blog">
+<meta property="og:description" content="70年代初，Dempster和Shafer建立的一套数学理论，称为D-S证据理论，是贝叶斯推理方法的推广，广泛应用于多源信息融合，不确定性推理。 贝叶斯理论通过已知的三个概率推断第四个概率，即在某些已知条件下，推断某事件发生的概率， \[ P(A|B)&#x3D;\frac{P(B|A)P(A)}{P(B)}\\ \] P(A|B)为已知B发生情况下A的后验概率 P(A)时A的先验概率(边缘概率) P(B|">
+<meta property="article:published_time" content="2020-09-12T12:31:37.066Z">
+<meta property="article:modified_time" content="2020-09-12T12:31:37.066Z">
+<meta property="article:author" content="ZhxJia">
+<meta property="article:tag" content="多传感器融合">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://zhxjia.github.io/2020/09/12/DS_evidence_theory/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>DS(Dempster-Shafer)多元信息融合证据理论 | ZhxJia's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZhxJia's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">半路出家</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input" id="search-input"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+  
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://zhxjia.github.io/2020/09/12/DS_evidence_theory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/jd.png">
+      <meta itemprop="name" content="ZhxJia">
+      <meta itemprop="description" content="行则将至">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZhxJia's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DS(Dempster-Shafer)多元信息融合证据理论
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-09-12 20:31:37" itemprop="dateCreated datePublished" datetime="2020-09-12T20:31:37+08:00">2020-09-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" itemprop="url" rel="index">
+                    <span itemprop="name">无人驾驶</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/%E5%A4%9A%E4%BC%A0%E6%84%9F%E5%99%A8%E8%9E%8D%E5%90%88/" itemprop="url" rel="index">
+                    <span itemprop="name">多传感器融合</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/09/12/DS_evidence_theory/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/09/12/DS_evidence_theory/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>12 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>70年代初，Dempster和Shafer建立的一套数学理论，称为D-S证据理论，是贝叶斯推理方法的推广，广泛应用于多源信息融合，不确定性推理。</p>
+<p>贝叶斯理论通过已知的三个概率推断第四个概率，即在某些已知条件下，推断某事件发生的概率， <span class="math display">\[
+P(A|B)=\frac{P(B|A)P(A)}{P(B)}\\
+\]</span> P(A|B)为已知B发生情况下A的后验概率 P(A)时A的先验概率(边缘概率) P(B|A)为以子A发生的情况下B的后验概率 P(B)是B的先验概率，通常表示为<span class="math inline">\(P(B)=\sum_{j}P(B|A_j)P(A_j),A_j为事件几何的各子集\)</span> 也可表述为:**后验概率 = (似然性*先验概率)/标准化常量** 所以A发生的后验概率与A的先验概率和似然度的乘积成正比。</p>
+<p>是否有不需要先验概率直接获得后验概率的方法呢？证据的本质就是基于观测对不同的假设赋予权值的一种方法： (1) 能够处理任意数量的假设 (2) 能够把证据的权值解释为一种函数，而这个函数把假设的先验概率空间映射到基于观测的假设后验概率空间。</p>
+<a id="more"></a>
+<h3 id="ds证据理论的基本概念--mass函数信度函数似真度函数">1. DS证据理论的基本概念--mass函数、信度函数、似真度函数</h3>
+<p><strong>定义1：基本概率分配（BPA）</strong></p>
+<blockquote>
+<p>DS证据理论设空间<span class="math inline">\(H\)</span>表示某个有限集合，称为假设空间；假设<span class="math inline">\(P(H)\)</span>表示<span class="math inline">\(H\)</span>所有子集(若样本空间有N个元素，则所有的子集有<span class="math inline">\(2^N\)</span>个)构成的集类(称为H的幂集)，则映射<span class="math inline">\(m:P(H){\rightarrow}[0,1]\)</span>称为一个基本概率赋值(BPA)或<code>mass</code>函数，需满足下列条件： (1) <span class="math inline">\(m(\phi)=0\)</span> (2) <span class="math inline">\(\sum_{A\subset H}m(A)=1\)</span>（假设空间所有子集的mass之和为1）时 则<code>mass</code>函数实际上是对各种假设的评价权值。注意基本概率赋值不是概率，不满足可列可加性。</p>
+</blockquote>
+<p>实际就是分配给H的每一个子集一个实数，且空集的基本概率数为0，所有子集的概率分配数之和为1，这个实数位于[0,1]之间，同时这个映射关系不是唯一的且概率分配函数与概率是不同的。</p>
+<p>设样本空间<span class="math inline">\(H=\{红，黄，蓝\}\)</span> M({红})=0.3 (认为是红色的信任度为0.3)，M({黄})=0，M({蓝})=0.1，M({红，黄})=0.2，M({红，蓝})=0.2(认为是红色或是蓝色的信息度为0.2)，M({黄，蓝})=0.1，M({红，黄，蓝})=0.1(表示命题不知道是红色，黄色还是蓝色，这0.1的权值不知道怎么分配), M({<span class="math inline">\(\Phi\)</span>})=0,但M({红})+M({黄})+M({蓝})=0.4$$1.0 所以概率分配函数与概率不同。</p>
+<p>参考韩崇昭老师的《多源信息融合》举个栗子： 两个医生同时给一个病人看病，甲医生认为0.9可能性是感冒，0.1可能性是某种病症；乙医生认为0.2可能性<strong>不是</strong>感冒，0.8可能性是某种病症。此时假设空间位<span class="math inline">\(H=\{h,\bar h\}\)</span> ,h是诊断为感冒，<span class="math inline">\(\bar h\)</span>表示诊断为不是感冒。<span class="math inline">\(P(H)=\{\Phi,\{h\},\{\bar h\},H\}\)</span>,<span class="math inline">\(\Phi\)</span>表示为不可能事件：“既是感冒又不是感冒”，<span class="math inline">\(H\)</span>表示事件“可能是感冒，又可能不是感冒”，则构造的mass函数为： <span class="math inline">\(m_1(h)=0.9\)</span> 表示甲医生认为是感冒的可能性； <span class="math inline">\(m_1(H)=0.1\)</span> 表示甲医生认为是某种说不清的病症的可能性 <span class="math inline">\(m_2(\bar h)=0.2\)</span>表示乙医生认为不是感冒的可能性； <span class="math inline">\(m_2(H)=0.8\)</span>表示乙医生认为是某种说不清的病症的可能性 问题是判断患者是感冒的可能性是多少？ 需要注意的是<span class="math inline">\(H=\{h\}\cup\{\bar h\}\)</span>,且<span class="math inline">\(\{h\}\cap\{\bar h\}=\Phi\)</span> 但 <span class="math inline">\(m_1(H)\neq m_1(h)+m_1(\bar h)\)</span> 即mass函数不是表示的概率。</p>
+<p><strong>定义2：信度函数(belief function)</strong></p>
+<blockquote>
+<p>设<span class="math inline">\(H\)</span>表示某个有限集合，<span class="math inline">\(P(H)\)</span>表示<span class="math inline">\(H\)</span>的所有子集构成的集类，映射<span class="math inline">\(Bel:P(H)\rightarrow[0,1]\)</span>称为信度函数， <span class="math inline">\(Bel(A)=\sum_{B\subseteq A }M(B)\)</span>,<span class="math inline">\(\forall A\subseteq H\)</span> ,如果满足： (1) <span class="math inline">\(Bel(\Phi)=0;Bel(H)=1\)</span> (样本空间的信度函数为1) (2) 对<span class="math inline">\(H\)</span>中的任意子集<span class="math inline">\(A_1,A_2,\dots,A_n\)</span>有： <span class="math display">\[
+Bel(\bigcup_{i=1}^{n}A_i) \ge \sum_{I\subseteq\{1,2,...,n\}\\I\neq\Phi}(-1)^{|I|+1}Bel(\bigcap_{i\in I}A_i)
+\]</span> 其中,<span class="math inline">\(|I|\)</span>表示集合<span class="math inline">\(I\)</span>中的元素个数。 说明信度函数表示对假设命题A为真的信任程度估计的下限(悲观估计)，假定仅对<span class="math inline">\(H\)</span>中的任意两个子集<span class="math inline">\(A_1,A_2\)</span>有： <span class="math display">\[
+Bel(A_1 \cup A_2)\ge Bel(A_1)+Bel(A_2)-Bel(A_1\cap A_2)
+\]</span> 此时称<span class="math inline">\(Bel:P(H)\rightarrow[0,1]\)</span>为弱信度函数(weak belief function)</p>
+</blockquote>
+<p>设样本空间<span class="math inline">\(H=\{红，黄，蓝\}\)</span> M({红})=0.3，M({黄})=0，M({红，黄})=0.2 Bel({红，黄})=M({红})+M({黄})+M({红，黄})=0.3+0+0.2=0.5,即对命题认为是红色或黄色的总信任程度为0.5</p>
+<p><strong>定义3： 似真度函数（plausibility function）</strong></p>
+<blockquote>
+<p>假设<span class="math inline">\(H\)</span>表示某个有限集合，<span class="math inline">\(P(H)\)</span>表示H的所有子集构成的集类，映射<span class="math inline">\(Pl:P(H)\rightarrow[0,1]\)</span>称为似真度函数，如果满足： (1) <span class="math inline">\(Pl(\Phi)=0;Pl(H)=1\)</span> (2) 对H中的任意子集<span class="math inline">\(A_1,A_2,...,A_n\)</span>有 <span class="math display">\[
+Pl(\bigcap_{i=1}^{n}A_i) \le \sum_{I\subseteq\{1,2,...,n\}\\I\neq\Phi}(-1)^{|I|+1}Pl(\bigcup_{i\in I}A_i)
+\]</span> 说明似真度函数表示对假设的信任程度估计的上限(乐观估计)。假定仅对H中的任意两个子集<span class="math inline">\(A_1,A_2\)</span>有： <span class="math display">\[
+Pl(A_1 \cap A_2)\le Pl(A_1)+Pl(A_2)-Pl(A_1\cup A_2)
+\]</span> 则称<span class="math inline">\(Pl:P(H)\rightarrow[0,1]\)</span>为弱似真度函数。</p>
+</blockquote>
+<p><strong>定理1：</strong></p>
+<blockquote>
+<p><span class="math inline">\(Pl(A)=1-Bel(A^{\lnot}),\forall A\subseteq H\)</span> ，$A $表示A的补集 <span class="math inline">\(Bel(A)=1-Pl(A\lnot)\)</span></p>
+</blockquote>
+<p><strong>定理2：</strong></p>
+<blockquote>
+<p><span class="math inline">\(Bel(A)=\sum_{D\subseteq A}m(D)\)</span> <span class="math inline">\(Pl(A) =\sum_{D\cap A\neq\Phi}m(D)\)</span></p>
+</blockquote>
+<p>例：设样本空间<span class="math inline">\(H=\{红，黄，蓝\}\)</span> M({红})=0.3，M({黄})=0，M({红，黄})=0.2 Bel({红，黄})=M({红})+M({黄})+M({红，黄})=0.5 Pl({蓝})=1-Bel({蓝}<span class="math inline">\(\lnot\)</span>)=1-Bel({红，黄})=1-0.5=0.5 表示</p>
+<p><code>信度函数</code>和<code>似真度函数</code>表征了一个命题不确定性的上下限，两者之间的关系如下： 因为 <span class="math inline">\(Bel(A)+Bel(\lnot A)=\sum_{B\subseteq A}M(B)+\sum_{C\subseteq\lnot A}M(C)\le\sum_{E\subseteq D}M(E)=1\)</span></p>
+<p>所以 <span class="math inline">\(Pl(A)-Bel(A)=1-Bel(\lnot A)-Bel(A)=1-(Bel(\lnot A)+Bel(A))\ge0\)</span></p>
+<p><span class="math inline">\(Pl(A)\ge Bel(A)\)</span> 其中<span class="math inline">\(Bel(A):对命题A为真的信任程度\)</span> <span class="math inline">\(Pl(A):对A为非假的信任程度\)</span> <span class="math inline">\(A(Bel(A),Pl(A))\)</span>为命题A信任程度的下限和上限，下面给出几种特殊情况：</p>
+<table>
+<thead>
+<tr class="header">
+<th>命题A信任度的上下限</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A(0,1)</td>
+<td>表示对命题A一无所知</td>
+</tr>
+<tr class="even">
+<td>A(1,1)</td>
+<td>A为真</td>
+</tr>
+<tr class="odd">
+<td>A(0,0)</td>
+<td>A为假</td>
+</tr>
+<tr class="even">
+<td>A(a,1),0&lt;a&lt;1</td>
+<td>对命题A部分信任，信任程度为a</td>
+</tr>
+<tr class="odd">
+<td>A(0,b),0&lt;b&lt;1</td>
+<td>对命题$A <span class="math inline">\(部分信任，信任程度为b | | A(a,b) | 表示对命题A和\)</span>A$同时信任</td>
+</tr>
+</tbody>
+</table>
+<p>设球的颜色样本空间<span class="math inline">\(H=\{红，黄，蓝\}\)</span> M({红})=0.3 ，M({黄})=0，M({蓝})=0.1，M({红，黄})=0.2，M({红，蓝})=0.2，M({黄，蓝})=0.1，M({红，黄，蓝})=0.1 则球是红色命题的信任度的上下限为A(0.3,0.8)</p>
+<p><strong>定理3：</strong></p>
+<blockquote>
+<p>设H是有限集合，Bel和Pl分别是定义在P(H)上的信度函数和似真度函数，<span class="math inline">\(z_1,z_2,...,z_l\in O\)</span>为<span class="math inline">\(l\)</span>个互斥且完备的观测，即<span class="math inline">\(\mu_(z_i)\)</span>表示<span class="math inline">\(z_i\)</span>发生的概率，满足<span class="math inline">\(z_i \cap z_j=\Phi,\forall i\neq j\)</span>且<span class="math inline">\(\sum_{i=1}^l \mu(z_i)=1\)</span>对于每个<span class="math inline">\(z_i \in O\)</span>,当<span class="math inline">\(m(\centerdot|z_i),Bel(\centerdot|z_i),Pl(\centerdot|z_i)\)</span>分别是H上的mass函数，信度函数，似真度函数时，则： <span class="math display">\[
+m(A)=\sum_{i=1}^{l}m(A|z_i)\mu(z_i)\\
+Bel(A)=\sum_{i=1}^{l}Bel(A|z_i)\mu(z_i)\\
+m(A)=\sum_{i=1}^{l}Pl(A|z_i)\mu(z_i)
+\]</span> 仍分别是H上的mass函数，信度函数和似真度函数。</p>
+</blockquote>
+<h3 id="dempster-shafer证据的组合">2. Dempster-Shafer证据的组合</h3>
+<p>意义在于两个不同的可能性判断，经过合成变为统一的判断，需要注意的是这是一种集合运算，与概率的数值计算不同。</p>
+<p><strong>定理4：</strong></p>
+<blockquote>
+<p>设<span class="math inline">\(m_1,m_2\)</span>是H上的两个mass函数，则 <span class="math inline">\(m(\Phi)=0\)</span> <span class="math inline">\(m(A)=\frac{1}{N}\sum_{E\cap F=A}m_1(E)m_2(F),A\neq \Phi\)</span> 是mass函数，其中<span class="math inline">\(N=\sum_{E\cap F\neq\Phi}m_1(E)m_2(F)&gt;0\)</span>为归一化系数。 一般记为<span class="math inline">\(m=m_1\oplus m_2\)</span> 扩展到一般情况下：<span class="math inline">\(m(A)=(m_1 \oplus...\oplus m_n)=\frac{1}{N}\sum_{\bigcap _{i=1}^{n}E_i=A}\prod_{i=1}^n m_i(E_i),A\neq \Phi\)</span> 如果<span class="math inline">\(N=0\)</span>，则由于mass函数存在矛盾不能合成。</p>
+</blockquote>
+<p>例： D={黑，白}，且设 <span class="math inline">\(M_2\)</span>({黑}，{白}，{黑，白}，<span class="math inline">\(\Phi\)</span>)=(0.6, 0.3, 0.1, 0) <span class="math inline">\(M_1\)</span>({黑}，{白}，{黑，白}，<span class="math inline">\(\Phi\)</span>)=(0.3, 0.5, 0.2, 0) 则 <span class="math display">\[
+\begin{align}
+N&amp;=\sum_{E\cap F\neq\Phi}m_1(E)m_2(F)\\
+&amp;=1-\sum_{E\cap F=\Phi}m_1(E)m_2(F)\\
+&amp;=1-[M_1(\{黑\})*M_2(\{白\})+M_1(\{白\})*M_2(\{黑\})]\\
+&amp;=1-[0.3*0.3+0.5*0.6]=0.61\\
+ \\
+M(\{黑\})&amp;=\frac{1}{0.61}[M_1(\{黑\})*M_2(\{黑\})+M_1(\{黑\})*M_2(\{黑,白\})+M_1(\{黑，白\})*M_2(\{黑\})]\\
+&amp;=\frac{1}{0.61}*[0.3*0.6+0.3*0.1+0.2*0.6]=0.54
+\end{align}
+\]</span></p>
+<h3 id="证据推理">3. 证据推理：</h3>
+<p><strong>定理5：</strong></p>
+<blockquote>
+<p>设m是假设空间H上的mass函数， P(H)表示H的所有子集构成的幂集，F是H上的概率分布，则有 <span class="math inline">\(v:p(H)\rightarrow[0,1]\)</span> ,满足<span class="math inline">\(v(\Phi)=0\)</span>，且： <span class="math display">\[
+v(A)=\frac{m(A)*F(A)}{\sum_{\Phi \neq B\subseteq H}m(B)*F(B)}
+\]</span> 以及<span class="math inline">\(\gamma:P(H)\rightarrow[0,,1]\)</span>,满足<span class="math inline">\(\gamma(\Phi)=0\)</span>,且 <span class="math display">\[
+\gamma(A)=\frac{m(A)/F(A)}{\sum_{\Phi\neq B\subseteq H}m(B)/F(B)}
+\]</span> 仍是H上的mass函数。</p>
+</blockquote>
+<p><strong>定理6：</strong></p>
+<blockquote>
+<p>设H是有限集合，<span class="math inline">\(m_1,m_2\)</span>是定义在P(H)上的mass函数，P是H上的概率分布，则有<span class="math inline">\(v:P(H)\rightarrow[0,1]\)</span> ,满足 <span class="math inline">\(v(\Phi)=0\)</span>,且 <span class="math display">\[
+v(A)=\frac{(r_1\oplus r_2)(A)*F(A)}{\sum_{\Phi \neq D\subseteq H}(r_1 \oplus r_2)(D)*F(D)},A\in P(H)
+\]</span> 仍是H上的mass函数，其中： <span class="math display">\[
+\gamma_i(A)=\frac{m_i(A)/F(A)}{\sum_{\Phi\neq B\subseteq H}m_i(B)/F(B)},i=1,2
+\]</span> 记为<span class="math inline">\(v(A)=(m_1\otimes m_2)(A)\)</span></p>
+</blockquote>
+<p>证据推理的一般步骤为：</p>
+<ol type="1">
+<li><p>计算mass函数<span class="math inline">\(m_i(A)\)</span>,即： <span class="math inline">\(m_i(A)=m(A|z_i)\mu_i(z_i)+m(A|\overline{z}_i)\mu_i(\overline{z}_i),i=1,..,l\)</span></p></li>
+<li><p>利用先验概率F,计算mass函数<span class="math inline">\(\gamma_i(A)\)</span> <span class="math display">\[
+\gamma_i(A)=\frac{m_i(A)/F(A)}{\sum_{\Phi\neq B\subseteq H}m_i(B)/F(B)},i=1,2
+\]</span></p></li>
+<li><p>利用Dempster-Shafer合成公式，计算mass函数<span class="math inline">\(\gamma(A)\)</span> <span class="math display">\[
+\gamma(A)=(r_1 \oplus r_2 \oplus ... \oplus r_l)(A)
+\]</span></p></li>
+<li><p>计算mass函数<span class="math inline">\(v(A)\)</span> <span class="math display">\[
+v(A)=\frac{\gamma(A)*F(A)}{\sum_{\Phi \neq D\subseteq H}\gamma(D)*F(D)},A\in P(H)
+\]</span></p></li>
+<li><p>计算信度函数和似真度函数， <span class="math display">\[
+Bel(A)=\sum_{D\subseteq A}v(D)\\
+Pl(A) =\sum_{D\cap A\neq\Phi}v(D)
+\]</span> 得到信任区间<span class="math inline">\([Bel(A),Pl(A)]\)</span></p></li>
+</ol>
+<p>例子： 设有规则： (1) 如果流鼻涕则感冒但非过敏性鼻炎(0.9),或过敏性鼻炎但非感冒(0.1) (2)如果眼发炎则感冒但非过敏性鼻炎(0.8),或过敏性鼻炎但非感冒(0.05)</p>
+<p>有事实（先验概率）： (1) 小王流鼻涕(0.9) (2) 小王眼发炎(0.4) 问：小王患的啥病？</p>
+<blockquote>
+<p>首先取样本空间<span class="math inline">\(H=\{h_1,h_2,h_3\}\)</span> <span class="math inline">\(h_1\)</span>表示感冒但非过敏性鼻炎,<span class="math inline">\(h_2\)</span>表示过敏性鼻炎但非感冒，<span class="math inline">\(h_3\)</span>表示同时得了两种病 取下面的基本概率分配函数： <span class="math display">\[
+M_1(\{h_1\})=0.9*0.9=0.81\\
+M_1(\{h_2\})=0.9*0.1=0.09\\
+M_1(\{h_1,h_2,h_3\})=1-M_1(\{h_1\})-M_1(\{h_2\})=0.1\\
+M_2(\{h_1\})=0.4*0.8=0.32\\
+M_2(\{h_2\})=0.4*0.051=0.02\\
+M_2(\{h_1,h_2,h_3\})=1-M_2(\{h_1\})-M_2(\{h_2\})=0.66\\
+\]</span> 然后进行概率合成： <span class="math display">\[
+N=1-[M_1(\{h_1\})M_2(\{h_2\})+M_1(\{h_2\})M_2(\{h_1\})]=1-0.81*0.02-0.09*0.32=0.955\\
+M(\{h_1\})=\frac{1}{0.955}*[0.81*0.32+0.81*0.66+0.1*0.32]=0.865\\
+M(\{h_2\})=\frac{1}{0.955}*[0.09*0.02+0.09*0.66+0.1*0.02]=0.066\\
+M(\{h_1,h_2,h_3\})=1-0.865-0.066=0.069
+\]</span> 信任度： <span class="math display">\[
+Bel(\{h_1\})=M(\{h_1\})=0.865\\
+Bel(\{h_2\})=M(\{h_2\})=0.066\\
+\]</span> 似真度： <span class="math display">\[
+Pl(\{h_1\})=M(\{h_1\})+M(\{h_1,h_2,h_3\})=0.934\\
+Pl(\{h_2\})=M(\{h_2\})+M(\{h_1,h_2,h_3\})=0.066+0.069=0.135
+\]</span> 则事件<span class="math inline">\(\{h_1\}\)</span>的信任区间为[0.865,0.934],而事件<span class="math inline">\(\{h_2\}\)</span>的信任区间为[0.066,0.135],因此小王应该是感冒了。</p>
+</blockquote>
+<h3 id="mass函数的获取方法">4.mass函数的获取方法</h3>
+<ol type="1">
+<li>考虑目标类型数和环境加权系数确定mass函数</li>
+<li>基于统计证据的mass函数获取方法</li>
+<li>基于隶属度函数生成mass函数的方法</li>
+</ol>
+<h3 id="证据理论存在的主要问题与发展">5.证据理论存在的主要问题与发展</h3>
+<h3 id="参考">参考</h3>
+<p><a href="https://blog.csdn.net/am45337908/article/details/48832947" target="_blank" rel="noopener">CSDN:D-S证据理论学习笔记</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%9A%E4%BC%A0%E6%84%9F%E5%99%A8%E8%9E%8D%E5%90%88/" rel="tag"># 多传感器融合</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/13/apollo-lidar_tracker/" rel="prev" title="apollo lidar算法--recognition component（一）">
+      <i class="fa fa-chevron-left"></i> apollo lidar算法--recognition component（一）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/09/12/pr-review_Image_PointCloud_Fusion/" rel="next" title="《Deep Learning for Image and Point Clound Fusion in Autonomous Driving:A Review》">
+      《Deep Learning for Image and Point Clound Fusion in Autonomous Driving:A Review》 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#ds证据理论的基本概念--mass函数信度函数似真度函数"><span class="nav-number">1.</span> <span class="nav-text">1. DS证据理论的基本概念--mass函数、信度函数、似真度函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dempster-shafer证据的组合"><span class="nav-number">2.</span> <span class="nav-text">2. Dempster-Shafer证据的组合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#证据推理"><span class="nav-number">3.</span> <span class="nav-text">3. 证据推理：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mass函数的获取方法"><span class="nav-number">4.</span> <span class="nav-text">4.mass函数的获取方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#证据理论存在的主要问题与发展"><span class="nav-number">5.</span> <span class="nav-text">5.证据理论存在的主要问题与发展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZhxJia"
+      src="/images/jd.png">
+  <p class="site-author-name" itemprop="name">ZhxJia</p>
+  <div class="site-description" itemprop="description">行则将至</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhxJia" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhxJia" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jachin9707@gmail.com" title="E-Mail → mailto:jachin9707@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+      
+        <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+        <div class="widget-wrap">
+          <h3 class="widget-title">Tag Cloud</h3>
+          <div id="myCanvasContainer" class="widget tagcloud">
+              <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                 <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apollo/" rel="tag">Apollo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MOT/" rel="tag">MOT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/STL/" rel="tag">STL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apollo/" rel="tag">apollo</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/build/" rel="tag">build</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/caffe/" rel="tag">caffe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/detector/" rel="tag">detector</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" rel="tag">lidar目标检测</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lidar%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">lidar目标跟踪</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perception/" rel="tag">perception</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/radar/" rel="tag">radar</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/slam/" rel="tag">slam</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/track/" rel="tag">track</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/" rel="tag">传感器标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E8%9E%8D%E5%90%88/" rel="tag">传感器融合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E8%A7%86%E5%9B%BE%E8%A1%A1%E9%87%8F/" rel="tag">单视图衡量</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2/" rel="tag">坐标转换</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E4%BC%A0%E6%84%9F%E5%99%A8%E8%9E%8D%E5%90%88/" rel="tag">多传感器融合</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%84%9F%E7%9F%A5/" rel="tag">感知</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E4%BA%BA%E9%A9%BE%E9%A9%B6/" rel="tag">无人驾驶</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag">概率论</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">深度学习</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" rel="tag">目标跟踪</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E8%A7%89/" rel="tag">视觉</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%9C%E7%A2%8D%E7%89%A9%E6%A3%80%E6%B5%8B/" rel="tag">障碍物检测</a><span class="tag-list-count">1</span></li></ul>
+        </canvas>
+       </div>
+     </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhxJia</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">302k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">8:23</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+    var t1 = Date.UTC(2020,01,28,00,00,00); //这里调整博客建站时间，时间：2019-05-14 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+  }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+  siteTime();
+</script>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+  <div class="addthis_inline_share_toolbox">
+    <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5e37e1f2e978cea8" async="async"></script>
+  </div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zhxjia.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://zhxjia.github.io/2020/09/12/DS_evidence_theory/";
+    this.page.identifier = "2020/09/12/DS_evidence_theory/";
+    this.page.title = "DS(Dempster-Shafer)多元信息融合证据理论";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zhxjia.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":true,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
