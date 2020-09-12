@@ -38,16 +38,18 @@
       
       <categories>
           
-          <category> 无人驾驶 </category>
+          <category> autonomous </category>
           
-          <category> 多传感器融合 </category>
+          <category> apollo </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 多传感器融合 </tag>
+            <tag> apollo </tag>
+            
+            <tag> sensor fusion </tag>
             
         </tags>
       
@@ -616,13 +618,25 @@
     
     
     <entry>
-      <title>深度学习服务器搭建</title>
+      <title>深度学习caffe安装过程存在的问题</title>
       <link href="/2020/03/09/dl-frame-build/"/>
       <url>/2020/03/09/dl-frame-build/</url>
       
-        <content type="html"><![CDATA[<p><a href="https://aimuch.com/2019/03/17/搭建深度学习服务器环境/" target="_blank" rel="noopener">https://aimuch.com/2019/03/17/%E6%90%AD%E5%BB%BA%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%8E%AF%E5%A2%83/</a></p><a id="more"></a><p>安了一晚上的caffe,</p><p>​ caffe 与 anaconda有很多包冲突的地方，八字不合</p>]]></content>
+        <content type="html"><![CDATA[<a id="more"></a><p>安了一晚上的caffe,</p><p>caffe 与 anaconda有很多包冲突的地方，八字不合</p><p>搭建深度学习服务器<a href="https://aimuch.com/2019/03/17/搭建深度学习服务器环境/" target="_blank" rel="noopener">https://aimuch.com/2019/03/17/%E6%90%AD%E5%BB%BA%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%8E%AF%E5%A2%83/</a></p>]]></content>
       
       
+      <categories>
+          
+          <category> caffe </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> caffe </tag>
+            
+        </tags>
       
     </entry>
     
@@ -976,23 +990,25 @@
     
     
     <entry>
-      <title>doxygen</title>
+      <title>doxygen安装</title>
       <link href="/2020/02/16/doxygen/"/>
       <url>/2020/02/16/doxygen/</url>
       
-        <content type="html"><![CDATA[<a id="more"></a><blockquote><p>参考：https://www.ibm.com/developerworks/cn/aix/library/au-learningdoxygen/index.html</p></blockquote><h2 id="安装doxygen">安装doxygen</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install flex bison</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/doxygen/doxygen.git</span><br><span class="line"><span class="built_in">cd</span> doxygen</span><br><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake .. &amp; make </span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure><h2 id="使用doxygen生成文档">使用Doxygen生成文档</h2><p>--目前应用好像有困难　　暂时先不写了</p>]]></content>
+        <content type="html"><![CDATA[<p>doxygen 自动文档生成工具安装</p><a id="more"></a><blockquote><p>参考：https://www.ibm.com/developerworks/cn/aix/library/au-learningdoxygen/index.html</p></blockquote><h2 id="安装doxygen">安装doxygen</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install flex bison</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/doxygen/doxygen.git</span><br><span class="line"><span class="built_in">cd</span> doxygen</span><br><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake .. &amp; make </span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure><h2 id="使用doxygen生成文档">使用Doxygen生成文档</h2><p>--目前应用好像有困难　　暂时先不写了</p>]]></content>
       
       
       <categories>
           
-          <category> 工具 </category>
+          <category> tools </category>
+          
+          <category> doxygen </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 工具 </tag>
+            <tag> doxygen </tag>
             
         </tags>
       
@@ -1120,18 +1136,18 @@
       
       <categories>
           
-          <category> 无人驾驶 </category>
+          <category> autonomous </category>
           
-          <category> c++ </category>
+          <category> apollo </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> apollo </tag>
-            
             <tag> c++ </tag>
+            
+            <tag> factory mode </tag>
             
         </tags>
       
