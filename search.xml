@@ -140,14 +140,18 @@
       
       <categories>
           
-          <category> fusion </category>
+          <category> autonomous </category>
+          
+          <category> apollo </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 多传感器融合 </tag>
+            <tag> apollo </tag>
+            
+            <tag> sensor fusion </tag>
             
         </tags>
       
@@ -352,11 +356,9 @@
       
         <tags>
             
-            <tag> 感知 </tag>
+            <tag> apollo </tag>
             
-            <tag> 标定 </tag>
-            
-            <tag> 视觉 </tag>
+            <tag> calibration </tag>
             
         </tags>
       
@@ -401,9 +403,9 @@
       
       <categories>
           
-          <category> apollo </category>
+          <category> autonomous </category>
           
-          <category> perception </category>
+          <category> apollo </category>
           
       </categories>
       
@@ -455,9 +457,9 @@
       
       <categories>
           
-          <category> apollo </category>
+          <category> autonomous </category>
           
-          <category> Cyber RT </category>
+          <category> apollo </category>
           
       </categories>
       
@@ -565,12 +567,14 @@
           
           <category> paper reading </category>
           
+          <category> MOT </category>
+          
       </categories>
       
       
         <tags>
             
-            <tag> 目标跟踪 </tag>
+            <tag> object tracking </tag>
             
         </tags>
       
@@ -652,6 +656,8 @@
       
       <categories>
           
+          <category> autonomous </category>
+          
           <category> apollo </category>
           
       </categories>
@@ -659,9 +665,9 @@
       
         <tags>
             
-            <tag> perception </tag>
-            
             <tag> detector </tag>
+            
+            <tag> apollo </tag>
             
         </tags>
       
@@ -704,9 +710,9 @@
       
       <categories>
           
-          <category> apollo </category>
+          <category> autonomous </category>
           
-          <category> perception </category>
+          <category> apollo </category>
           
       </categories>
       
@@ -731,9 +737,9 @@
       
       <categories>
           
-          <category> apollo </category>
+          <category> autonomous </category>
           
-          <category> perception </category>
+          <category> apollo </category>
           
       </categories>
       
